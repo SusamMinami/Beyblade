@@ -4,18 +4,30 @@ extends Control
 @onready var weight_options: OptionButton = %WeightOptions
 @onready var tip_options: OptionButton = %TipOptions
 @onready var summary_label: Label = %SummaryLabel
-@onready var preview_root: Node3D = %PreviewRoot
+@onready var model_root: Node3D = %ModelRoot
+@onready var preview_camera: Camera3D = %PreviewCamera
 @onready var preview_ring: MeshInstance3D = %PreviewRing
 @onready var preview_core: MeshInstance3D = %PreviewCore
 @onready var preview_tip: MeshInstance3D = %PreviewTip
+@onready var preview_blades: Array[MeshInstance3D] = [%BladeA, %BladeB, %BladeC, %BladeD]
+
+var preview_dragging := false
+var last_drag_position := Vector2.ZERO
 
 func _ready() -> void:
+	_position_preview_camera()
 	_populate_options()
 	_update_summary()
 
 
 func _process(delta: float) -> void:
-	preview_root.rotation_degrees.y += delta * 24.0
+	if not preview_dragging:
+		model_root.rotation_degrees.y += delta * 18.0
+
+
+func _position_preview_camera() -> void:
+	preview_camera.global_position = Vector3(0.0, 1.05, 6.6)
+	preview_camera.look_at(Vector3(0.0, -0.12, 0.0), Vector3.UP)
 
 
 func _populate_options() -> void:
@@ -69,11 +81,14 @@ func _update_preview(ring: String, weight: String, tip: String) -> void:
 	preview_core.scale = Vector3.ONE
 	preview_tip.scale = Vector3.ONE
 	preview_core.position.x = 0.0
+	_set_blade_layout(0.84, Vector3.ONE)
 
 	if ring == "重击外圈":
 		preview_ring.scale = Vector3(1.22, 0.9, 1.22)
+		_set_blade_layout(1.02, Vector3(1.28, 1.12, 1.18))
 	elif ring == "轻量续航外圈":
 		preview_ring.scale = Vector3(0.92, 1.12, 0.92)
+		_set_blade_layout(0.74, Vector3(0.82, 0.9, 0.9))
 
 	if weight == "重型配重":
 		preview_core.scale = Vector3(1.12, 1.18, 1.12)
@@ -88,13 +103,27 @@ func _update_preview(ring: String, weight: String, tip: String) -> void:
 	_apply_preview_material(preview_ring, _game_state().custom_ring_color)
 	_apply_preview_material(preview_core, _game_state().custom_core_color)
 	_apply_preview_material(preview_tip, Color(0.88, 0.88, 0.92, 1.0))
+	for blade in preview_blades:
+		_apply_preview_material(blade, _game_state().custom_ring_color.lightened(0.18))
+
+
+func _set_blade_layout(radius: float, blade_scale: Vector3) -> void:
+	var positions := [
+		Vector3(radius, 0.12, 0.0),
+		Vector3(-radius, 0.12, 0.0),
+		Vector3(0.0, 0.12, radius),
+		Vector3(0.0, 0.12, -radius)
+	]
+	for index in range(preview_blades.size()):
+		preview_blades[index].position = positions[index]
+		preview_blades[index].scale = blade_scale
 
 
 func _apply_preview_material(mesh: MeshInstance3D, color: Color) -> void:
-	var material := StandardMaterial3D.new()
-	material.albedo_color = color
-	material.roughness = 0.35
-	mesh.material_override = material
+	var preview_material := StandardMaterial3D.new()
+	preview_material.albedo_color = color
+	preview_material.roughness = 0.35
+	mesh.material_override = preview_material
 
 
 func _on_next_button_pressed() -> void:
@@ -141,3 +170,21 @@ func _on_tip_previous_pressed() -> void:
 
 func _on_tip_next_pressed() -> void:
 	_select_next(tip_options)
+
+
+func _on_preview_panel_gui_input(event: InputEvent) -> void:
+	if event is InputEventMouseButton:
+		preview_dragging = event.pressed
+		last_drag_position = event.position
+	elif event is InputEventMouseMotion and preview_dragging:
+		_rotate_preview(event.relative)
+	elif event is InputEventScreenTouch:
+		preview_dragging = event.pressed
+		last_drag_position = event.position
+	elif event is InputEventScreenDrag:
+		_rotate_preview(event.relative)
+
+
+func _rotate_preview(delta: Vector2) -> void:
+	model_root.rotation_degrees.y += delta.x * 0.45
+	model_root.rotation_degrees.x = clampf(model_root.rotation_degrees.x + delta.y * 0.25, -18.0, 18.0)
