@@ -1,0 +1,125 @@
+[gd_scene load_steps=7 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/test_lab_screen.gd" id="1"]
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_test_ring"]
+top_radius = 0.9
+bottom_radius = 0.9
+height = 0.25
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_test_core"]
+top_radius = 0.36
+bottom_radius = 0.32
+height = 0.5
+
+[sub_resource type="SphereMesh" id="SphereMesh_test_tip"]
+radius = 0.2
+height = 0.18
+
+[sub_resource type="SphereMesh" id="SphereMesh_com"]
+radius = 0.08
+height = 0.16
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_com"]
+albedo_color = Color(1, 0.12, 0.08, 1)
+
+[node name="TestLabScreen" type="Control"]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+script = ExtResource("1")
+
+[node name="MarginContainer" type="MarginContainer" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 48.0
+offset_top = 48.0
+offset_right = -48.0
+offset_bottom = -48.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "测试实验室"
+horizontal_alignment = 1
+theme_override_font_sizes/font_size = 34
+
+[node name="PreviewPanel" type="SubViewportContainer" parent="MarginContainer/VBoxContainer"]
+custom_minimum_size = Vector2(0, 260)
+layout_mode = 2
+stretch = true
+
+[node name="PreviewViewport" type="SubViewport" parent="MarginContainer/VBoxContainer/PreviewPanel"]
+handle_input_locally = false
+size = Vector2i(720, 360)
+render_target_update_mode = 4
+
+[node name="PreviewRoot" type="Node3D" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewViewport"]
+
+[node name="Camera3D" type="Camera3D" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewViewport/PreviewRoot"]
+transform = Transform3D(1, 0, 0, 0, 0.642788, 0.766044, 0, -0.766044, 0.642788, 0, 1.9, 3.2)
+current = true
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewViewport/PreviewRoot"]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 4, 0)
+light_energy = 1.6
+
+[node name="RingMesh" type="MeshInstance3D" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewViewport/PreviewRoot"]
+mesh = SubResource("CylinderMesh_test_ring")
+
+[node name="CoreMesh" type="MeshInstance3D" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewViewport/PreviewRoot"]
+position = Vector3(0, 0.08, 0)
+mesh = SubResource("CylinderMesh_test_core")
+
+[node name="TipMesh" type="MeshInstance3D" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewViewport/PreviewRoot"]
+position = Vector3(0, -0.34, 0)
+mesh = SubResource("SphereMesh_test_tip")
+
+[node name="CenterOfMassMarker" type="MeshInstance3D" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewViewport/PreviewRoot"]
+unique_name_in_owner = true
+mesh = SubResource("SphereMesh_com")
+surface_material_override/0 = SubResource("StandardMaterial3D_com")
+
+[node name="WindLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "风力"
+
+[node name="WindOptions" type="OptionButton" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="TerrainLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "地形"
+
+[node name="TerrainOptions" type="OptionButton" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ResultLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "测试结果"
+autowrap_mode = 3
+
+[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+size_flags_vertical = 3
+
+[node name="BackButton" type="Button" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+text = "返回设计"
+
+[connection signal="item_selected" from="MarginContainer/VBoxContainer/WindOptions" to="." method="_on_option_changed"]
+[connection signal="item_selected" from="MarginContainer/VBoxContainer/TerrainOptions" to="." method="_on_option_changed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/BackButton" to="." method="_on_back_button_pressed"]

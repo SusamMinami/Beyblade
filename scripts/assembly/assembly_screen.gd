@@ -4,6 +4,10 @@ extends Control
 @onready var weight_options: OptionButton = %WeightOptions
 @onready var tip_options: OptionButton = %TipOptions
 @onready var summary_label: Label = %SummaryLabel
+@onready var preview_root: Node3D = %PreviewRoot
+@onready var preview_ring: MeshInstance3D = %PreviewRing
+@onready var preview_core: MeshInstance3D = %PreviewCore
+@onready var preview_tip: MeshInstance3D = %PreviewTip
 
 func _ready() -> void:
 	_populate_options()
@@ -34,7 +38,48 @@ func _update_summary() -> void:
 	var ring := ring_options.get_item_text(ring_options.selected)
 	var weight := weight_options.get_item_text(weight_options.selected)
 	var tip := tip_options.get_item_text(tip_options.selected)
-	summary_label.text = "当前组装\n外圈：%s\n配重：%s\n底尖：%s" % [ring, weight, tip]
+	summary_label.text = "当前组装\n外圈：%s\n配重：%s\n底尖：%s\n样式：%s\n赏金：%d" % [
+		ring,
+		weight,
+		tip,
+		_game_state().custom_part_style,
+		_game_state().coins
+	]
+	_update_preview(ring, weight, tip)
+
+
+func _update_preview(ring: String, weight: String, tip: String) -> void:
+	preview_root.rotation_degrees.y += 18.0
+	preview_ring.scale = Vector3.ONE
+	preview_core.scale = Vector3.ONE
+	preview_tip.scale = Vector3.ONE
+	preview_core.position.x = 0.0
+
+	if ring == "重击外圈":
+		preview_ring.scale = Vector3(1.22, 0.9, 1.22)
+	elif ring == "轻量续航外圈":
+		preview_ring.scale = Vector3(0.92, 1.12, 0.92)
+
+	if weight == "重型配重":
+		preview_core.scale = Vector3(1.12, 1.18, 1.12)
+	elif weight == "偏心攻击配重":
+		preview_core.position.x = 0.12
+
+	if tip == "金属续航尖":
+		preview_tip.scale = Vector3(0.72, 1.28, 0.72)
+	elif tip == "攻击扁平尖":
+		preview_tip.scale = Vector3(1.28, 0.65, 1.28)
+
+	_apply_preview_material(preview_ring, _game_state().custom_ring_color)
+	_apply_preview_material(preview_core, _game_state().custom_core_color)
+	_apply_preview_material(preview_tip, Color(0.88, 0.88, 0.92, 1.0))
+
+
+func _apply_preview_material(mesh: MeshInstance3D, color: Color) -> void:
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.roughness = 0.35
+	mesh.material_override = material
 
 
 func _on_next_button_pressed() -> void:
@@ -44,3 +89,16 @@ func _on_next_button_pressed() -> void:
 		tip_options.get_item_text(tip_options.selected)
 	)
 	get_tree().change_scene_to_file("res://scenes/maps/MapSelectScreen.tscn")
+
+
+func _on_customize_button_pressed() -> void:
+	get_tree().change_scene_to_file("res://scenes/assembly/PartCustomizeScreen.tscn")
+
+
+func _on_test_button_pressed() -> void:
+	_game_state().set_build(
+		ring_options.get_item_text(ring_options.selected),
+		weight_options.get_item_text(weight_options.selected),
+		tip_options.get_item_text(tip_options.selected)
+	)
+	get_tree().change_scene_to_file("res://scenes/assembly/TestLabScreen.tscn")
