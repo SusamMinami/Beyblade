@@ -1,74 +1,236 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=13 format=3]
 
 [ext_resource type="Script" path="res://scripts/battle/battle_screen.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/battle/BeybladeBody.tscn" id="2"]
 
-[node name="BattleScreen" type="Control"]
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_arena"]
+albedo_color = Color(0.18, 0.2, 0.23, 1)
+roughness = 0.55
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_center"]
+albedo_color = Color(0.55, 0.62, 0.68, 1)
+metallic = 0.6
+roughness = 0.28
+
+[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall"]
+albedo_color = Color(0.08, 0.1, 0.13, 1)
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_arena"]
+top_radius = 7.0
+bottom_radius = 7.0
+height = 0.25
+
+[sub_resource type="CylinderMesh" id="CylinderMesh_center"]
+top_radius = 2.2
+bottom_radius = 2.2
+height = 0.03
+
+[sub_resource type="CylinderShape3D" id="CylinderShape3D_arena"]
+height = 0.25
+radius = 7.0
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_long"]
+size = Vector3(15, 1.2, 0.45)
+
+[sub_resource type="BoxMesh" id="BoxMesh_wall_short"]
+size = Vector3(0.45, 1.2, 15)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_long"]
+size = Vector3(15, 1.2, 0.45)
+
+[sub_resource type="BoxShape3D" id="BoxShape3D_wall_short"]
+size = Vector3(0.45, 1.2, 15)
+
+[node name="BattleScreen" type="Node3D"]
+script = ExtResource("1")
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="."]
+
+[node name="DirectionalLight3D" type="DirectionalLight3D" parent="."]
+transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 7, 0)
+light_energy = 1.8
+
+[node name="Camera3D" type="Camera3D" parent="."]
+transform = Transform3D(1, 0, 0, 0, 0.573576, 0.819152, 0, -0.819152, 0.573576, 0, 8.4, 9.8)
+current = true
+fov = 48.0
+
+[node name="Arena" type="Node3D" parent="."]
+
+[node name="ArenaFloor" type="StaticBody3D" parent="Arena"]
+
+[node name="ArenaMesh" type="MeshInstance3D" parent="Arena/ArenaFloor"]
+mesh = SubResource("CylinderMesh_arena")
+surface_material_override/0 = SubResource("StandardMaterial3D_arena")
+
+[node name="ArenaCollision" type="CollisionShape3D" parent="Arena/ArenaFloor"]
+shape = SubResource("CylinderShape3D_arena")
+
+[node name="CenterMetalPatch" type="MeshInstance3D" parent="Arena"]
+position = Vector3(0, 0.145, 0)
+mesh = SubResource("CylinderMesh_center")
+surface_material_override/0 = SubResource("StandardMaterial3D_center")
+
+[node name="NorthWall" type="StaticBody3D" parent="Arena"]
+position = Vector3(0, 0.45, -7.25)
+
+[node name="NorthWallMesh" type="MeshInstance3D" parent="Arena/NorthWall"]
+mesh = SubResource("BoxMesh_wall_long")
+surface_material_override/0 = SubResource("StandardMaterial3D_wall")
+
+[node name="NorthWallCollision" type="CollisionShape3D" parent="Arena/NorthWall"]
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="SouthWall" type="StaticBody3D" parent="Arena"]
+position = Vector3(0, 0.45, 7.25)
+
+[node name="SouthWallMesh" type="MeshInstance3D" parent="Arena/SouthWall"]
+mesh = SubResource("BoxMesh_wall_long")
+surface_material_override/0 = SubResource("StandardMaterial3D_wall")
+
+[node name="SouthWallCollision" type="CollisionShape3D" parent="Arena/SouthWall"]
+shape = SubResource("BoxShape3D_wall_long")
+
+[node name="WestWall" type="StaticBody3D" parent="Arena"]
+position = Vector3(-7.25, 0.45, 0)
+
+[node name="WestWallMesh" type="MeshInstance3D" parent="Arena/WestWall"]
+mesh = SubResource("BoxMesh_wall_short")
+surface_material_override/0 = SubResource("StandardMaterial3D_wall")
+
+[node name="WestWallCollision" type="CollisionShape3D" parent="Arena/WestWall"]
+shape = SubResource("BoxShape3D_wall_short")
+
+[node name="EastWall" type="StaticBody3D" parent="Arena"]
+position = Vector3(7.25, 0.45, 0)
+
+[node name="EastWallMesh" type="MeshInstance3D" parent="Arena/EastWall"]
+mesh = SubResource("BoxMesh_wall_short")
+surface_material_override/0 = SubResource("StandardMaterial3D_wall")
+
+[node name="EastWallCollision" type="CollisionShape3D" parent="Arena/EastWall"]
+shape = SubResource("BoxShape3D_wall_short")
+
+[node name="Beyblade" parent="." instance=ExtResource("2")]
+unique_name_in_owner = true
+position = Vector3(0, 0.45, 0)
+
+[node name="BattleUI" type="CanvasLayer" parent="."]
+
+[node name="Root" type="Control" parent="BattleUI"]
 layout_mode = 3
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
 grow_horizontal = 2
 grow_vertical = 2
-script = ExtResource("1")
 
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="TopPanel" type="PanelContainer" parent="BattleUI/Root"]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 24.0
+offset_top = 24.0
+offset_right = -24.0
+offset_bottom = 150.0
+grow_horizontal = 2
+
+[node name="TopRow" type="HBoxContainer" parent="BattleUI/Root/TopPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="BattleSummaryLabel" type="Label" parent="BattleUI/Root/TopPanel/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "战斗配置"
+autowrap_mode = 3
+
+[node name="SpinLabel" type="Label" parent="BattleUI/Root/TopPanel/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "状态：待发射\n转速：0.0"
+
+[node name="BattleLogLabel" type="Label" parent="BattleUI/Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -96.0
+offset_right = -24.0
+offset_bottom = -24.0
+grow_horizontal = 2
+grow_vertical = 0
+text = "战斗日志"
+autowrap_mode = 3
+
+[node name="JoystickArea" type="Panel" parent="BattleUI/Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 2
+anchor_top = 1.0
+anchor_bottom = 1.0
+offset_left = 24.0
+offset_top = -230.0
+offset_right = 224.0
+offset_bottom = -30.0
+grow_vertical = 0
+
+[node name="JoystickHint" type="Label" parent="BattleUI/Root/JoystickArea"]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 48.0
-offset_top = 48.0
-offset_right = -48.0
-offset_bottom = -48.0
 grow_horizontal = 2
 grow_vertical = 2
-
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
-layout_mode = 2
-theme_override_constants/separation = 18
-
-[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "战斗界面"
-horizontal_alignment = 1
-theme_override_font_sizes/font_size = 34
-
-[node name="BattleSummaryLabel" type="Label" parent="MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "战斗配置"
-autowrap_mode = 3
-
-[node name="ArenaPlaceholder" type="PanelContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="ArenaLabel" type="Label" parent="MarginContainer/VBoxContainer/ArenaPlaceholder"]
-layout_mode = 2
-text = "竞技场占位\n后续这里会替换成 3D 战斗场景、发射器和陀螺刚体。"
+text = "摇杆"
 horizontal_alignment = 1
 vertical_alignment = 1
-autowrap_mode = 3
 
-[node name="BattleLogLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="JoystickKnob" type="ColorRect" parent="BattleUI/Root/JoystickArea"]
 unique_name_in_owner = true
-layout_mode = 2
-text = "战斗日志"
-autowrap_mode = 3
+custom_minimum_size = Vector2(42, 42)
+layout_mode = 0
+offset_left = 79.0
+offset_top = 79.0
+offset_right = 121.0
+offset_bottom = 121.0
+color = Color(0.2, 0.75, 1, 0.75)
 
-[node name="ButtonRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-theme_override_constants/separation = 12
+[node name="ButtonColumn" type="VBoxContainer" parent="BattleUI/Root"]
+layout_mode = 1
+anchors_preset = 3
+anchor_left = 1.0
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -220.0
+offset_top = -230.0
+offset_right = -24.0
+offset_bottom = -30.0
+grow_horizontal = 0
+grow_vertical = 0
+theme_override_constants/separation = 10
 
-[node name="BackButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
+[node name="LaunchButton" type="Button" parent="BattleUI/Root/ButtonColumn"]
 layout_mode = 2
-size_flags_horizontal = 3
+size_flags_vertical = 3
+text = "发射"
+
+[node name="RestartButton" type="Button" parent="BattleUI/Root/ButtonColumn"]
+layout_mode = 2
+size_flags_vertical = 3
+text = "重置"
+
+[node name="BackButton" type="Button" parent="BattleUI/Root/ButtonColumn"]
+layout_mode = 2
+size_flags_vertical = 3
 text = "返回地图"
 
-[node name="RestartButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
-layout_mode = 2
-size_flags_horizontal = 3
-text = "重置回合"
-
-[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonRow/BackButton" to="." method="_on_back_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonRow/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="gui_input" from="BattleUI/Root/JoystickArea" to="." method="_on_joystick_area_gui_input"]
+[connection signal="pressed" from="BattleUI/Root/ButtonColumn/LaunchButton" to="." method="_on_launch_button_pressed"]
+[connection signal="pressed" from="BattleUI/Root/ButtonColumn/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="BattleUI/Root/ButtonColumn/BackButton" to="." method="_on_back_button_pressed"]

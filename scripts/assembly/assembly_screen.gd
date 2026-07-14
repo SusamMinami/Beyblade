@@ -22,6 +22,10 @@ func _add_options(option_button: OptionButton, items: Array[String]) -> void:
 		option_button.add_item(item)
 
 
+func _game_state():
+	return get_node("/root/GameState")
+
+
 func _on_option_changed(_index: int) -> void:
 	_update_summary()
 
@@ -34,7 +38,7 @@ func _update_summary() -> void:
 
 
 func _on_next_button_pressed() -> void:
-	GameState.set_build(
+	_game_state().set_build(
 		ring_options.get_item_text(ring_options.selected),
 		weight_options.get_item_text(weight_options.selected),
 		tip_options.get_item_text(tip_options.selected)
