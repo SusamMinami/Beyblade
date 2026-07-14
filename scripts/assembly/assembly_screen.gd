@@ -13,6 +13,7 @@ extends Control
 
 var preview_dragging := false
 var last_drag_position := Vector2.ZERO
+var drag_distance := 0.0
 
 func _ready() -> void:
 	_position_preview_camera()
@@ -174,17 +175,42 @@ func _on_tip_next_pressed() -> void:
 
 func _on_preview_panel_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
-		preview_dragging = event.pressed
-		last_drag_position = event.position
+		if event.pressed:
+			preview_dragging = true
+			last_drag_position = event.position
+			drag_distance = 0.0
+		else:
+			preview_dragging = false
+			if drag_distance < 8.0:
+				_select_part_from_screen_position(event.position)
 	elif event is InputEventMouseMotion and preview_dragging:
+		drag_distance += event.relative.length()
 		_rotate_preview(event.relative)
 	elif event is InputEventScreenTouch:
-		preview_dragging = event.pressed
-		last_drag_position = event.position
+		if event.pressed:
+			preview_dragging = true
+			last_drag_position = event.position
+			drag_distance = 0.0
+		else:
+			preview_dragging = false
+			if drag_distance < 8.0:
+				_select_part_from_screen_position(event.position)
 	elif event is InputEventScreenDrag:
+		drag_distance += event.relative.length()
 		_rotate_preview(event.relative)
 
 
 func _rotate_preview(delta: Vector2) -> void:
 	model_root.rotation_degrees.y += delta.x * 0.45
 	model_root.rotation_degrees.x = clampf(model_root.rotation_degrees.x + delta.y * 0.25, -18.0, 18.0)
+
+
+func _select_part_from_screen_position(position: Vector2) -> void:
+	var screen_size := get_viewport_rect().size
+	var normalized_y := position.y / maxf(screen_size.y, 1.0)
+	if normalized_y < 0.44:
+		_select_next(ring_options)
+	elif normalized_y < 0.56:
+		_select_next(weight_options)
+	else:
+		_select_next(tip_options)
