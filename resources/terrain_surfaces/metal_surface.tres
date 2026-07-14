@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TerrainSurfaceResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/maps/terrain_surface_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+surface_name = "低摩擦金属地面"
+surface_friction = 0.45
+spin_damping_multiplier = 0.72
+linear_drag_multiplier = 0.65
+bounce_multiplier = 1.15
+stability_modifier = 0.92
+damage_multiplier = 1.08
+control_modifier = 0.75
+noise_strength = 0.02
+description = "低摩擦高速地形。陀螺续航更强，但碰撞后更容易滑移和撞飞。"

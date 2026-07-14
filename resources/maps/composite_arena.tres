@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ArenaMapResource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/maps/arena_map_resource.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/terrain_surfaces/standard_surface.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+map_name = "复合材质竞技场"
+scene_path = "res://scenes/maps/CompositeArena.tscn"
+default_surface = ExtResource("2")
+supports_composite_terrain = true
+recommended_players = 2
+description = "中央金属区、外圈橡胶区和边缘减速区组合，用于验证多材质地形。"

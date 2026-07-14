@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TerrainSurfaceResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/maps/terrain_surface_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+surface_name = "标准地面"
+surface_friction = 1.0
+spin_damping_multiplier = 1.0
+linear_drag_multiplier = 1.0
+bounce_multiplier = 1.0
+stability_modifier = 1.0
+damage_multiplier = 1.0
+control_modifier = 1.0
+noise_strength = 0.0
+description = "MVP 基准地形，用于验证默认移动、碰撞和停转表现。"

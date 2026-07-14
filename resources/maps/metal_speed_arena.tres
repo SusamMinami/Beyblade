@@ -1,0 +1,13 @@
+[gd_resource type="Resource" script_class="ArenaMapResource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/maps/arena_map_resource.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/terrain_surfaces/metal_surface.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+map_name = "金属高速竞技场"
+scene_path = "res://scenes/maps/MetalSpeedArena.tscn"
+default_surface = ExtResource("2")
+supports_composite_terrain = false
+recommended_players = 2
+description = "低摩擦，高续航，碰撞后滑移和撞飞风险更明显。"
