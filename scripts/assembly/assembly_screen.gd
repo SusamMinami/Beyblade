@@ -14,6 +14,10 @@ func _ready() -> void:
 	_update_summary()
 
 
+func _process(delta: float) -> void:
+	preview_root.rotation_degrees.y += delta * 24.0
+
+
 func _populate_options() -> void:
 	_add_options(ring_options, ["平衡外圈", "重击外圈", "轻量续航外圈"])
 	_add_options(weight_options, ["标准配重", "重型配重", "偏心攻击配重"])
@@ -34,11 +38,23 @@ func _on_option_changed(_index: int) -> void:
 	_update_summary()
 
 
+func _select_previous(option_button: OptionButton) -> void:
+	var next_index := wrapi(option_button.selected - 1, 0, option_button.item_count)
+	option_button.select(next_index)
+	_update_summary()
+
+
+func _select_next(option_button: OptionButton) -> void:
+	var next_index := wrapi(option_button.selected + 1, 0, option_button.item_count)
+	option_button.select(next_index)
+	_update_summary()
+
+
 func _update_summary() -> void:
 	var ring := ring_options.get_item_text(ring_options.selected)
 	var weight := weight_options.get_item_text(weight_options.selected)
 	var tip := tip_options.get_item_text(tip_options.selected)
-	summary_label.text = "当前组装\n外圈：%s\n配重：%s\n底尖：%s\n样式：%s\n赏金：%d" % [
+	summary_label.text = "%s / %s / %s\n样式：%s  赏金：%d" % [
 		ring,
 		weight,
 		tip,
@@ -49,7 +65,6 @@ func _update_summary() -> void:
 
 
 func _update_preview(ring: String, weight: String, tip: String) -> void:
-	preview_root.rotation_degrees.y += 18.0
 	preview_ring.scale = Vector3.ONE
 	preview_core.scale = Vector3.ONE
 	preview_tip.scale = Vector3.ONE
@@ -102,3 +117,27 @@ func _on_test_button_pressed() -> void:
 		tip_options.get_item_text(tip_options.selected)
 	)
 	get_tree().change_scene_to_file("res://scenes/assembly/TestLabScreen.tscn")
+
+
+func _on_ring_previous_pressed() -> void:
+	_select_previous(ring_options)
+
+
+func _on_ring_next_pressed() -> void:
+	_select_next(ring_options)
+
+
+func _on_weight_previous_pressed() -> void:
+	_select_previous(weight_options)
+
+
+func _on_weight_next_pressed() -> void:
+	_select_next(weight_options)
+
+
+func _on_tip_previous_pressed() -> void:
+	_select_previous(tip_options)
+
+
+func _on_tip_next_pressed() -> void:
+	_select_next(tip_options)
