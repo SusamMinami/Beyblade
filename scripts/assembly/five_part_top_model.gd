@@ -16,6 +16,15 @@ const PART_BASE_POSITIONS: Array[Vector3] = [
 	Vector3(0.0, -0.19, 0.0),
 	Vector3(0.0, -0.54, 0.0)
 ]
+const BROKEN_PART_OFFSETS: Array[Vector3] = [
+	Vector3(0.22, 0.08, -0.08),
+	Vector3(-0.14, 0.16, 0.1),
+	Vector3(0.16, -0.04, 0.16),
+	Vector3(-0.12, -0.14, -0.1),
+	Vector3(0.1, -0.2, 0.08)
+]
+const DAMAGE_WARNING_THRESHOLD := 0.65
+const DAMAGE_CRITICAL_THRESHOLD := 0.3
 const RING_SEGMENTS := 96
 
 @onready var attack_ring_root: Node3D = %AttackRingRoot
@@ -40,6 +49,12 @@ var bright_metal_material: StandardMaterial3D
 var dark_metal_material: StandardMaterial3D
 var rubber_material: StandardMaterial3D
 var shadow_material: StandardMaterial3D
+var damage_overlay_material: StandardMaterial3D
+var critical_overlay_material: StandardMaterial3D
+var broken_overlay_material: StandardMaterial3D
+
+var part_integrities: Array[float] = [1.0, 1.0, 1.0, 1.0, 1.0]
+var broken_parts: Array[bool] = [false, false, false, false, false]
 
 func _ready() -> void:
 	_rebuild_model()
@@ -91,6 +106,38 @@ func set_active_part(part_index: int) -> void:
 	_apply_part_transforms()
 
 
+func set_part_damage_state(
+	part_index: int,
+	integrity_ratio: float,
+	is_broken: bool
+) -> void:
+	if part_index < 0 or part_index >= get_customizable_part_count():
+		return
+	part_integrities[part_index] = clampf(integrity_ratio, 0.0, 1.0)
+	broken_parts[part_index] = is_broken
+	_apply_part_transforms()
+
+
+func reset_damage_visuals() -> void:
+	for part_index in range(get_customizable_part_count()):
+		part_integrities[part_index] = 1.0
+		broken_parts[part_index] = false
+	_apply_part_transforms()
+
+
+func flash_part_damage(part_index: int) -> void:
+	var part_nodes := get_part_nodes()
+	if part_index < 0 or part_index >= part_nodes.size():
+		return
+	var part_node := part_nodes[part_index]
+	var target_scale := part_node.scale
+	part_node.scale = target_scale * 1.1
+	var tween := create_tween()
+	tween.set_trans(Tween.TRANS_QUAD)
+	tween.set_ease(Tween.EASE_OUT)
+	tween.tween_property(part_node, "scale", target_scale, 0.14)
+
+
 func _rebuild_model() -> void:
 	_build_materials()
 	for part_node in get_part_nodes():
@@ -111,6 +158,9 @@ func _build_materials() -> void:
 	dark_metal_material = _create_material(Color(0.12, 0.15, 0.17), 0.88, 0.24)
 	rubber_material = _create_material(Color(0.025, 0.035, 0.04), 0.02, 0.78)
 	shadow_material = _create_material(Color(0.055, 0.075, 0.08), 0.35, 0.42)
+	damage_overlay_material = _create_damage_overlay(Color(1.0, 0.48, 0.08, 0.3), 0.7)
+	critical_overlay_material = _create_damage_overlay(Color(1.0, 0.08, 0.03, 0.48), 1.25)
+	broken_overlay_material = _create_damage_overlay(Color(0.12, 0.015, 0.01, 0.68), 0.35)
 
 
 func _create_material(
@@ -128,6 +178,17 @@ func _create_material(
 		material.clearcoat_enabled = true
 		material.clearcoat = 0.72
 		material.clearcoat_roughness = 0.16
+	return material
+
+
+func _create_damage_overlay(color: Color, emission_energy: float) -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.transparency = BaseMaterial3D.TRANSPARENCY_ALPHA
+	material.shading_mode = BaseMaterial3D.SHADING_MODE_UNSHADED
+	material.emission_enabled = true
+	material.emission = Color(color.r, color.g, color.b)
+	material.emission_energy_multiplier = emission_energy
 	return material
 
 
@@ -367,9 +428,51 @@ func _apply_part_transforms() -> void:
 	for index in range(part_nodes.size()):
 		var part_node := part_nodes[index]
 		part_node.position = PART_BASE_POSITIONS[index]
+		part_node.rotation_degrees = Vector3.ZERO
 		part_node.scale = Vector3.ONE
 		if index == active_part_index:
 			part_node.scale = Vector3.ONE * 1.035
+		var damage_amount := 1.0 - part_integrities[index]
+		if broken_parts[index]:
+			part_node.position += BROKEN_PART_OFFSETS[index]
+			part_node.rotation_degrees = Vector3(
+				18.0 + index * 5.0,
+				12.0 - index * 7.0,
+				22.0 + index * 8.0
+			)
+			part_node.scale *= 0.72
+		elif damage_amount > 0.0:
+			part_node.position += BROKEN_PART_OFFSETS[index] * damage_amount * 0.16
+			part_node.rotation_degrees = Vector3(
+				damage_amount * (index + 1) * 1.2,
+				0.0,
+				damage_amount * (3.0 + index)
+			)
+			part_node.scale *= 1.0 - damage_amount * 0.04
+		_apply_part_damage_overlay(part_node, part_integrities[index], broken_parts[index])
+
+
+func _apply_part_damage_overlay(
+	part_node: Node,
+	integrity_ratio: float,
+	is_broken: bool
+) -> void:
+	for child in part_node.get_children():
+		if child is MeshInstance3D:
+			if is_broken:
+				child.material_overlay = broken_overlay_material
+				child.transparency = 0.22
+			elif integrity_ratio <= DAMAGE_CRITICAL_THRESHOLD:
+				child.material_overlay = critical_overlay_material
+				child.transparency = 0.06
+			elif integrity_ratio <= DAMAGE_WARNING_THRESHOLD:
+				child.material_overlay = damage_overlay_material
+				child.transparency = 0.0
+			else:
+				child.material_overlay = null
+				child.transparency = 0.0
+		if child.get_child_count() > 0:
+			_apply_part_damage_overlay(child, integrity_ratio, is_broken)
 
 
 func _create_profiled_ring_mesh(

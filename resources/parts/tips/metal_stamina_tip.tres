@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"tip_metal_stamina"
+part_name = "金属续航尖"
+part_type = 4
+mass = 0.003
+center_of_mass_offset = Vector3(0, -0.025, 0)
+moment_of_inertia = 1.2e-07
+transverse_moment_of_inertia = 2.7e-07
+friction = 0.22
+restitution = 0.24
+contact_area = 4.5e-06
+spin_damping_multiplier = 0.72
+stability = 1.02
+control_response = 0.6
+attack_power = 0.85
+durability = 135.0
+description = "硬质窄圆尖显著减小接触面积和滚动阻力，续航最好，但抓地与方向控制较弱、受击后更易滑移。"

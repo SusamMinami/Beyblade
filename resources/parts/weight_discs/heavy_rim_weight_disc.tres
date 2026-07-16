@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"weight_disc_heavy_rim"
+part_name = "重型外缘配重盘"
+part_type = 2
+mass = 0.0165
+center_of_mass_offset = Vector3(0, 0, 0)
+moment_of_inertia = 1.12e-05
+transverse_moment_of_inertia = 5.8e-06
+friction = 0.35
+restitution = 0.1
+contact_area = 0.0
+spin_damping_multiplier = 0.96
+stability = 1.12
+control_response = 0.88
+attack_power = 1.08
+durability = 140.0
+description = "额外金属集中在盘缘，显著提高轴向角动量和抗碰撞能力，但方向响应更迟缓。"

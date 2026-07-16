@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"tip_attack_flat"
+part_name = "攻击扁平尖"
+part_type = 4
+mass = 0.0028
+center_of_mass_offset = Vector3(0, -0.022, 0)
+moment_of_inertia = 2.2e-07
+transverse_moment_of_inertia = 2.8e-07
+friction = 0.62
+restitution = 0.12
+contact_area = 7.8e-05
+spin_damping_multiplier = 1.35
+stability = 0.82
+control_response = 1.35
+attack_power = 1.15
+durability = 85.0
+description = "宽平接触面将自旋快速耦合为场地上的切向运动，起步迅猛且易主动追击，但摩擦损耗和失控风险最高。"

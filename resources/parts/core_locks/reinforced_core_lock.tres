@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"core_lock_reinforced"
+part_name = "强化核心锁扣"
+part_type = 1
+mass = 0.0048
+center_of_mass_offset = Vector3(0, 0.015, 0)
+moment_of_inertia = 8.2e-07
+transverse_moment_of_inertia = 7.0e-07
+friction = 0.42
+restitution = 0.16
+contact_area = 0.0
+spin_damping_multiplier = 1.02
+stability = 1.02
+control_response = 0.94
+attack_power = 1.02
+durability = 135.0
+description = "金属嵌件和更多卡爪提高锁止强度与耐久，代价是上层质量和启动负担略高。"

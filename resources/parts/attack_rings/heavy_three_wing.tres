@@ -1,0 +1,22 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"attack_ring_heavy_three_wing"
+part_name = "三翼重击攻击环"
+part_type = 0
+mass = 0.0205
+center_of_mass_offset = Vector3(0, 0.0085, 0)
+moment_of_inertia = 1.82e-05
+transverse_moment_of_inertia = 9.3e-06
+friction = 0.48
+restitution = 0.34
+contact_area = 0.0
+spin_damping_multiplier = 1.1
+stability = 0.9
+control_response = 0.92
+attack_power = 1.2
+durability = 95.0
+description = "三个宽厚翼端把质量和接触点推向外缘，提升撞击冲量与回弹，同时增加空气阻力和自反冲。"

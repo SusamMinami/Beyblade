@@ -1,0 +1,23 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"driver_shaft_high_assault"
+part_name = "高位突击中轴"
+part_type = 3
+mass = 0.004
+center_of_mass_offset = Vector3(0, -0.008, 0)
+moment_of_inertia = 3.0e-07
+transverse_moment_of_inertia = 5.8e-07
+friction = 0.38
+restitution = 0.18
+contact_area = 0.0
+spin_damping_multiplier = 1.08
+stability = 0.82
+control_response = 1.1
+attack_power = 1.12
+durability = 92.0
+upper_stack_height_offset = 0.004
+description = "长轴将上层堆叠抬高 4 毫米，增加倾斜和撞击杠杆，但更容易摆振、刮地和受到横向扰动。"

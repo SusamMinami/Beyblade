@@ -41,16 +41,19 @@ func _on_option_changed(_index: int) -> void:
 
 
 func _update_result() -> void:
-	var com := _estimate_center_of_mass()
-	center_of_mass_marker.position = com
+	var snapshot: TopBattleSnapshot = _game_state().get_battle_snapshot()
+	var display_com := snapshot.center_of_mass_m * 20.0
+	center_of_mass_marker.position = display_com
 
 	var wind := wind_options.get_item_text(wind_options.selected)
 	var terrain := terrain_options.get_item_text(terrain_options.selected)
-	var stability_score := _estimate_stability(wind, terrain, com)
-	var control_score := _estimate_control(terrain)
-	result_label.text = "当前组装\n%s\n\n质心位置：%s\n风力：%s\n地形：%s\n稳定性估算：%.0f/100\n控制响应估算：%.0f/100" % [
+	var stability_score := _estimate_stability(wind, terrain, snapshot)
+	var control_score := _estimate_control(terrain, snapshot)
+	result_label.text = "当前组装\n%s\n\n总质量：%.1f g\n质心偏移：%s mm\n轴向惯量：%.2f g·cm²\n风力：%s\n地形：%s\n稳定性估算：%.0f/100\n控制响应估算：%.0f/100" % [
 		_game_state().get_build_summary(),
-		str(com),
+		snapshot.total_mass_kg * 1000.0,
+		str(snapshot.center_of_mass_m * 1000.0),
+		snapshot.inertia_kg_m2.y * 10000000.0,
 		wind,
 		terrain,
 		stability_score,
@@ -58,38 +61,14 @@ func _update_result() -> void:
 	]
 
 
-func _estimate_center_of_mass() -> Vector3:
-	var y := 0.02
-	var x := 0.0
-	if _game_state().selected_weight_disc == "重型外缘配重盘":
-		y -= 0.08
-	elif _game_state().selected_weight_disc == "偏心突击配重盘":
-		x += 0.14
-	if _game_state().selected_core_lock == "低重心核心锁扣":
-		y -= 0.04
-	elif _game_state().selected_core_lock == "强化核心锁扣":
-		y += 0.02
-	if _game_state().selected_driver_shaft == "低位稳定中轴":
-		y -= 0.05
-	elif _game_state().selected_driver_shaft == "高位突击中轴":
-		y += 0.07
-	if _game_state().selected_tip == "金属续航尖":
-		y -= 0.05
-	elif _game_state().selected_tip == "攻击扁平尖":
-		y += 0.03
-	return Vector3(x, y, 0.0)
-
-
-func _estimate_stability(wind: String, terrain: String, com: Vector3) -> float:
-	var score := 78.0
-	score -= absf(com.x) * 120.0
-	score -= maxf(com.y, 0.0) * 80.0
-	if _game_state().selected_attack_ring == "圆弧续航攻击环":
-		score += 8.0
-	elif _game_state().selected_attack_ring == "三翼重击攻击环":
-		score -= 7.0
-	if _game_state().selected_core_lock == "强化核心锁扣":
-		score += 5.0
+func _estimate_stability(
+	wind: String,
+	terrain: String,
+	snapshot: TopBattleSnapshot
+) -> float:
+	var score := 72.0 * snapshot.stability
+	score -= absf(snapshot.center_of_mass_m.x) * 4000.0
+	score -= maxf(snapshot.center_of_mass_m.y - 0.002, 0.0) * 1500.0
 	if wind == "侧风":
 		score -= 8.0
 	elif wind == "强逆风":
@@ -103,16 +82,8 @@ func _estimate_stability(wind: String, terrain: String, com: Vector3) -> float:
 	return clampf(score, 0.0, 100.0)
 
 
-func _estimate_control(terrain: String) -> float:
-	var score := 60.0
-	if _game_state().selected_driver_shaft == "低位稳定中轴":
-		score += 8.0
-	elif _game_state().selected_driver_shaft == "高位突击中轴":
-		score -= 5.0
-	if _game_state().selected_tip == "橡胶平衡尖":
-		score += 18.0
-	elif _game_state().selected_tip == "金属续航尖":
-		score -= 10.0
+func _estimate_control(terrain: String, snapshot: TopBattleSnapshot) -> float:
+	var score := 58.0 * snapshot.control_response
 	if terrain == "高摩擦橡胶":
 		score += 12.0
 	elif terrain == "低摩擦金属":
