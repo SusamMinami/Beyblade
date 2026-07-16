@@ -1,20 +1,7 @@
-[gd_scene load_steps=7 format=3]
+[gd_scene load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/assembly/test_lab_screen.gd" id="1"]
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_test_ring"]
-top_radius = 0.9
-bottom_radius = 0.9
-height = 0.25
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_test_core"]
-top_radius = 0.36
-bottom_radius = 0.32
-height = 0.5
-
-[sub_resource type="SphereMesh" id="SphereMesh_test_tip"]
-radius = 0.2
-height = 0.18
+[ext_resource type="PackedScene" path="res://scenes/assembly/FivePartTopModel.tscn" id="2"]
 
 [sub_resource type="SphereMesh" id="SphereMesh_com"]
 radius = 0.08
@@ -74,16 +61,9 @@ current = true
 transform = Transform3D(0.866025, -0.353553, 0.353553, 0, 0.707107, 0.707107, -0.5, -0.612372, 0.612372, 0, 4, 0)
 light_energy = 1.6
 
-[node name="RingMesh" type="MeshInstance3D" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewViewport/PreviewRoot"]
-mesh = SubResource("CylinderMesh_test_ring")
-
-[node name="CoreMesh" type="MeshInstance3D" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewViewport/PreviewRoot"]
-position = Vector3(0, 0.08, 0)
-mesh = SubResource("CylinderMesh_test_core")
-
-[node name="TipMesh" type="MeshInstance3D" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewViewport/PreviewRoot"]
-position = Vector3(0, -0.34, 0)
-mesh = SubResource("SphereMesh_test_tip")
+[node name="TopModel" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewViewport/PreviewRoot" instance=ExtResource("2")]
+unique_name_in_owner = true
+scale = Vector3(0.85, 0.85, 0.85)
 
 [node name="CenterOfMassMarker" type="MeshInstance3D" parent="MarginContainer/VBoxContainer/PreviewPanel/PreviewViewport/PreviewRoot"]
 unique_name_in_owner = true

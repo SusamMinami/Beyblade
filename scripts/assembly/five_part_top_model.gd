@@ -1,0 +1,573 @@
+class_name FivePartTopModel
+extends Node3D
+
+enum PartSlot {
+	ATTACK_RING,
+	CORE_LOCK,
+	WEIGHT_DISC,
+	DRIVER_SHAFT,
+	TIP
+}
+
+const PART_BASE_POSITIONS: Array[Vector3] = [
+	Vector3(0.0, 0.24, 0.0),
+	Vector3(0.0, 0.38, 0.0),
+	Vector3(0.0, 0.06, 0.0),
+	Vector3(0.0, -0.19, 0.0),
+	Vector3(0.0, -0.54, 0.0)
+]
+const RING_SEGMENTS := 96
+
+@onready var attack_ring_root: Node3D = %AttackRingRoot
+@onready var core_lock_root: Node3D = %CoreLockRoot
+@onready var weight_disc_root: Node3D = %WeightDiscRoot
+@onready var driver_shaft_root: Node3D = %DriverShaftRoot
+@onready var tip_root: Node3D = %TipRoot
+
+var attack_ring_name := "六刃平衡攻击环"
+var core_lock_name := "标准核心锁扣"
+var weight_disc_name := "标准金属配重盘"
+var driver_shaft_name := "标准驱动中轴"
+var tip_name := "橡胶平衡尖"
+var ring_color := Color(0.04, 0.72, 0.62, 1.0)
+var core_color := Color(0.92, 0.76, 0.22, 1.0)
+var active_part_index := PartSlot.ATTACK_RING
+
+var polymer_material: StandardMaterial3D
+var polymer_accent_material: StandardMaterial3D
+var core_material: StandardMaterial3D
+var bright_metal_material: StandardMaterial3D
+var dark_metal_material: StandardMaterial3D
+var rubber_material: StandardMaterial3D
+var shadow_material: StandardMaterial3D
+
+func _ready() -> void:
+	_rebuild_model()
+
+
+func configure(
+	new_attack_ring: String,
+	new_core_lock: String,
+	new_weight_disc: String,
+	new_driver_shaft: String,
+	new_tip: String,
+	new_ring_color: Color,
+	new_core_color: Color
+) -> void:
+	attack_ring_name = new_attack_ring
+	core_lock_name = new_core_lock
+	weight_disc_name = new_weight_disc
+	driver_shaft_name = new_driver_shaft
+	tip_name = new_tip
+	ring_color = new_ring_color
+	core_color = new_core_color
+	if is_node_ready():
+		_rebuild_model()
+
+
+func get_customizable_part_count() -> int:
+	return 5
+
+
+func get_part_nodes() -> Array[Node3D]:
+	return [
+		attack_ring_root,
+		core_lock_root,
+		weight_disc_root,
+		driver_shaft_root,
+		tip_root
+	]
+
+
+func get_part_anchor_positions() -> PackedVector3Array:
+	var result := PackedVector3Array()
+	for part_node in get_part_nodes():
+		result.append(part_node.global_position)
+	return result
+
+
+func set_active_part(part_index: int) -> void:
+	active_part_index = clampi(part_index, -1, get_customizable_part_count() - 1)
+	_apply_part_transforms()
+
+
+func _rebuild_model() -> void:
+	_build_materials()
+	for part_node in get_part_nodes():
+		_clear_children(part_node)
+	_build_attack_ring()
+	_build_core_lock()
+	_build_weight_disc()
+	_build_driver_shaft()
+	_build_tip()
+	_apply_part_transforms()
+
+
+func _build_materials() -> void:
+	polymer_material = _create_material(ring_color, 0.08, 0.22, true)
+	polymer_accent_material = _create_material(ring_color.lightened(0.2), 0.18, 0.16, true)
+	core_material = _create_material(core_color, 0.38, 0.2, true)
+	bright_metal_material = _create_material(Color(0.72, 0.78, 0.8), 0.94, 0.17)
+	dark_metal_material = _create_material(Color(0.12, 0.15, 0.17), 0.88, 0.24)
+	rubber_material = _create_material(Color(0.025, 0.035, 0.04), 0.02, 0.78)
+	shadow_material = _create_material(Color(0.055, 0.075, 0.08), 0.35, 0.42)
+
+
+func _create_material(
+	color: Color,
+	metallic: float,
+	roughness: float,
+	use_clearcoat := false
+) -> StandardMaterial3D:
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.metallic = metallic
+	material.roughness = roughness
+	material.cull_mode = BaseMaterial3D.CULL_DISABLED
+	if use_clearcoat:
+		material.clearcoat_enabled = true
+		material.clearcoat = 0.72
+		material.clearcoat_roughness = 0.16
+	return material
+
+
+func _build_attack_ring() -> void:
+	var ring_body := _create_profiled_ring_mesh(
+		0.52,
+		0.22,
+		RING_SEGMENTS,
+		PartSlot.ATTACK_RING,
+		attack_ring_name
+	)
+	_add_mesh(attack_ring_root, "AttackRingBody", ring_body, polymer_material)
+
+	var insert_mesh := _create_attack_insert_mesh(attack_ring_name)
+	_add_mesh(
+		attack_ring_root,
+		"ContactInserts",
+		insert_mesh,
+		bright_metal_material,
+		Vector3(0.0, 0.015, 0.0)
+	)
+
+	var inner_bezel := _create_profiled_ring_mesh(
+		0.5,
+		0.055,
+		64,
+		PartSlot.WEIGHT_DISC,
+		"内圈"
+	)
+	_add_mesh(
+		attack_ring_root,
+		"InnerBezel",
+		inner_bezel,
+		dark_metal_material,
+		Vector3(0.0, 0.125, 0.0),
+		Vector3.ZERO,
+		Vector3(0.82, 1.0, 0.82)
+	)
+
+	var detail_count := _attack_lobe_count(attack_ring_name)
+	for index in range(detail_count):
+		var angle := TAU * float(index) / float(detail_count)
+		var screw := _cylinder_mesh(0.034, 0.034, 0.025, 20)
+		_add_mesh(
+			attack_ring_root,
+			"RingBolt%d" % index,
+			screw,
+			dark_metal_material,
+			Vector3(cos(angle) * 0.64, 0.145, sin(angle) * 0.64)
+		)
+
+
+func _build_core_lock() -> void:
+	var lock_radius := 0.37
+	var lock_height := 0.18
+	var root_offset_y := 0.0
+	if core_lock_name == "低重心核心锁扣":
+		lock_radius = 0.41
+		lock_height = 0.14
+		root_offset_y = -0.025
+	elif core_lock_name == "强化核心锁扣":
+		lock_radius = 0.4
+		lock_height = 0.22
+
+	_add_mesh(
+		core_lock_root,
+		"LockBody",
+		_cylinder_mesh(lock_radius, lock_radius * 0.92, lock_height, 32),
+		core_material,
+		Vector3(0.0, root_offset_y, 0.0)
+	)
+	_add_mesh(
+		core_lock_root,
+		"LockCap",
+		_cylinder_mesh(0.28, 0.31, 0.085, 16),
+		dark_metal_material,
+		Vector3(0.0, root_offset_y + lock_height * 0.52, 0.0),
+		Vector3(0.0, PI / 16.0, 0.0)
+	)
+	_add_mesh(
+		core_lock_root,
+		"CoreEmblem",
+		_cylinder_mesh(0.165, 0.165, 0.028, 32),
+		polymer_accent_material,
+		Vector3(0.0, root_offset_y + lock_height * 0.78, 0.0)
+	)
+
+	var clamp_count := 3 if core_lock_name != "强化核心锁扣" else 6
+	for index in range(clamp_count):
+		var angle := TAU * float(index) / float(clamp_count)
+		var clamp_mesh := _create_box_mesh(Vector3(0.15, 0.075, 0.08))
+		_add_mesh(
+			core_lock_root,
+			"LockClamp%d" % index,
+			clamp_mesh,
+			bright_metal_material,
+			Vector3(cos(angle) * 0.31, root_offset_y + 0.015, sin(angle) * 0.31),
+			Vector3(0.0, -angle, 0.0)
+		)
+
+
+func _build_weight_disc() -> void:
+	var disc_mesh := _create_profiled_ring_mesh(
+		0.29,
+		0.14,
+		80,
+		PartSlot.WEIGHT_DISC,
+		weight_disc_name
+	)
+	var disc_offset := Vector3.ZERO
+	if weight_disc_name == "偏心突击配重盘":
+		disc_offset.x = 0.065
+	_add_mesh(weight_disc_root, "WeightDisc", disc_mesh, bright_metal_material, disc_offset)
+
+	_add_mesh(
+		weight_disc_root,
+		"WeightHub",
+		_cylinder_mesh(0.34, 0.34, 0.165, 32),
+		dark_metal_material,
+		disc_offset
+	)
+
+	var inset_count := 8 if weight_disc_name == "重型外缘配重盘" else 6
+	for index in range(inset_count):
+		var angle := TAU * float(index) / float(inset_count)
+		var radius := 0.58
+		var inset_mesh := _cylinder_mesh(0.05, 0.05, 0.025, 16)
+		_add_mesh(
+			weight_disc_root,
+			"WeightInset%d" % index,
+			inset_mesh,
+			shadow_material,
+			disc_offset + Vector3(cos(angle) * radius, 0.085, sin(angle) * radius)
+		)
+
+
+func _build_driver_shaft() -> void:
+	var shaft_height := 0.4
+	var shaft_radius := 0.17
+	var shaft_offset_y := 0.0
+	if driver_shaft_name == "低位稳定中轴":
+		shaft_height = 0.32
+		shaft_radius = 0.21
+		shaft_offset_y = 0.035
+	elif driver_shaft_name == "高位突击中轴":
+		shaft_height = 0.5
+		shaft_radius = 0.145
+		shaft_offset_y = -0.045
+
+	_add_mesh(
+		driver_shaft_root,
+		"DriverShaft",
+		_cylinder_mesh(shaft_radius, shaft_radius * 0.92, shaft_height, 32),
+		shadow_material,
+		Vector3(0.0, shaft_offset_y, 0.0)
+	)
+	_add_mesh(
+		driver_shaft_root,
+		"UpperCollar",
+		_cylinder_mesh(0.285, 0.245, 0.1, 32),
+		core_material,
+		Vector3(0.0, shaft_offset_y + shaft_height * 0.38, 0.0)
+	)
+	_add_mesh(
+		driver_shaft_root,
+		"LowerCollar",
+		_cylinder_mesh(shaft_radius * 1.12, shaft_radius, 0.08, 32),
+		dark_metal_material,
+		Vector3(0.0, shaft_offset_y - shaft_height * 0.42, 0.0)
+	)
+
+	var rib_count := 6
+	for index in range(rib_count):
+		var angle := TAU * float(index) / float(rib_count)
+		_add_mesh(
+			driver_shaft_root,
+			"ShaftRib%d" % index,
+			_create_box_mesh(Vector3(0.04, shaft_height * 0.58, 0.055)),
+			bright_metal_material,
+			Vector3(cos(angle) * shaft_radius, shaft_offset_y, sin(angle) * shaft_radius),
+			Vector3(0.0, -angle, 0.0)
+		)
+
+
+func _build_tip() -> void:
+	if tip_name == "金属续航尖":
+		_add_mesh(
+			tip_root,
+			"TipHousing",
+			_cylinder_mesh(0.17, 0.07, 0.22, 32),
+			dark_metal_material,
+			Vector3(0.0, 0.03, 0.0)
+		)
+		_add_mesh(
+			tip_root,
+			"ContactPoint",
+			_sphere_mesh(0.065, 0.13, 32),
+			bright_metal_material,
+			Vector3(0.0, -0.105, 0.0)
+		)
+	elif tip_name == "攻击扁平尖":
+		_add_mesh(
+			tip_root,
+			"TipHousing",
+			_cylinder_mesh(0.22, 0.18, 0.18, 32),
+			rubber_material,
+			Vector3(0.0, 0.02, 0.0)
+		)
+		_add_mesh(
+			tip_root,
+			"FlatContact",
+			_cylinder_mesh(0.19, 0.19, 0.065, 32),
+			core_material,
+			Vector3(0.0, -0.095, 0.0)
+		)
+	else:
+		_add_mesh(
+			tip_root,
+			"TipHousing",
+			_cylinder_mesh(0.2, 0.095, 0.22, 32),
+			core_material,
+			Vector3(0.0, 0.025, 0.0)
+		)
+		_add_mesh(
+			tip_root,
+			"RubberContact",
+			_sphere_mesh(0.105, 0.18, 32),
+			rubber_material,
+			Vector3(0.0, -0.115, 0.0),
+			Vector3.ZERO,
+			Vector3(1.0, 0.72, 1.0)
+		)
+
+
+func _apply_part_transforms() -> void:
+	var part_nodes := get_part_nodes()
+	for index in range(part_nodes.size()):
+		var part_node := part_nodes[index]
+		part_node.position = PART_BASE_POSITIONS[index]
+		part_node.scale = Vector3.ONE
+		if index == active_part_index:
+			part_node.scale = Vector3.ONE * 1.035
+
+
+func _create_profiled_ring_mesh(
+	inner_radius: float,
+	height: float,
+	segments: int,
+	part_slot: PartSlot,
+	variant_name: String
+) -> ArrayMesh:
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var half_height := height * 0.5
+	for index in range(segments):
+		var angle_a := TAU * float(index) / float(segments)
+		var angle_b := TAU * float(index + 1) / float(segments)
+		var outer_a := _outer_radius(angle_a, part_slot, variant_name)
+		var outer_b := _outer_radius(angle_b, part_slot, variant_name)
+		_append_annular_section(
+			surface,
+			angle_a,
+			angle_b,
+			inner_radius,
+			inner_radius,
+			outer_a,
+			outer_b,
+			-half_height,
+			half_height
+		)
+	return surface.commit()
+
+
+func _create_attack_insert_mesh(variant_name: String) -> ArrayMesh:
+	var surface := SurfaceTool.new()
+	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
+	var lobe_count := _attack_lobe_count(variant_name)
+	var half_width := 0.2
+	if variant_name == "三翼重击攻击环":
+		half_width = 0.34
+	elif variant_name == "圆弧续航攻击环":
+		half_width = 0.13
+	var segment_steps := 8
+	for lobe_index in range(lobe_count):
+		var center_angle := TAU * float(lobe_index) / float(lobe_count)
+		for step in range(segment_steps):
+			var angle_a := center_angle - half_width + half_width * 2.0 * float(step) / float(segment_steps)
+			var angle_b := center_angle - half_width + half_width * 2.0 * float(step + 1) / float(segment_steps)
+			_append_annular_section(
+				surface,
+				angle_a,
+				angle_b,
+				0.76,
+				0.76,
+				_outer_radius(angle_a, PartSlot.ATTACK_RING, variant_name) + 0.018,
+				_outer_radius(angle_b, PartSlot.ATTACK_RING, variant_name) + 0.018,
+				0.075,
+				0.145
+			)
+	return surface.commit()
+
+
+func _append_annular_section(
+	surface: SurfaceTool,
+	angle_a: float,
+	angle_b: float,
+	inner_a: float,
+	inner_b: float,
+	outer_a: float,
+	outer_b: float,
+	bottom_y: float,
+	top_y: float
+) -> void:
+	var inner_bottom_a := _radial_point(angle_a, inner_a, bottom_y)
+	var inner_bottom_b := _radial_point(angle_b, inner_b, bottom_y)
+	var outer_bottom_a := _radial_point(angle_a, outer_a, bottom_y)
+	var outer_bottom_b := _radial_point(angle_b, outer_b, bottom_y)
+	var inner_top_a := _radial_point(angle_a, inner_a, top_y)
+	var inner_top_b := _radial_point(angle_b, inner_b, top_y)
+	var outer_top_a := _radial_point(angle_a, outer_a, top_y)
+	var outer_top_b := _radial_point(angle_b, outer_b, top_y)
+
+	_add_quad(surface, inner_top_a, inner_top_b, outer_top_b, outer_top_a, Vector3.UP)
+	_add_quad(surface, inner_bottom_a, outer_bottom_a, outer_bottom_b, inner_bottom_b, Vector3.DOWN)
+
+	var mid_angle := (angle_a + angle_b) * 0.5
+	var outer_normal := Vector3(cos(mid_angle), 0.0, sin(mid_angle))
+	var inner_normal := -outer_normal
+	_add_quad(surface, outer_bottom_a, outer_top_a, outer_top_b, outer_bottom_b, outer_normal)
+	_add_quad(surface, inner_bottom_b, inner_top_b, inner_top_a, inner_bottom_a, inner_normal)
+
+
+func _outer_radius(angle: float, part_slot: PartSlot, variant_name: String) -> float:
+	if part_slot == PartSlot.ATTACK_RING:
+		if variant_name == "三翼重击攻击环":
+			var attack_pulse := pow(maxf(0.0, cos(angle * 3.0 - 0.28)), 4.0)
+			return 0.91 + attack_pulse * 0.3
+		if variant_name == "圆弧续航攻击环":
+			return 1.01 + cos(angle * 8.0) * 0.022
+		var balance_pulse := pow(0.5 + 0.5 * cos(angle * 6.0), 2.0)
+		return 0.94 + balance_pulse * 0.12
+
+	if variant_name == "重型外缘配重盘":
+		return 0.82 + cos(angle * 8.0) * 0.018
+	if variant_name == "偏心突击配重盘":
+		return 0.74 + cos(angle) * 0.075 + cos(angle * 5.0) * 0.018
+	if variant_name == "内圈":
+		return 0.72
+	return 0.74 + cos(angle * 6.0) * 0.012
+
+
+func _attack_lobe_count(variant_name: String) -> int:
+	if variant_name == "三翼重击攻击环":
+		return 3
+	if variant_name == "圆弧续航攻击环":
+		return 8
+	return 6
+
+
+func _radial_point(angle: float, radius: float, y: float) -> Vector3:
+	return Vector3(cos(angle) * radius, y, sin(angle) * radius)
+
+
+func _add_quad(
+	surface: SurfaceTool,
+	a: Vector3,
+	b: Vector3,
+	c: Vector3,
+	d: Vector3,
+	normal: Vector3
+) -> void:
+	_add_triangle(surface, a, b, c, normal)
+	_add_triangle(surface, a, c, d, normal)
+
+
+func _add_triangle(
+	surface: SurfaceTool,
+	a: Vector3,
+	b: Vector3,
+	c: Vector3,
+	normal: Vector3
+) -> void:
+	surface.set_normal(normal)
+	surface.add_vertex(a)
+	surface.set_normal(normal)
+	surface.add_vertex(b)
+	surface.set_normal(normal)
+	surface.add_vertex(c)
+
+
+func _cylinder_mesh(
+	top_radius: float,
+	bottom_radius: float,
+	height: float,
+	segments: int
+) -> CylinderMesh:
+	var mesh := CylinderMesh.new()
+	mesh.top_radius = top_radius
+	mesh.bottom_radius = bottom_radius
+	mesh.height = height
+	mesh.radial_segments = segments
+	mesh.rings = 2
+	return mesh
+
+
+func _sphere_mesh(radius: float, height: float, segments: int) -> SphereMesh:
+	var mesh := SphereMesh.new()
+	mesh.radius = radius
+	mesh.height = height
+	mesh.radial_segments = segments
+	mesh.rings = 16
+	return mesh
+
+
+func _create_box_mesh(size: Vector3) -> BoxMesh:
+	var mesh := BoxMesh.new()
+	mesh.size = size
+	return mesh
+
+
+func _add_mesh(
+	parent: Node3D,
+	node_name: String,
+	mesh: Mesh,
+	material: Material,
+	local_position := Vector3.ZERO,
+	local_rotation := Vector3.ZERO,
+	local_scale := Vector3.ONE
+) -> MeshInstance3D:
+	var instance := MeshInstance3D.new()
+	instance.name = node_name
+	instance.mesh = mesh
+	instance.material_override = material
+	instance.position = local_position
+	instance.rotation = local_rotation
+	instance.scale = local_scale
+	parent.add_child(instance)
+	return instance
+
+
+func _clear_children(parent: Node) -> void:
+	for child in parent.get_children():
+		child.free()

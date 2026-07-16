@@ -7,13 +7,33 @@ extends RigidBody3D
 @export var control_force: float = 9.0
 @export var min_active_spin_speed: float = 2.0
 
+@onready var visual_model: FivePartTopModel = %VisualModel
+
 var spin_speed: float = 0.0
 var is_launched: bool = false
 var control_vector: Vector2 = Vector2.ZERO
 
 func _ready() -> void:
 	can_sleep = false
+	_apply_saved_appearance()
 	reset_top()
+
+
+func _apply_saved_appearance() -> void:
+	var game_state = get_node_or_null("/root/GameState")
+	if game_state == null:
+		visual_model.set_active_part(-1)
+		return
+	visual_model.configure(
+		game_state.selected_attack_ring,
+		game_state.selected_core_lock,
+		game_state.selected_weight_disc,
+		game_state.selected_driver_shaft,
+		game_state.selected_tip,
+		game_state.custom_ring_color,
+		game_state.custom_core_color
+	)
+	visual_model.set_active_part(-1)
 
 
 func _physics_process(delta: float) -> void:

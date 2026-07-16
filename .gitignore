@@ -1,3 +1,7 @@
 # Godot 4+ specific ignores
 .godot/
 /android/
+
+# Local Tone.js audio workbench
+/tools/audio-lab/node_modules/
+/tools/audio-lab/dist/

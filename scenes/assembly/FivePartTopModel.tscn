@@ -1,0 +1,21 @@
+[gd_scene load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/five_part_top_model.gd" id="1"]
+
+[node name="FivePartTopModel" type="Node3D"]
+script = ExtResource("1")
+
+[node name="AttackRingRoot" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="CoreLockRoot" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="WeightDiscRoot" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="DriverShaftRoot" type="Node3D" parent="."]
+unique_name_in_owner = true
+
+[node name="TipRoot" type="Node3D" parent="."]
+unique_name_in_owner = true
