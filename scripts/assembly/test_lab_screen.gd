@@ -6,14 +6,17 @@ extends Control
 @onready var center_of_mass_marker: MeshInstance3D = %CenterOfMassMarker
 @onready var top_model: FivePartTopModel = %TopModel
 
+var build_data: TopBuildData
+
 func _ready() -> void:
 	_populate_options()
+	build_data = _game_state().get_build_data()
 	top_model.configure(
-		_game_state().selected_attack_ring,
-		_game_state().selected_core_lock,
-		_game_state().selected_weight_disc,
-		_game_state().selected_driver_shaft,
-		_game_state().selected_tip,
+		_game_state().selected_attack_ring_id,
+		_game_state().selected_core_lock_id,
+		_game_state().selected_weight_disc_id,
+		_game_state().selected_driver_shaft_id,
+		_game_state().selected_tip_id,
 		_game_state().custom_ring_color,
 		_game_state().custom_core_color
 	)
@@ -41,16 +44,34 @@ func _on_option_changed(_index: int) -> void:
 
 
 func _update_result() -> void:
-	var com := _estimate_center_of_mass()
-	center_of_mass_marker.position = com
+	if build_data == null or not build_data.is_valid():
+		result_label.text = "当前组装数据无效，请返回设计页重新选择零件。"
+		return
 
+	center_of_mass_marker.position = build_data.center_of_mass
 	var wind := wind_options.get_item_text(wind_options.selected)
 	var terrain := terrain_options.get_item_text(terrain_options.selected)
-	var stability_score := _estimate_stability(wind, terrain, com)
-	var control_score := _estimate_control(terrain)
-	result_label.text = "当前组装\n%s\n\n质心位置：%s\n风力：%s\n地形：%s\n稳定性估算：%.0f/100\n控制响应估算：%.0f/100" % [
+	var stability_score := _environment_stability_score(wind, terrain)
+	var control_score := _environment_control_score(terrain)
+
+	result_label.text = (
+		"当前组装\n%s\n\n"
+		+ "总质量：%.2f kg  转动惯量：%.2f\n"
+		+ "质心：%s\n"
+		+ "摩擦：%.2f  回弹：%.2f  转速衰减：%.2f/s\n"
+		+ "攻击：%.2f  耐久：%.0f\n"
+		+ "风力：%s  地形：%s\n"
+		+ "稳定性估算：%.0f/100  控制响应：%.0f/100"
+	) % [
 		_game_state().get_build_summary(),
-		str(com),
+		build_data.total_mass,
+		build_data.moment_of_inertia,
+		str(build_data.center_of_mass),
+		build_data.friction,
+		build_data.restitution,
+		build_data.spin_decay_per_second,
+		build_data.attack_power,
+		build_data.durability,
 		wind,
 		terrain,
 		stability_score,
@@ -58,38 +79,8 @@ func _update_result() -> void:
 	]
 
 
-func _estimate_center_of_mass() -> Vector3:
-	var y := 0.02
-	var x := 0.0
-	if _game_state().selected_weight_disc == "重型外缘配重盘":
-		y -= 0.08
-	elif _game_state().selected_weight_disc == "偏心突击配重盘":
-		x += 0.14
-	if _game_state().selected_core_lock == "低重心核心锁扣":
-		y -= 0.04
-	elif _game_state().selected_core_lock == "强化核心锁扣":
-		y += 0.02
-	if _game_state().selected_driver_shaft == "低位稳定中轴":
-		y -= 0.05
-	elif _game_state().selected_driver_shaft == "高位突击中轴":
-		y += 0.07
-	if _game_state().selected_tip == "金属续航尖":
-		y -= 0.05
-	elif _game_state().selected_tip == "攻击扁平尖":
-		y += 0.03
-	return Vector3(x, y, 0.0)
-
-
-func _estimate_stability(wind: String, terrain: String, com: Vector3) -> float:
-	var score := 78.0
-	score -= absf(com.x) * 120.0
-	score -= maxf(com.y, 0.0) * 80.0
-	if _game_state().selected_attack_ring == "圆弧续航攻击环":
-		score += 8.0
-	elif _game_state().selected_attack_ring == "三翼重击攻击环":
-		score -= 7.0
-	if _game_state().selected_core_lock == "强化核心锁扣":
-		score += 5.0
+func _environment_stability_score(wind: String, terrain: String) -> float:
+	var score := build_data.stability * 75.0
 	if wind == "侧风":
 		score -= 8.0
 	elif wind == "强逆风":
@@ -103,16 +94,8 @@ func _estimate_stability(wind: String, terrain: String, com: Vector3) -> float:
 	return clampf(score, 0.0, 100.0)
 
 
-func _estimate_control(terrain: String) -> float:
-	var score := 60.0
-	if _game_state().selected_driver_shaft == "低位稳定中轴":
-		score += 8.0
-	elif _game_state().selected_driver_shaft == "高位突击中轴":
-		score -= 5.0
-	if _game_state().selected_tip == "橡胶平衡尖":
-		score += 18.0
-	elif _game_state().selected_tip == "金属续航尖":
-		score -= 10.0
+func _environment_control_score(terrain: String) -> float:
+	var score := build_data.control_response * 65.0
 	if terrain == "高摩擦橡胶":
 		score += 12.0
 	elif terrain == "低摩擦金属":

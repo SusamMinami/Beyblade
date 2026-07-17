@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"weight_disc.standard"
+part_name = "标准金属配重盘"
+part_type = 2
+mass = 0.42
+center_of_mass_offset = Vector3(0, 0, 0)
+moment_of_inertia = 0.36
+friction = 0.5
+restitution = 0.3
+contact_area = 0.08
+spin_damping_multiplier = 1.0
+stability = 1.0
+control_response = 1.0
+attack_power = 1.0
+durability = 110.0
+description = "质量均匀分布的标准配重基准。"

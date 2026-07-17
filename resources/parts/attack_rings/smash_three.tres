@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"attack_ring.smash_three"
+part_name = "三翼重击攻击环"
+part_type = 0
+mass = 0.42
+center_of_mass_offset = Vector3(0.02, 0.14, 0)
+moment_of_inertia = 0.38
+friction = 0.7
+restitution = 0.5
+contact_area = 0.22
+spin_damping_multiplier = 1.08
+stability = 0.86
+control_response = 0.9
+attack_power = 1.35
+durability = 110.0
+description = "三枚前倾重击翼提高碰撞强度，代价是稳定性和续航。"

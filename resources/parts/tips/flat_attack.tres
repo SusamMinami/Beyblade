@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"tip.flat_attack"
+part_name = "攻击扁平尖"
+part_type = 4
+mass = 0.13
+center_of_mass_offset = Vector3(0, -0.15, 0)
+moment_of_inertia = 0.045
+friction = 0.88
+restitution = 0.16
+contact_area = 0.2
+spin_damping_multiplier = 1.16
+stability = 0.74
+control_response = 1.08
+attack_power = 1.24
+durability = 96.0
+description = "大接触面制造高速横移，攻击强但稳定和续航偏弱。"

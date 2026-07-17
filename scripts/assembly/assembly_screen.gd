@@ -1,12 +1,12 @@
 extends Control
 
 const PART_NAMES := ["攻击环", "核心锁扣", "金属配重盘", "驱动中轴", "轴尖"]
-const PART_VARIANTS := [
-	["六刃平衡攻击环", "三翼重击攻击环", "圆弧续航攻击环"],
-	["标准核心锁扣", "低重心核心锁扣", "强化核心锁扣"],
-	["标准金属配重盘", "重型外缘配重盘", "偏心突击配重盘"],
-	["标准驱动中轴", "低位稳定中轴", "高位突击中轴"],
-	["橡胶平衡尖", "金属续航尖", "攻击扁平尖"]
+const PART_TYPES := [
+	TopPartResource.PartType.ATTACK_RING,
+	TopPartResource.PartType.CORE_LOCK,
+	TopPartResource.PartType.WEIGHT_DISC,
+	TopPartResource.PartType.DRIVER_SHAFT,
+	TopPartResource.PartType.TIP
 ]
 const PART_DESCRIPTIONS := [
 	"决定接触轮廓、攻击方向与外缘惯量",
@@ -32,7 +32,13 @@ const PREVIEW_CLICK_RADIUS := 150.0
 ]
 @onready var ui_select_player: AudioStreamPlayer = %UiSelectPlayer
 
-var part_selections: Array[int] = [0, 0, 0, 0, 0]
+var part_selections: Array[StringName] = [
+	&"attack_ring.balance_six",
+	&"core_lock.standard",
+	&"weight_disc.standard",
+	&"driver_shaft.standard",
+	&"tip.rubber_balance"
+]
 var active_part_index := FivePartTopModel.PartSlot.ATTACK_RING
 var preview_dragging := false
 var last_drag_position := Vector2.ZERO
@@ -60,26 +66,29 @@ func _game_state():
 
 
 func _restore_saved_build() -> void:
-	var saved_names := [
-		_game_state().selected_attack_ring,
-		_game_state().selected_core_lock,
-		_game_state().selected_weight_disc,
-		_game_state().selected_driver_shaft,
-		_game_state().selected_tip
+	var saved_ids: Array[StringName] = [
+		_game_state().selected_attack_ring_id,
+		_game_state().selected_core_lock_id,
+		_game_state().selected_weight_disc_id,
+		_game_state().selected_driver_shaft_id,
+		_game_state().selected_tip_id
 	]
-	for part_index in range(PART_VARIANTS.size()):
-		var saved_index: int = PART_VARIANTS[part_index].find(saved_names[part_index])
-		part_selections[part_index] = maxi(saved_index, 0)
+	for part_index in range(PART_TYPES.size()):
+		var saved_part := PartDatabase.get_part(saved_ids[part_index])
+		if saved_part != null and saved_part.part_type == PART_TYPES[part_index]:
+			part_selections[part_index] = saved_ids[part_index]
 
 
 func _select_active_part(part_index: int, play_sound := true) -> void:
-	active_part_index = clampi(part_index, 0, PART_VARIANTS.size() - 1)
+	active_part_index = clampi(part_index, 0, PART_TYPES.size() - 1)
 	active_part_label.text = "%02d  %s" % [active_part_index + 1, PART_NAMES[active_part_index]]
 	part_description_label.text = PART_DESCRIPTIONS[active_part_index]
 	part_options.clear()
-	for variant_name in PART_VARIANTS[active_part_index]:
-		part_options.add_item(variant_name)
-	part_options.select(part_selections[active_part_index])
+	var variants := _get_active_variants()
+	for part in variants:
+		part_options.add_item(part.part_name)
+	var selected_index := _find_selected_index(variants)
+	part_options.select(selected_index)
 	top_model.set_active_part(active_part_index)
 	for index in range(part_buttons.size()):
 		part_buttons[index].disabled = index == active_part_index
@@ -88,48 +97,57 @@ func _select_active_part(part_index: int, play_sound := true) -> void:
 
 
 func _on_part_options_item_selected(index: int) -> void:
-	part_selections[active_part_index] = index
+	var variants := _get_active_variants()
+	if index < 0 or index >= variants.size():
+		return
+	part_selections[active_part_index] = variants[index].part_id
 	_update_summary()
 	_play_ui_select()
 
 
 func _select_previous_variant() -> void:
-	var variants: Array = PART_VARIANTS[active_part_index]
-	part_selections[active_part_index] = wrapi(
-		part_selections[active_part_index] - 1,
-		0,
-		variants.size()
-	)
-	part_options.select(part_selections[active_part_index])
+	var variants := _get_active_variants()
+	var selected_index := wrapi(_find_selected_index(variants) - 1, 0, variants.size())
+	part_selections[active_part_index] = variants[selected_index].part_id
+	part_options.select(selected_index)
 	_update_summary()
 	_play_ui_select()
 
 
 func _select_next_variant() -> void:
-	var variants: Array = PART_VARIANTS[active_part_index]
-	part_selections[active_part_index] = wrapi(
-		part_selections[active_part_index] + 1,
-		0,
-		variants.size()
-	)
-	part_options.select(part_selections[active_part_index])
+	var variants := _get_active_variants()
+	var selected_index := wrapi(_find_selected_index(variants) + 1, 0, variants.size())
+	part_selections[active_part_index] = variants[selected_index].part_id
+	part_options.select(selected_index)
 	_update_summary()
 	_play_ui_select()
 
 
+func _get_active_variants() -> Array[TopPartResource]:
+	return PartDatabase.get_parts_by_type(PART_TYPES[active_part_index])
+
+
+func _find_selected_index(variants: Array[TopPartResource]) -> int:
+	for index in range(variants.size()):
+		if variants[index].part_id == part_selections[active_part_index]:
+			return index
+	return 0
+
+
 func _current_part_name(part_index: int) -> String:
-	return PART_VARIANTS[part_index][part_selections[part_index]]
+	var part := PartDatabase.get_part(part_selections[part_index])
+	return part.part_name if part != null else "未知零件"
 
 
 func _update_summary() -> void:
 	var build_names := _get_build_names()
 	summary_label.text = "五件式结构 · 5/5 已配置\n%s / %s / %s / %s / %s" % build_names
 	top_model.configure(
-		build_names[0],
-		build_names[1],
-		build_names[2],
-		build_names[3],
-		build_names[4],
+		part_selections[0],
+		part_selections[1],
+		part_selections[2],
+		part_selections[3],
+		part_selections[4],
 		_game_state().custom_ring_color,
 		_game_state().custom_core_color
 	)
@@ -147,13 +165,12 @@ func _get_build_names() -> Array[String]:
 
 
 func _commit_build() -> void:
-	var build_names := _get_build_names()
 	_game_state().set_build(
-		build_names[0],
-		build_names[1],
-		build_names[2],
-		build_names[3],
-		build_names[4]
+		part_selections[0],
+		part_selections[1],
+		part_selections[2],
+		part_selections[3],
+		part_selections[4]
 	)
 
 

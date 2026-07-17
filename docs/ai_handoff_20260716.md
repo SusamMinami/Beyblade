@@ -18,6 +18,9 @@ https://github.com/SusamMinami/Beyblade.git
 - 组装页、测试实验室和战斗视觉模型共用同一个五件式模型。
 - Tone.js 音效实验室和第一批 10 个 Godot WAV 音效。
 - 自动化冒烟测试：验证五件式模型、15 个变体和五位置 UI。
+- 15 个正式 `TopPartResource`、稳定 `part_id` 与 `PartDatabase`。
+- `TopBuildData` 和 `AssemblyCalculator` 自动合成战斗物理参数。
+- `BeybladeBody` 已应用质量、重心、惯量、材质、转速、控制、攻击和耐久。
 
 ## 关键文件
 
@@ -70,17 +73,30 @@ scripts/assembly/assembly_screen.gd
 scripts/core/game_state.gd
 ```
 
-当前保存五个 DIY 字段：
+当前保存五个稳定 ID：
 
 ```gdscript
-selected_attack_ring
-selected_core_lock
-selected_weight_disc
-selected_driver_shaft
-selected_tip
+selected_attack_ring_id
+selected_core_lock_id
+selected_weight_disc_id
+selected_driver_shaft_id
+selected_tip_id
 ```
 
-`set_build()` 已从旧三参数改为五参数。后续如果新增调用点，必须传入 5 个零件名。
+`set_build()` 接收五个 `part_id`，显示名称统一从 `PartDatabase` 查询。
+
+### 零件数据库与属性计算
+
+```text
+resources/parts/
+scripts/data/part_database.gd
+scripts/assembly/top_build_data.gd
+scripts/assembly/assembly_calculator.gd
+```
+
+数据库包含五类共 15 个 `.tres`。`AssemblyCalculator` 会合成总质量、重心、
+转动惯量、摩擦、回弹、转速衰减、稳定性、控制响应、攻击力和耐久，并生成
+启动转速、发射冲量和控制力。
 
 ### 测试实验室
 
@@ -113,6 +129,10 @@ BeybladeBody
 ```
 
 这样视觉复杂度不会直接拖慢物理。注意：视觉模型位置上移了 `0.2`，用于对齐旧碰撞体底面。
+
+`BeybladeBody._integrate_forces()` 会聚合与其他 `BeybladeBody` 的接触冲量，
+使用攻击者的 `attack_power` 计算伤害并扣除当前耐久。低冲量接触不会造成
+伤害，连续接触受短冷却保护；耐久归零会触发 `durability_depleted` 信号。
 
 ### 零件资源格式
 
@@ -215,6 +235,8 @@ C:\Users\Admin\Downloads\Godot_v4.7-stable_win64.exe\Godot_v4.7-stable_win64_con
 $godot = 'C:\Users\Admin\Downloads\Godot_v4.7-stable_win64.exe\Godot_v4.7-stable_win64_console.exe'
 
 & $godot --headless --path . --script res://tests/assembly/five_part_top_model_test.gd
+& $godot --headless --path . --script res://tests/assembly/assembly_calculator_test.gd
+& $godot --headless --path . --script res://tests/battle/collision_damage_test.gd
 & $godot --headless --path . --scene res://scenes/assembly/AssemblyScreen.tscn --quit-after 10
 & $godot --headless --path . --scene res://scenes/assembly/TestLabScreen.tscn --quit-after 10
 & $godot --headless --path . --scene res://scenes/battle/BattleScreen.tscn --quit-after 20
@@ -224,6 +246,8 @@ $godot = 'C:\Users\Admin\Downloads\Godot_v4.7-stable_win64.exe\Godot_v4.7-stable
 已通过的检查：
 
 - `five_part_top_model_test.gd` 输出 `PASS: five_part_top_model_test`
+- `assembly_calculator_test.gd` 输出 `PASS: assembly_calculator_test`
+- `collision_damage_test.gd` 输出 `PASS: collision_damage_test`
 - 组装页启动无脚本错误
 - 测试实验室启动无脚本错误
 - 战斗场景启动无脚本错误
@@ -234,16 +258,16 @@ $godot = 'C:\Users\Admin\Downloads\Godot_v4.7-stable_win64.exe\Godot_v4.7-stable
 ## 当前边界
 
 - 五件式模型是程序化基准模型，不是最终美术资产。
-- 战斗物理尚未读取 15 个零件的真实参数。
 - 地图资源仍未真正影响战斗物理。
-- 敌方陀螺、AI、碰撞结算、撞飞/停转/损坏判定仍是后续工作。
+- 敌方陀螺、AI、撞飞与完整胜负管理仍是后续工作。
 - 音效只接入了组装 UI 选择声；战斗发射、碰撞和旋转音效尚未绑定事件。
+- 碰撞伤害和击破状态已实现，但部件级损坏与解体表现尚未实现。
 
 ## 推荐下一步
 
-1. 创建 15 个 `TopPartResource` 资源文件。
-2. 实现 `TopBuildData` 或 `AssemblyCalculator`，把五件零件合成为质量、重心、惯量、摩擦、控制响应等派生参数。
-3. 在 `BeybladeBody` 中读取派生参数，影响 `mass`、转速衰减、控制力、稳定性和碰撞反馈。
-4. 接入 `spin_loop_fast.wav`，按 `spin_speed` 动态控制音高和音量。
-5. 接入发射、轻/重碰撞、失衡刮擦、停转和奖励音效。
+1. 实现第二个陀螺和基础 AI，形成可验证的 1v1。
+2. 实现击破、停转和撞飞的统一胜负管理。
+3. 接入 `spin_loop_fast.wav`，按 `spin_speed` 动态控制音高和音量。
+4. 接入发射、轻/重碰撞、失衡刮擦、停转和奖励音效。
+5. 将地图和地形资源接入战斗物理。
 6. 用 Godot 编辑器或真机检查五件式模型在竖屏下的实际观感，再决定是否进入 Blender/GLB 美术资产流程。

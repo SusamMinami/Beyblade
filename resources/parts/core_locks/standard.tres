@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"core_lock.standard"
+part_name = "标准核心锁扣"
+part_type = 1
+mass = 0.18
+center_of_mass_offset = Vector3(0, 0.05, 0)
+moment_of_inertia = 0.08
+friction = 0.55
+restitution = 0.2
+contact_area = 0.04
+spin_damping_multiplier = 1.0
+stability = 1.0
+control_response = 1.0
+attack_power = 1.0
+durability = 100.0
+description = "标准锁定结构，各项性能均衡。"

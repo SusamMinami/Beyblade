@@ -66,8 +66,14 @@ func _get_keyboard_control_vector() -> Vector2:
 
 
 func _update_spin_label() -> void:
-	var state_text := "已发射" if beyblade.is_launched else "待发射"
-	spin_label.text = "状态：%s\n转速：%.1f\n赏金：%d" % [state_text, beyblade.spin_speed, _game_state().coins]
+	var state_text := "已击破" if beyblade.is_defeated() else ("已发射" if beyblade.is_launched else "待发射")
+	spin_label.text = "状态：%s\n转速：%.1f\n耐久：%.0f/%.0f\n赏金：%d" % [
+		state_text,
+		beyblade.spin_speed,
+		beyblade.current_durability,
+		beyblade.max_durability,
+		_game_state().coins
+	]
 
 
 func _on_launch_button_pressed() -> void:
@@ -105,6 +111,9 @@ func _check_battle_end() -> void:
 	if not battle_started or reward_granted or beyblade.is_launched:
 		return
 	reward_granted = true
+	if beyblade.is_defeated():
+		battle_log_label.text = "陀螺耐久归零，本回合被击破。"
+		return
 	_game_state().add_reward(WIN_REWARD)
 	battle_log_label.text = "战斗结束。获得赏金 %d，可用于改造陀螺或购买更好的零件。" % WIN_REWARD
 

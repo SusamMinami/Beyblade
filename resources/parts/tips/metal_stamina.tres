@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"tip.metal_stamina"
+part_name = "金属续航尖"
+part_type = 4
+mass = 0.15
+center_of_mass_offset = Vector3(0, -0.2, 0)
+moment_of_inertia = 0.05
+friction = 0.42
+restitution = 0.22
+contact_area = 0.05
+spin_damping_multiplier = 0.62
+stability = 1.02
+control_response = 0.58
+attack_power = 0.88
+durability = 125.0
+description = "低摩擦金属点接触，续航强但移动控制较弱。"

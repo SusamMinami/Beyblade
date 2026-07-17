@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"core_lock.reinforced"
+part_name = "强化核心锁扣"
+part_type = 1
+mass = 0.24
+center_of_mass_offset = Vector3(0, 0.04, 0)
+moment_of_inertia = 0.11
+friction = 0.58
+restitution = 0.2
+contact_area = 0.05
+spin_damping_multiplier = 1.03
+stability = 1.08
+control_response = 0.95
+attack_power = 0.98
+durability = 140.0
+description = "增加锁爪和结构厚度，大幅提高耐久。"

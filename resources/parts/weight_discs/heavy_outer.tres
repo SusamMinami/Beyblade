@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"weight_disc.heavy_outer"
+part_name = "重型外缘配重盘"
+part_type = 2
+mass = 0.58
+center_of_mass_offset = Vector3(0, -0.02, 0)
+moment_of_inertia = 0.5
+friction = 0.52
+restitution = 0.32
+contact_area = 0.1
+spin_damping_multiplier = 0.96
+stability = 1.05
+control_response = 0.78
+attack_power = 1.12
+durability = 130.0
+description = "外缘集中配重，提高惯量和撞击动量，但启动和控制更迟钝。"

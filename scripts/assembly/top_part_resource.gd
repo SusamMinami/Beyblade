@@ -9,6 +9,7 @@ enum PartType {
 	TIP
 }
 
+@export var part_id: StringName = &""
 @export var part_name: String = ""
 @export var part_type: PartType = PartType.ATTACK_RING
 @export var mass: float = 1.0
