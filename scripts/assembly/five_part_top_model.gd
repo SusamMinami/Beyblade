@@ -26,6 +26,18 @@ const BROKEN_PART_OFFSETS: Array[Vector3] = [
 const DAMAGE_WARNING_THRESHOLD := 0.65
 const DAMAGE_CRITICAL_THRESHOLD := 0.3
 const RING_SEGMENTS := 96
+const ATTACK_RING_BALANCE := &"attack_ring.balance_six"
+const ATTACK_RING_SMASH := &"attack_ring.smash_three"
+const ATTACK_RING_STAMINA := &"attack_ring.stamina_arc"
+const CORE_LOCK_LOW := &"core_lock.low_center"
+const CORE_LOCK_REINFORCED := &"core_lock.reinforced"
+const WEIGHT_DISC_HEAVY := &"weight_disc.heavy_outer"
+const WEIGHT_DISC_ECCENTRIC := &"weight_disc.eccentric"
+const DRIVER_SHAFT_LOW := &"driver_shaft.low_stable"
+const DRIVER_SHAFT_HIGH := &"driver_shaft.high_attack"
+const TIP_METAL := &"tip.metal_stamina"
+const TIP_FLAT := &"tip.flat_attack"
+const INTERNAL_BEZEL := &"internal.bezel"
 
 @onready var attack_ring_root: Node3D = %AttackRingRoot
 @onready var core_lock_root: Node3D = %CoreLockRoot
@@ -33,11 +45,11 @@ const RING_SEGMENTS := 96
 @onready var driver_shaft_root: Node3D = %DriverShaftRoot
 @onready var tip_root: Node3D = %TipRoot
 
-var attack_ring_name := "六刃平衡攻击环"
-var core_lock_name := "标准核心锁扣"
-var weight_disc_name := "标准金属配重盘"
-var driver_shaft_name := "标准驱动中轴"
-var tip_name := "橡胶平衡尖"
+var attack_ring_id := ATTACK_RING_BALANCE
+var core_lock_id := &"core_lock.standard"
+var weight_disc_id := &"weight_disc.standard"
+var driver_shaft_id := &"driver_shaft.standard"
+var tip_id := &"tip.rubber_balance"
 var ring_color := Color(0.04, 0.72, 0.62, 1.0)
 var core_color := Color(0.92, 0.76, 0.22, 1.0)
 var active_part_index := PartSlot.ATTACK_RING
@@ -61,19 +73,19 @@ func _ready() -> void:
 
 
 func configure(
-	new_attack_ring: String,
-	new_core_lock: String,
-	new_weight_disc: String,
-	new_driver_shaft: String,
-	new_tip: String,
+	new_attack_ring_id: StringName,
+	new_core_lock_id: StringName,
+	new_weight_disc_id: StringName,
+	new_driver_shaft_id: StringName,
+	new_tip_id: StringName,
 	new_ring_color: Color,
 	new_core_color: Color
 ) -> void:
-	attack_ring_name = new_attack_ring
-	core_lock_name = new_core_lock
-	weight_disc_name = new_weight_disc
-	driver_shaft_name = new_driver_shaft
-	tip_name = new_tip
+	attack_ring_id = new_attack_ring_id
+	core_lock_id = new_core_lock_id
+	weight_disc_id = new_weight_disc_id
+	driver_shaft_id = new_driver_shaft_id
+	tip_id = new_tip_id
 	ring_color = new_ring_color
 	core_color = new_core_color
 	if is_node_ready():
@@ -198,11 +210,11 @@ func _build_attack_ring() -> void:
 		0.22,
 		RING_SEGMENTS,
 		PartSlot.ATTACK_RING,
-		attack_ring_name
+		attack_ring_id
 	)
 	_add_mesh(attack_ring_root, "AttackRingBody", ring_body, polymer_material)
 
-	var insert_mesh := _create_attack_insert_mesh(attack_ring_name)
+	var insert_mesh := _create_attack_insert_mesh(attack_ring_id)
 	_add_mesh(
 		attack_ring_root,
 		"ContactInserts",
@@ -216,7 +228,7 @@ func _build_attack_ring() -> void:
 		0.055,
 		64,
 		PartSlot.WEIGHT_DISC,
-		"内圈"
+		INTERNAL_BEZEL
 	)
 	_add_mesh(
 		attack_ring_root,
@@ -228,7 +240,7 @@ func _build_attack_ring() -> void:
 		Vector3(0.82, 1.0, 0.82)
 	)
 
-	var detail_count := _attack_lobe_count(attack_ring_name)
+	var detail_count := _attack_lobe_count(attack_ring_id)
 	for index in range(detail_count):
 		var angle := TAU * float(index) / float(detail_count)
 		var screw := _cylinder_mesh(0.034, 0.034, 0.025, 20)
@@ -245,11 +257,11 @@ func _build_core_lock() -> void:
 	var lock_radius := 0.37
 	var lock_height := 0.18
 	var root_offset_y := 0.0
-	if core_lock_name == "低重心核心锁扣":
+	if core_lock_id == CORE_LOCK_LOW:
 		lock_radius = 0.41
 		lock_height = 0.14
 		root_offset_y = -0.025
-	elif core_lock_name == "强化核心锁扣":
+	elif core_lock_id == CORE_LOCK_REINFORCED:
 		lock_radius = 0.4
 		lock_height = 0.22
 
@@ -276,7 +288,7 @@ func _build_core_lock() -> void:
 		Vector3(0.0, root_offset_y + lock_height * 0.78, 0.0)
 	)
 
-	var clamp_count := 3 if core_lock_name != "强化核心锁扣" else 6
+	var clamp_count := 3 if core_lock_id != CORE_LOCK_REINFORCED else 6
 	for index in range(clamp_count):
 		var angle := TAU * float(index) / float(clamp_count)
 		var clamp_mesh := _create_box_mesh(Vector3(0.15, 0.075, 0.08))
@@ -296,10 +308,10 @@ func _build_weight_disc() -> void:
 		0.14,
 		80,
 		PartSlot.WEIGHT_DISC,
-		weight_disc_name
+		weight_disc_id
 	)
 	var disc_offset := Vector3.ZERO
-	if weight_disc_name == "偏心突击配重盘":
+	if weight_disc_id == WEIGHT_DISC_ECCENTRIC:
 		disc_offset.x = 0.065
 	_add_mesh(weight_disc_root, "WeightDisc", disc_mesh, bright_metal_material, disc_offset)
 
@@ -311,7 +323,7 @@ func _build_weight_disc() -> void:
 		disc_offset
 	)
 
-	var inset_count := 8 if weight_disc_name == "重型外缘配重盘" else 6
+	var inset_count := 8 if weight_disc_id == WEIGHT_DISC_HEAVY else 6
 	for index in range(inset_count):
 		var angle := TAU * float(index) / float(inset_count)
 		var radius := 0.58
@@ -329,11 +341,11 @@ func _build_driver_shaft() -> void:
 	var shaft_height := 0.4
 	var shaft_radius := 0.17
 	var shaft_offset_y := 0.0
-	if driver_shaft_name == "低位稳定中轴":
+	if driver_shaft_id == DRIVER_SHAFT_LOW:
 		shaft_height = 0.32
 		shaft_radius = 0.21
 		shaft_offset_y = 0.035
-	elif driver_shaft_name == "高位突击中轴":
+	elif driver_shaft_id == DRIVER_SHAFT_HIGH:
 		shaft_height = 0.5
 		shaft_radius = 0.145
 		shaft_offset_y = -0.045
@@ -374,7 +386,7 @@ func _build_driver_shaft() -> void:
 
 
 func _build_tip() -> void:
-	if tip_name == "金属续航尖":
+	if tip_id == TIP_METAL:
 		_add_mesh(
 			tip_root,
 			"TipHousing",
@@ -389,7 +401,7 @@ func _build_tip() -> void:
 			bright_metal_material,
 			Vector3(0.0, -0.105, 0.0)
 		)
-	elif tip_name == "攻击扁平尖":
+	elif tip_id == TIP_FLAT:
 		_add_mesh(
 			tip_root,
 			"TipHousing",
@@ -480,7 +492,7 @@ func _create_profiled_ring_mesh(
 	height: float,
 	segments: int,
 	part_slot: PartSlot,
-	variant_name: String
+	variant_id: StringName
 ) -> ArrayMesh:
 	var surface := SurfaceTool.new()
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
@@ -488,8 +500,8 @@ func _create_profiled_ring_mesh(
 	for index in range(segments):
 		var angle_a := TAU * float(index) / float(segments)
 		var angle_b := TAU * float(index + 1) / float(segments)
-		var outer_a := _outer_radius(angle_a, part_slot, variant_name)
-		var outer_b := _outer_radius(angle_b, part_slot, variant_name)
+		var outer_a := _outer_radius(angle_a, part_slot, variant_id)
+		var outer_b := _outer_radius(angle_b, part_slot, variant_id)
 		_append_annular_section(
 			surface,
 			angle_a,
@@ -504,14 +516,14 @@ func _create_profiled_ring_mesh(
 	return surface.commit()
 
 
-func _create_attack_insert_mesh(variant_name: String) -> ArrayMesh:
+func _create_attack_insert_mesh(variant_id: StringName) -> ArrayMesh:
 	var surface := SurfaceTool.new()
 	surface.begin(Mesh.PRIMITIVE_TRIANGLES)
-	var lobe_count := _attack_lobe_count(variant_name)
+	var lobe_count := _attack_lobe_count(variant_id)
 	var half_width := 0.2
-	if variant_name == "三翼重击攻击环":
+	if variant_id == ATTACK_RING_SMASH:
 		half_width = 0.34
-	elif variant_name == "圆弧续航攻击环":
+	elif variant_id == ATTACK_RING_STAMINA:
 		half_width = 0.13
 	var segment_steps := 8
 	for lobe_index in range(lobe_count):
@@ -525,8 +537,8 @@ func _create_attack_insert_mesh(variant_name: String) -> ArrayMesh:
 				angle_b,
 				0.76,
 				0.76,
-				_outer_radius(angle_a, PartSlot.ATTACK_RING, variant_name) + 0.018,
-				_outer_radius(angle_b, PartSlot.ATTACK_RING, variant_name) + 0.018,
+				_outer_radius(angle_a, PartSlot.ATTACK_RING, variant_id) + 0.018,
+				_outer_radius(angle_b, PartSlot.ATTACK_RING, variant_id) + 0.018,
 				0.075,
 				0.145
 			)
@@ -563,29 +575,29 @@ func _append_annular_section(
 	_add_quad(surface, inner_bottom_b, inner_top_b, inner_top_a, inner_bottom_a, inner_normal)
 
 
-func _outer_radius(angle: float, part_slot: PartSlot, variant_name: String) -> float:
+func _outer_radius(angle: float, part_slot: PartSlot, variant_id: StringName) -> float:
 	if part_slot == PartSlot.ATTACK_RING:
-		if variant_name == "三翼重击攻击环":
+		if variant_id == ATTACK_RING_SMASH:
 			var attack_pulse := pow(maxf(0.0, cos(angle * 3.0 - 0.28)), 4.0)
 			return 0.91 + attack_pulse * 0.3
-		if variant_name == "圆弧续航攻击环":
+		if variant_id == ATTACK_RING_STAMINA:
 			return 1.01 + cos(angle * 8.0) * 0.022
 		var balance_pulse := pow(0.5 + 0.5 * cos(angle * 6.0), 2.0)
 		return 0.94 + balance_pulse * 0.12
 
-	if variant_name == "重型外缘配重盘":
+	if variant_id == WEIGHT_DISC_HEAVY:
 		return 0.82 + cos(angle * 8.0) * 0.018
-	if variant_name == "偏心突击配重盘":
+	if variant_id == WEIGHT_DISC_ECCENTRIC:
 		return 0.74 + cos(angle) * 0.075 + cos(angle * 5.0) * 0.018
-	if variant_name == "内圈":
+	if variant_id == INTERNAL_BEZEL:
 		return 0.72
 	return 0.74 + cos(angle * 6.0) * 0.012
 
 
-func _attack_lobe_count(variant_name: String) -> int:
-	if variant_name == "三翼重击攻击环":
+func _attack_lobe_count(variant_id: StringName) -> int:
+	if variant_id == ATTACK_RING_SMASH:
 		return 3
-	if variant_name == "圆弧续航攻击环":
+	if variant_id == ATTACK_RING_STAMINA:
 		return 8
 	return 6
 

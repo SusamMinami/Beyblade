@@ -1,45 +1,18 @@
-[gd_scene load_steps=13 format=3]
+[gd_scene load_steps=6 format=3]
 
 [ext_resource type="Script" path="res://scripts/battle/battle_screen.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/battle/BeybladeBody.tscn" id="2"]
-
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_arena"]
-albedo_color = Color(0.18, 0.2, 0.23, 1)
-roughness = 0.55
+[ext_resource type="Script" path="res://scripts/maps/arena_terrain.gd" id="3"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_center"]
 albedo_color = Color(0.55, 0.62, 0.68, 1)
 metallic = 0.6
 roughness = 0.28
 
-[sub_resource type="StandardMaterial3D" id="StandardMaterial3D_wall"]
-albedo_color = Color(0.08, 0.1, 0.13, 1)
-
-[sub_resource type="CylinderMesh" id="CylinderMesh_arena"]
-top_radius = 7.0
-bottom_radius = 7.0
-height = 0.25
-
 [sub_resource type="CylinderMesh" id="CylinderMesh_center"]
 top_radius = 2.2
 bottom_radius = 2.2
-height = 0.03
-
-[sub_resource type="CylinderShape3D" id="CylinderShape3D_arena"]
-height = 0.25
-radius = 7.0
-
-[sub_resource type="BoxMesh" id="BoxMesh_wall_long"]
-size = Vector3(15, 1.2, 0.45)
-
-[sub_resource type="BoxMesh" id="BoxMesh_wall_short"]
-size = Vector3(0.45, 1.2, 15)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_wall_long"]
-size = Vector3(15, 1.2, 0.45)
-
-[sub_resource type="BoxShape3D" id="BoxShape3D_wall_short"]
-size = Vector3(0.45, 1.2, 15)
+height = 0.02
 
 [node name="BattleScreen" type="Node3D"]
 script = ExtResource("1")
@@ -58,59 +31,15 @@ fov = 48.0
 
 [node name="Arena" type="Node3D" parent="."]
 
-[node name="ArenaFloor" type="StaticBody3D" parent="Arena"]
-
-[node name="ArenaMesh" type="MeshInstance3D" parent="Arena/ArenaFloor"]
-mesh = SubResource("CylinderMesh_arena")
-surface_material_override/0 = SubResource("StandardMaterial3D_arena")
-
-[node name="ArenaCollision" type="CollisionShape3D" parent="Arena/ArenaFloor"]
-shape = SubResource("CylinderShape3D_arena")
+[node name="ArenaTerrain" type="StaticBody3D" parent="Arena"]
+unique_name_in_owner = true
+script = ExtResource("3")
 
 [node name="CenterMetalPatch" type="MeshInstance3D" parent="Arena"]
-position = Vector3(0, 0.145, 0)
+unique_name_in_owner = true
+position = Vector3(0, 0.015, 0)
 mesh = SubResource("CylinderMesh_center")
 surface_material_override/0 = SubResource("StandardMaterial3D_center")
-
-[node name="NorthWall" type="StaticBody3D" parent="Arena"]
-position = Vector3(0, 0.45, -7.25)
-
-[node name="NorthWallMesh" type="MeshInstance3D" parent="Arena/NorthWall"]
-mesh = SubResource("BoxMesh_wall_long")
-surface_material_override/0 = SubResource("StandardMaterial3D_wall")
-
-[node name="NorthWallCollision" type="CollisionShape3D" parent="Arena/NorthWall"]
-shape = SubResource("BoxShape3D_wall_long")
-
-[node name="SouthWall" type="StaticBody3D" parent="Arena"]
-position = Vector3(0, 0.45, 7.25)
-
-[node name="SouthWallMesh" type="MeshInstance3D" parent="Arena/SouthWall"]
-mesh = SubResource("BoxMesh_wall_long")
-surface_material_override/0 = SubResource("StandardMaterial3D_wall")
-
-[node name="SouthWallCollision" type="CollisionShape3D" parent="Arena/SouthWall"]
-shape = SubResource("BoxShape3D_wall_long")
-
-[node name="WestWall" type="StaticBody3D" parent="Arena"]
-position = Vector3(-7.25, 0.45, 0)
-
-[node name="WestWallMesh" type="MeshInstance3D" parent="Arena/WestWall"]
-mesh = SubResource("BoxMesh_wall_short")
-surface_material_override/0 = SubResource("StandardMaterial3D_wall")
-
-[node name="WestWallCollision" type="CollisionShape3D" parent="Arena/WestWall"]
-shape = SubResource("BoxShape3D_wall_short")
-
-[node name="EastWall" type="StaticBody3D" parent="Arena"]
-position = Vector3(7.25, 0.45, 0)
-
-[node name="EastWallMesh" type="MeshInstance3D" parent="Arena/EastWall"]
-mesh = SubResource("BoxMesh_wall_short")
-surface_material_override/0 = SubResource("StandardMaterial3D_wall")
-
-[node name="EastWallCollision" type="CollisionShape3D" parent="Arena/EastWall"]
-shape = SubResource("BoxShape3D_wall_short")
 
 [node name="Beyblade" parent="." instance=ExtResource("2")]
 unique_name_in_owner = true

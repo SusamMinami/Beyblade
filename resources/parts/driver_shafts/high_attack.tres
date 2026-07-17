@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"driver_shaft.high_attack"
+part_name = "高位突击中轴"
+part_type = 3
+mass = 0.15
+center_of_mass_offset = Vector3(0, 0.02, 0)
+moment_of_inertia = 0.08
+friction = 0.58
+restitution = 0.22
+contact_area = 0.05
+spin_damping_multiplier = 1.08
+stability = 0.78
+control_response = 0.88
+attack_power = 1.2
+durability = 92.0
+description = "提高攻击环接触高度和进攻倾角，代价是更易失衡。"

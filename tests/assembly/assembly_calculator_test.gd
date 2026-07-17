@@ -1,8 +1,12 @@
 extends SceneTree
 
-const BODY_SCENE_PATH := "res://scenes/battle/BeybladeBody.tscn"
-const EXPECTED_PARTS_PER_SLOT := 3
-const EXPECTED_TOTAL_PARTS := 15
+const DEFAULT_IDS := [
+	"attack_ring.balance_six",
+	"core_lock.standard",
+	"weight_disc.standard",
+	"driver_shaft.standard",
+	"tip.rubber_balance"
+]
 
 var _failures: Array[String] = []
 
@@ -12,213 +16,125 @@ func _initialize() -> void:
 
 
 func _run() -> void:
-	_test_catalog()
-	_test_default_snapshot()
-	_test_physical_tradeoffs()
-	_test_all_combinations()
-	_test_game_state_ids()
-	await _test_beyblade_body_application()
+	_test_database()
+	_test_derived_attributes()
+	await _test_body_integration()
 	_finish()
 
 
-func _test_catalog() -> void:
-	var parts := TopPartCatalog.get_all_parts()
-	_expect(parts.size() == EXPECTED_TOTAL_PARTS, "零件目录必须包含 15 个零件")
+func _test_database() -> void:
+	var validation_errors := PartDatabase.validate_database()
+	_expect(validation_errors.is_empty(), "零件数据库校验必须通过：%s" % str(validation_errors))
 
-	var ids: Dictionary = {}
-	var names: Dictionary = {}
-	var slot_counts := [0, 0, 0, 0, 0]
-	for part in parts:
-		_expect(part != null, "目录中的零件资源必须可加载")
-		if part == null:
-			continue
-		_expect(not part.part_id.is_empty(), "%s 必须有唯一 ID" % part.resource_path)
-		_expect(not ids.has(part.part_id), "零件 ID 重复：%s" % part.part_id)
-		_expect(not names.has(part.part_name), "零件名称重复：%s" % part.part_name)
-		ids[part.part_id] = true
-		names[part.part_name] = true
-		_expect(part.mass > 0.0, "%s 的质量必须为正" % part.part_name)
-		_expect(part.moment_of_inertia > 0.0, "%s 的轴向惯量必须为正" % part.part_name)
-		_expect(
-			part.transverse_moment_of_inertia > 0.0,
-			"%s 的横向惯量必须为正" % part.part_name
-		)
-		slot_counts[part.part_type] += 1
+	var all_parts := PartDatabase.get_all_parts()
+	_expect(all_parts.size() == 15, "零件数据库必须包含 15 个正式资源")
 
-	for slot_count in slot_counts:
-		_expect(
-			slot_count == EXPECTED_PARTS_PER_SLOT,
-			"每个槽位必须正好包含 3 个零件"
-		)
+	var unique_ids := {}
+	for part in all_parts:
+		_expect(not part.part_id.is_empty(), "每个零件必须具有稳定 part_id")
+		_expect(not unique_ids.has(part.part_id), "part_id 必须唯一：%s" % part.part_id)
+		unique_ids[part.part_id] = true
+
+	for part_type in range(TopPartResource.PartType.size()):
+		var typed_parts := PartDatabase.get_parts_by_type(part_type as TopPartResource.PartType)
+		_expect(typed_parts.size() == 3, "每个 DIY 位置必须包含 3 个零件，类型：%d" % part_type)
 
 
-func _test_default_snapshot() -> void:
-	var build := _build(
-		"六刃平衡攻击环",
-		"标准核心锁扣",
-		"标准金属配重盘",
-		"标准驱动中轴",
-		"橡胶平衡尖"
-	)
-	_expect(build.is_complete(), "默认五件式配置必须完整")
-
-	var snapshot := AssemblyCalculator.calculate(build)
-	_expect(snapshot.is_valid(), "默认配置必须生成有效战斗快照")
-	_expect(is_equal_approx(snapshot.total_mass_kg, 0.0416), "默认总质量应为 41.6 g")
-	_expect(snapshot.part_ids.size() == 5, "战斗快照必须保留五个零件 ID")
-	_expect(snapshot.center_of_mass_m.y > 0.0, "默认质心应略高于模型原点")
-	_expect(snapshot.inertia_kg_m2.y > snapshot.inertia_kg_m2.x, "轴向惯量应大于横向惯量")
-	_expect(is_equal_approx(snapshot.friction, build.tip.friction), "地面摩擦必须来自轴尖")
-	_expect(
-		is_equal_approx(snapshot.restitution, build.attack_ring.restitution),
-		"碰撞回弹必须来自攻击环"
-	)
-
-
-func _test_physical_tradeoffs() -> void:
-	var default_snapshot := AssemblyCalculator.calculate(_build(
-		"六刃平衡攻击环",
-		"标准核心锁扣",
-		"标准金属配重盘",
-		"标准驱动中轴",
-		"橡胶平衡尖"
-	))
-	var heavy_snapshot := AssemblyCalculator.calculate(_build(
-		"圆弧续航攻击环",
-		"强化核心锁扣",
-		"重型外缘配重盘",
-		"低位稳定中轴",
-		"金属续航尖"
-	))
-	var eccentric_snapshot := AssemblyCalculator.calculate(_build(
-		"三翼重击攻击环",
-		"标准核心锁扣",
-		"偏心突击配重盘",
-		"高位突击中轴",
-		"攻击扁平尖"
-	))
-
-	_expect(heavy_snapshot.total_mass_kg > default_snapshot.total_mass_kg, "重型配置必须更重")
-	_expect(
-		heavy_snapshot.inertia_kg_m2.y > default_snapshot.inertia_kg_m2.y,
-		"外缘配重必须提高轴向惯量"
-	)
-	_expect(
-		heavy_snapshot.center_of_mass_m.y < default_snapshot.center_of_mass_m.y,
-		"低位中轴配置必须降低质心"
-	)
-	_expect(absf(eccentric_snapshot.center_of_mass_m.x) > 0.0005, "偏心盘必须产生横向质心偏移")
-	_expect(
-		eccentric_snapshot.contact_area_m2 > heavy_snapshot.contact_area_m2,
-		"扁平尖接触面积必须大于金属尖"
-	)
-	_expect(eccentric_snapshot.friction > heavy_snapshot.friction, "扁平尖摩擦必须大于金属尖")
-
-
-func _test_all_combinations() -> void:
-	var parts_by_slot: Array[Array] = [[], [], [], [], []]
-	for part in TopPartCatalog.get_all_parts():
-		parts_by_slot[part.part_type].append(part)
-
-	var combination_count := 0
-	for attack_ring in parts_by_slot[TopPartResource.PartType.ATTACK_RING]:
-		for core_lock in parts_by_slot[TopPartResource.PartType.CORE_LOCK]:
-			for weight_disc in parts_by_slot[TopPartResource.PartType.WEIGHT_DISC]:
-				for driver_shaft in parts_by_slot[TopPartResource.PartType.DRIVER_SHAFT]:
-					for tip in parts_by_slot[TopPartResource.PartType.TIP]:
-						var build := TopBuildData.new()
-						build.attack_ring = attack_ring
-						build.core_lock = core_lock
-						build.weight_disc = weight_disc
-						build.driver_shaft = driver_shaft
-						build.tip = tip
-						var snapshot := AssemblyCalculator.calculate(build)
-						combination_count += 1
-						_expect(snapshot.is_valid(), "所有 243 种组合都必须生成有效快照")
-						_expect(
-							snapshot.total_mass_kg >= 0.035
-							and snapshot.total_mass_kg <= 0.055,
-							"组合总质量必须保持在可信范围"
-						)
-						_expect(
-							snapshot.center_of_mass_m.length() < 0.01,
-							"组合质心偏移必须保持在碰撞体内部"
-						)
-	_expect(combination_count == 243, "五槽位各三零件必须生成 243 种组合")
-
-
-func _test_game_state_ids() -> void:
-	var game_state = root.get_node_or_null("GameState")
-	_expect(game_state != null, "测试运行时必须加载 GameState")
-	if game_state == null:
+func _test_derived_attributes() -> void:
+	var standard := _calculate(DEFAULT_IDS)
+	_expect(standard != null and standard.is_valid(), "标准配置必须成功生成派生属性")
+	if standard == null:
 		return
-	game_state.set_build(
-		"圆弧续航攻击环",
-		"强化核心锁扣",
-		"重型外缘配重盘",
-		"低位稳定中轴",
-		"金属续航尖"
-	)
-	var build: TopBuildData = game_state.get_selected_build()
-	_expect(build.is_complete(), "GameState 必须通过 ID 恢复完整组合")
-	_expect(
-		build.attack_ring.part_id == &"attack_ring_round_stamina",
-		"显示名选择必须同步为稳定零件 ID"
-	)
-	game_state.set_build(
-		"六刃平衡攻击环",
-		"标准核心锁扣",
-		"标准金属配重盘",
-		"标准驱动中轴",
-		"橡胶平衡尖"
-	)
+
+	_expect(standard.total_mass > 0.0, "总质量必须大于 0")
+	_expect(standard.moment_of_inertia > 0.0, "转动惯量必须大于 0")
+	_expect(standard.friction > 0.0, "摩擦必须大于 0")
+	_expect(standard.restitution >= 0.0, "回弹不能为负数")
+	_expect(standard.spin_decay_per_second > 0.0, "转速衰减必须大于 0")
+	_expect(standard.stability > 0.0, "稳定性必须大于 0")
+	_expect(standard.control_response > 0.0, "控制响应必须大于 0")
+	_expect(standard.attack_power > 0.0, "攻击力必须大于 0")
+	_expect(standard.durability > 0.0, "耐久必须大于 0")
+
+	var heavy_ids := DEFAULT_IDS.duplicate()
+	heavy_ids[2] = "weight_disc.heavy_outer"
+	var heavy := _calculate(heavy_ids)
+	_expect(heavy.total_mass > standard.total_mass, "重型配重盘必须提高总质量")
+	_expect(heavy.moment_of_inertia > standard.moment_of_inertia, "重型配重盘必须提高转动惯量")
+	_expect(heavy.collision_momentum > standard.collision_momentum * 1.08, "重型配重盘必须明显提高撞击动量")
+	_expect(heavy.max_spin_speed < standard.max_spin_speed * 0.95, "重型配重盘必须明显降低启动转速")
+	_expect(heavy.control_response < standard.control_response * 0.95, "重型配重盘必须明显降低控制响应")
+
+	var metal_ids := DEFAULT_IDS.duplicate()
+	metal_ids[4] = "tip.metal_stamina"
+	var metal := _calculate(metal_ids)
+	_expect(metal.spin_decay_per_second < standard.spin_decay_per_second, "金属尖必须降低转速衰减")
+	_expect(metal.control_response < standard.control_response, "金属尖必须降低控制响应")
+
+	var rubber := standard
+	_expect(rubber.control_response > metal.control_response, "橡胶尖控制必须强于金属尖")
+	_expect(rubber.spin_decay_per_second > metal.spin_decay_per_second, "橡胶尖转速衰减必须快于金属尖")
+
+	var eccentric_ids := DEFAULT_IDS.duplicate()
+	eccentric_ids[2] = "weight_disc.eccentric"
+	var eccentric := _calculate(eccentric_ids)
+	_expect(absf(eccentric.center_of_mass.x) > absf(standard.center_of_mass.x), "偏心配重必须产生横向重心偏移")
+	_expect(eccentric.attack_power > standard.attack_power, "偏心配重必须提高攻击力")
+	_expect(eccentric.stability < standard.stability, "偏心配重必须降低稳定性")
 
 
-func _test_beyblade_body_application() -> void:
-	var body_scene := load(BODY_SCENE_PATH) as PackedScene
-	_expect(body_scene != null, "BeybladeBody 场景必须存在")
+func _test_body_integration() -> void:
+	var body_scene := load("res://scenes/battle/BeybladeBody.tscn") as PackedScene
+	_expect(body_scene != null, "战斗陀螺场景必须可加载")
 	if body_scene == null:
 		return
 
 	var body := body_scene.instantiate() as BeybladeBody
 	root.add_child(body)
 	await process_frame
+	_expect(body.has_method("apply_build_data"), "BeybladeBody 必须提供 apply_build_data")
+	if not body.has_method("apply_build_data"):
+		body.free()
+		await process_frame
+		return
 
-	_expect(body.battle_snapshot != null, "刚体必须读取当前组合快照")
-	if body.battle_snapshot != null:
-		_expect(is_equal_approx(body.mass, 1.4), "默认真实质量应映射到 1.4 的模拟质量")
-		_expect(body.inertia.y > body.inertia.x, "刚体必须应用三轴组合惯量")
+	var heavy_ids := DEFAULT_IDS.duplicate()
+	heavy_ids[2] = "weight_disc.heavy_outer"
+	var heavy := _calculate(heavy_ids)
+	body.apply_build_data(heavy)
+
+	_expect(is_equal_approx(body.mass, heavy.total_mass), "BeybladeBody 必须应用总质量")
+	_expect(body.center_of_mass.is_equal_approx(heavy.center_of_mass), "BeybladeBody 必须应用重心")
+	_expect(is_equal_approx(body.inertia.y, heavy.moment_of_inertia), "BeybladeBody 必须应用转动惯量")
+	_expect(is_equal_approx(body.max_spin_speed, heavy.max_spin_speed), "BeybladeBody 必须应用启动转速")
+	_expect(is_equal_approx(body.spin_decay_per_second, heavy.spin_decay_per_second), "BeybladeBody 必须应用转速衰减")
+	_expect(is_equal_approx(body.launch_forward_impulse, heavy.launch_forward_impulse), "BeybladeBody 必须应用发射动量")
+	_expect(is_equal_approx(body.control_force, heavy.control_force), "BeybladeBody 必须应用控制力")
+	_expect(is_equal_approx(body.stability, heavy.stability), "BeybladeBody 必须应用稳定性")
+	_expect(is_equal_approx(body.attack_power, heavy.attack_power), "BeybladeBody 必须应用攻击力")
+	_expect(is_equal_approx(body.max_durability, heavy.durability), "BeybladeBody 必须应用耐久")
+	_expect(body.physics_material_override != null, "BeybladeBody 必须应用物理材质")
+	if body.physics_material_override != null:
 		_expect(
-			is_equal_approx(
-				body.physics_material_override.friction,
-				body.battle_snapshot.friction
-			),
-			"刚体必须应用轴尖摩擦"
+			is_equal_approx(body.physics_material_override.friction, heavy.friction),
+			"BeybladeBody 必须应用摩擦"
+		)
+		_expect(
+			is_equal_approx(body.physics_material_override.bounce, heavy.restitution),
+			"BeybladeBody 必须应用回弹"
 		)
 
-	body.is_launched = true
-	body.angular_velocity = Vector3(2.5, 20.0, -1.5)
-	var vertical_before := body.angular_velocity.y
-	body._physics_process(0.1)
-	_expect(is_equal_approx(body.angular_velocity.x, 2.5), "自旋更新不得覆盖 X 角速度")
-	_expect(is_equal_approx(body.angular_velocity.z, -1.5), "自旋更新不得覆盖 Z 角速度")
-	_expect(body.angular_velocity.y < vertical_before, "自旋更新必须衰减 Y 角速度")
 	body.free()
+	await process_frame
 
 
-func _build(
-	attack_ring_name: String,
-	core_lock_name: String,
-	weight_disc_name: String,
-	driver_shaft_name: String,
-	tip_name: String
-) -> TopBuildData:
-	return TopPartCatalog.create_build_from_names(
-		attack_ring_name,
-		core_lock_name,
-		weight_disc_name,
-		driver_shaft_name,
-		tip_name
+func _calculate(ids: Array) -> TopBuildData:
+	return AssemblyCalculator.calculate_by_ids(
+		ids[0],
+		ids[1],
+		ids[2],
+		ids[3],
+		ids[4]
 	)
 
 

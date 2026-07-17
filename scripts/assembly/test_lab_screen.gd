@@ -6,14 +6,18 @@ extends Control
 @onready var center_of_mass_marker: MeshInstance3D = %CenterOfMassMarker
 @onready var top_model: FivePartTopModel = %TopModel
 
+var build_data: TopBuildData
+
+
 func _ready() -> void:
 	_populate_options()
+	build_data = _game_state().get_build_data()
 	top_model.configure(
-		_game_state().selected_attack_ring,
-		_game_state().selected_core_lock,
-		_game_state().selected_weight_disc,
-		_game_state().selected_driver_shaft,
-		_game_state().selected_tip,
+		_game_state().selected_attack_ring_id,
+		_game_state().selected_core_lock_id,
+		_game_state().selected_weight_disc_id,
+		_game_state().selected_driver_shaft_id,
+		_game_state().selected_tip_id,
 		_game_state().custom_ring_color,
 		_game_state().custom_core_color
 	)
@@ -41,19 +45,34 @@ func _on_option_changed(_index: int) -> void:
 
 
 func _update_result() -> void:
-	var snapshot: TopBattleSnapshot = _game_state().get_battle_snapshot()
-	var display_com := snapshot.center_of_mass_m * 20.0
-	center_of_mass_marker.position = display_com
+	if build_data == null or not build_data.is_valid():
+		result_label.text = "当前组装数据无效，请返回设计页重新选择零件。"
+		return
 
+	center_of_mass_marker.position = build_data.center_of_mass
 	var wind := wind_options.get_item_text(wind_options.selected)
 	var terrain := terrain_options.get_item_text(terrain_options.selected)
-	var stability_score := _estimate_stability(wind, terrain, snapshot)
-	var control_score := _estimate_control(terrain, snapshot)
-	result_label.text = "当前组装\n%s\n\n总质量：%.1f g\n质心偏移：%s mm\n轴向惯量：%.2f g·cm²\n风力：%s\n地形：%s\n稳定性估算：%.0f/100\n控制响应估算：%.0f/100" % [
+	var stability_score := _environment_stability_score(wind, terrain)
+	var control_score := _environment_control_score(terrain)
+
+	result_label.text = (
+		"当前组装\n%s\n\n"
+		+ "总质量：%.2f kg  转动惯量：%.2f\n"
+		+ "质心：%s\n"
+		+ "摩擦：%.2f  回弹：%.2f  转速衰减：%.2f/s\n"
+		+ "攻击：%.2f  耐久：%.0f\n"
+		+ "风力：%s  地形：%s\n"
+		+ "稳定性估算：%.0f/100  控制响应：%.0f/100"
+	) % [
 		_game_state().get_build_summary(),
-		snapshot.total_mass_kg * 1000.0,
-		str(snapshot.center_of_mass_m * 1000.0),
-		snapshot.inertia_kg_m2.y * 10000000.0,
+		build_data.total_mass,
+		build_data.moment_of_inertia,
+		str(build_data.center_of_mass),
+		build_data.friction,
+		build_data.restitution,
+		build_data.spin_decay_per_second,
+		build_data.attack_power,
+		build_data.durability,
 		wind,
 		terrain,
 		stability_score,
@@ -61,14 +80,8 @@ func _update_result() -> void:
 	]
 
 
-func _estimate_stability(
-	wind: String,
-	terrain: String,
-	snapshot: TopBattleSnapshot
-) -> float:
-	var score := 72.0 * snapshot.stability
-	score -= absf(snapshot.center_of_mass_m.x) * 4000.0
-	score -= maxf(snapshot.center_of_mass_m.y - 0.002, 0.0) * 1500.0
+func _environment_stability_score(wind: String, terrain: String) -> float:
+	var score := build_data.stability * 75.0
 	if wind == "侧风":
 		score -= 8.0
 	elif wind == "强逆风":
@@ -82,8 +95,8 @@ func _estimate_stability(
 	return clampf(score, 0.0, 100.0)
 
 
-func _estimate_control(terrain: String, snapshot: TopBattleSnapshot) -> float:
-	var score := 58.0 * snapshot.control_response
+func _environment_control_score(terrain: String) -> float:
+	var score := build_data.control_response * 65.0
 	if terrain == "高摩擦橡胶":
 		score += 12.0
 	elif terrain == "低摩擦金属":

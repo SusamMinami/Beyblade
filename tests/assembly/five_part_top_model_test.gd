@@ -3,11 +3,11 @@ extends SceneTree
 const MODEL_SCENE_PATH := "res://scenes/assembly/FivePartTopModel.tscn"
 const ASSEMBLY_SCENE_PATH := "res://scenes/assembly/AssemblyScreen.tscn"
 const PART_VARIANTS := [
-	["六刃平衡攻击环", "三翼重击攻击环", "圆弧续航攻击环"],
-	["标准核心锁扣", "低重心核心锁扣", "强化核心锁扣"],
-	["标准金属配重盘", "重型外缘配重盘", "偏心突击配重盘"],
-	["标准驱动中轴", "低位稳定中轴", "高位突击中轴"],
-	["橡胶平衡尖", "金属续航尖", "攻击扁平尖"]
+	[&"attack_ring.balance_six", &"attack_ring.smash_three", &"attack_ring.stamina_arc"],
+	[&"core_lock.standard", &"core_lock.low_center", &"core_lock.reinforced"],
+	[&"weight_disc.standard", &"weight_disc.heavy_outer", &"weight_disc.eccentric"],
+	[&"driver_shaft.standard", &"driver_shaft.low_stable", &"driver_shaft.high_attack"],
+	[&"tip.rubber_balance", &"tip.metal_stamina", &"tip.flat_attack"]
 ]
 
 var _failures: Array[String] = []

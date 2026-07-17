@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"tip.rubber_balance"
+part_name = "橡胶平衡尖"
+part_type = 4
+mass = 0.12
+center_of_mass_offset = Vector3(0, -0.18, 0)
+moment_of_inertia = 0.04
+friction = 1.15
+restitution = 0.12
+contact_area = 0.14
+spin_damping_multiplier = 1.28
+stability = 1.08
+control_response = 1.3
+attack_power = 0.95
+durability = 90.0
+description = "高抓地橡胶接点，控制响应强但转速衰减较快。"

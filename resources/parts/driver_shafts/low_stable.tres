@@ -1,0 +1,21 @@
+[gd_resource type="Resource" script_class="TopPartResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/assembly/top_part_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+part_id = &"driver_shaft.low_stable"
+part_name = "低位稳定中轴"
+part_type = 3
+mass = 0.19
+center_of_mass_offset = Vector3(0, -0.13, 0)
+moment_of_inertia = 0.1
+friction = 0.62
+restitution = 0.16
+contact_area = 0.07
+spin_damping_multiplier = 0.96
+stability = 1.18
+control_response = 1.1
+attack_power = 0.86
+durability = 112.0
+description = "压低整体高度，提高稳定性与方向控制。"
