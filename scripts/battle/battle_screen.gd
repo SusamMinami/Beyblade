@@ -1,22 +1,25 @@
 extends Node3D
 
+const UI_THEME_FACTORY := preload("res://scripts/ui/ui_theme_factory.gd")
+const ARENA_MAP_CATALOG := preload("res://scripts/maps/arena_map_catalog.gd")
 const KEYBOARD_CONTROL_STEP := 1.0
 const JOYSTICK_RADIUS := 72.0
-const PRE_LAUNCH_CAMERA_POSITION := Vector3(0.0, 8.4, 9.8)
-const FOLLOW_CAMERA_OFFSET := Vector3(0.0, 3.2, 4.2)
+const PRE_LAUNCH_CAMERA_POSITION := Vector3(0.0, 6.4, 8.0)
+const FOLLOW_CAMERA_OFFSET := Vector3(0.0, 2.25, 2.85)
 const LAUNCH_HORIZONTAL_POSITION := Vector3(0.0, 0.0, 5.4)
 const TOP_GROUND_CLEARANCE := 0.45
 const WIN_REWARD := 120
 
 @onready var beyblade: BeybladeBody = %Beyblade
 @onready var camera: Camera3D = %BattleCamera
-@onready var arena_terrain: ArenaTerrain = %ArenaTerrain
+@onready var arena_terrain = %ArenaTerrain
 @onready var center_metal_patch: MeshInstance3D = %CenterMetalPatch
 @onready var battle_summary_label: Label = %BattleSummaryLabel
 @onready var spin_label: Label = %SpinLabel
 @onready var battle_log_label: Label = %BattleLogLabel
 @onready var joystick_area: Control = %JoystickArea
 @onready var joystick_knob: Control = %JoystickKnob
+@onready var control_feedback_label: Label = %ControlFeedbackLabel
 
 var joystick_vector := Vector2.ZERO
 var joystick_dragging := false
@@ -26,7 +29,8 @@ var arena_map: ArenaMapResource
 
 
 func _ready() -> void:
-	arena_map = ArenaMapCatalog.get_by_name(_game_state().selected_map)
+	arena_map = ARENA_MAP_CATALOG.get_by_name(_game_state().selected_map)
+	_apply_map_theme()
 	_configure_arena()
 	beyblade.part_damaged.connect(_on_beyblade_part_damaged)
 	beyblade.part_detached.connect(_on_beyblade_part_detached)
@@ -52,23 +56,15 @@ func _process(delta: float) -> void:
 		else joystick_vector
 	)
 	beyblade.set_control_vector(final_control)
+	_update_control_feedback(final_control)
 	_update_camera(delta)
 	_check_battle_end()
 	_update_spin_label()
 
 
 func _configure_arena() -> void:
-	var terrain_color := Color(0.18, 0.2, 0.23, 1.0)
-	if arena_map.default_surface != null:
-		var friction_ratio := clampf(
-			arena_map.default_surface.surface_friction,
-			0.0,
-			1.4
-		)
-		terrain_color = Color(0.12, 0.16, 0.2).lerp(
-			Color(0.34, 0.38, 0.4),
-			friction_ratio / 1.4
-		)
+	var palette: Dictionary = UI_THEME_FACTORY.get_battle_palette(arena_map.map_name)
+	var terrain_color: Color = palette.arena
 	arena_terrain.configure(arena_map, terrain_color)
 	beyblade.set_terrain_surface(arena_map.default_surface)
 
@@ -88,6 +84,7 @@ func _prepare_for_launch() -> void:
 	beyblade.global_position = Vector3(0.0, -8.0, 0.0)
 	camera.global_position = PRE_LAUNCH_CAMERA_POSITION
 	camera.look_at(Vector3.ZERO, Vector3.UP)
+	_update_control_feedback(Vector2.ZERO)
 
 
 func _get_keyboard_control_vector() -> Vector2:
@@ -168,9 +165,82 @@ func _update_camera(delta: float) -> void:
 	var target_position := beyblade.global_position + FOLLOW_CAMERA_OFFSET
 	camera.global_position = camera.global_position.lerp(
 		target_position,
-		minf(delta * 5.0, 1.0)
+		minf(delta * 6.5, 1.0)
 	)
-	camera.look_at(beyblade.global_position, Vector3.UP)
+	var velocity_lead := Vector3(
+		beyblade.linear_velocity.x,
+		0.0,
+		beyblade.linear_velocity.z
+	) * 0.1
+	camera.look_at(beyblade.global_position + velocity_lead, Vector3.UP)
+
+
+func _update_control_feedback(control: Vector2) -> void:
+	var influence := beyblade.get_control_influence() * 100.0
+	var arrow := _control_arrow(control)
+	var state_text := "拖动摇杆决定偏转方向"
+	if beyblade.is_launched and beyblade.spin_speed < beyblade.max_spin_speed * 0.18:
+		state_text = "低转速：推力和移动距离显著衰减"
+	elif control.length_squared() > 0.01:
+		state_text = "箭头方向即当前施力方向"
+	control_feedback_label.text = "操控 %s  推力 %.0f%%\n%s" % [
+		arrow,
+		influence,
+		state_text
+	]
+
+
+func _control_arrow(control: Vector2) -> String:
+	if control.length_squared() <= 0.01:
+		return "·"
+	var horizontal := signf(control.x)
+	var vertical := signf(control.y)
+	if horizontal < 0.0 and vertical < 0.0:
+		return "↖"
+	if horizontal > 0.0 and vertical < 0.0:
+		return "↗"
+	if horizontal < 0.0 and vertical > 0.0:
+		return "↙"
+	if horizontal > 0.0 and vertical > 0.0:
+		return "↘"
+	if absf(control.x) > absf(control.y):
+		return "←" if control.x < 0.0 else "→"
+	return "↑" if control.y < 0.0 else "↓"
+
+
+func _apply_map_theme() -> void:
+	var palette: Dictionary = UI_THEME_FACTORY.get_battle_palette(arena_map.map_name)
+	$BattleUI/Root.theme = UI_THEME_FACTORY.create_battle_theme(arena_map.map_name)
+
+	var environment := Environment.new()
+	environment.background_mode = Environment.BG_COLOR
+	environment.background_color = palette.background
+	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
+	environment.ambient_light_color = palette.accent.lightened(0.35)
+	environment.ambient_light_energy = 0.58
+	$WorldEnvironment.environment = environment
+
+	_apply_mesh_color(center_metal_patch, palette.center, 0.76, 0.24)
+	$DirectionalLight3D.light_color = palette.accent.lightened(0.45)
+	joystick_knob.color = Color(
+		palette.accent.r,
+		palette.accent.g,
+		palette.accent.b,
+		0.82
+	)
+
+
+func _apply_mesh_color(
+	mesh_instance: MeshInstance3D,
+	color: Color,
+	metallic: float,
+	roughness: float
+) -> void:
+	var material := StandardMaterial3D.new()
+	material.albedo_color = color
+	material.metallic = metallic
+	material.roughness = roughness
+	mesh_instance.material_override = material
 
 
 func _check_battle_end() -> void:

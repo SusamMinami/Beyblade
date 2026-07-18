@@ -36,6 +36,9 @@ const FALLEN_COLLISION_PATTERN: Array[int] = [4, 3, 2, 1, 0]
 @export var collision_damage_cooldown: float = 0.12
 @export var lateral_angular_damping: float = 0.16
 @export var terrain_linear_drag: float = 0.45
+@export var low_spin_linear_damping: float = 8.0
+@export var high_spin_linear_damping: float = 0.22
+@export var minimum_mobility_speed: float = 0.35
 
 @onready var visual_model: FivePartTopModel = %VisualModel
 @onready var light_collision_player: AudioStreamPlayer3D = %LightCollisionPlayer
@@ -198,18 +201,18 @@ func _physics_process(delta: float) -> void:
 
 	var control_direction := Vector3(control_vector.x, 0.0, control_vector.y)
 	if control_direction.length_squared() > 0.01 and spin_speed > min_active_spin_speed:
-		apply_central_force(control_direction.normalized() * runtime_control_force)
+		apply_central_force(
+			control_direction.normalized()
+			* runtime_control_force
+			* _get_spin_mobility()
+		)
 
 	var drag_multiplier := (
 		_terrain_surface.linear_drag_multiplier
 		if _terrain_surface != null
 		else 1.0
 	)
-	var horizontal_velocity := Vector3(linear_velocity.x, 0.0, linear_velocity.z)
-	if horizontal_velocity.length_squared() > 0.001:
-		apply_central_force(
-			-horizontal_velocity * terrain_linear_drag * drag_multiplier
-		)
+	_apply_spin_coupled_movement(delta, drag_multiplier)
 
 	if _terrain_surface != null and _terrain_surface.noise_strength > 0.0:
 		var noise_direction := Vector3(
@@ -222,6 +225,52 @@ func _physics_process(delta: float) -> void:
 	if spin_speed <= 0.001:
 		is_launched = false
 		angular_velocity = lateral_velocity
+
+
+func _apply_spin_coupled_movement(
+	delta: float,
+	terrain_drag_multiplier: float = 1.0
+) -> void:
+	var mobility := _get_spin_mobility()
+	var horizontal_velocity := Vector3(
+		linear_velocity.x,
+		0.0,
+		linear_velocity.z
+	)
+	var damping := (
+		lerpf(low_spin_linear_damping, high_spin_linear_damping, mobility)
+		+ terrain_linear_drag * terrain_drag_multiplier
+	)
+	horizontal_velocity *= exp(-damping * delta)
+
+	var maximum_speed := lerpf(
+		minimum_mobility_speed,
+		maxf(launch_forward_impulse * 2.2, minimum_mobility_speed),
+		sqrt(mobility)
+	)
+	if horizontal_velocity.length() > maximum_speed:
+		horizontal_velocity = horizontal_velocity.normalized() * maximum_speed
+	linear_velocity = Vector3(
+		horizontal_velocity.x,
+		linear_velocity.y,
+		horizontal_velocity.z
+	)
+
+
+func _get_spin_mobility() -> float:
+	if max_spin_speed <= 0.0:
+		return 0.0
+	var spin_ratio := clampf(spin_speed / max_spin_speed, 0.0, 1.0)
+	return smoothstep(0.02, 0.55, spin_ratio)
+
+
+func get_control_influence() -> float:
+	var runtime_ratio := runtime_control_force / maxf(control_force, 0.001)
+	return clampf(
+		control_vector.length() * _get_spin_mobility() * runtime_ratio,
+		0.0,
+		1.0
+	)
 
 
 func _integrate_forces(state: PhysicsDirectBodyState3D) -> void:

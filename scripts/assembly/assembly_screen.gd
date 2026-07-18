@@ -1,5 +1,6 @@
 extends Control
 
+const UI_THEME_FACTORY := preload("res://scripts/ui/ui_theme_factory.gd")
 const PART_NAMES := ["攻击环", "核心锁扣", "金属配重盘", "驱动中轴", "轴尖"]
 const PART_TYPES := [
 	TopPartResource.PartType.ATTACK_RING,
@@ -45,6 +46,7 @@ var last_drag_position := Vector2.ZERO
 var drag_distance := 0.0
 
 func _ready() -> void:
+	theme = UI_THEME_FACTORY.create_graffiti_theme()
 	_position_preview_camera()
 	_restore_saved_build()
 	_select_active_part(active_part_index, false)
@@ -57,7 +59,7 @@ func _process(delta: float) -> void:
 
 
 func _position_preview_camera() -> void:
-	preview_camera.global_position = Vector3(0.0, 1.18, 6.4)
+	preview_camera.global_position = Vector3(0.0, 1.05, 5.15)
 	preview_camera.look_at(Vector3(0.0, 0.02, 0.0), Vector3.UP)
 
 

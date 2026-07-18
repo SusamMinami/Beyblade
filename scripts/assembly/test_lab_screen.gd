@@ -1,5 +1,7 @@
 extends Control
 
+const UI_THEME_FACTORY := preload("res://scripts/ui/ui_theme_factory.gd")
+
 @onready var wind_options: OptionButton = %WindOptions
 @onready var terrain_options: OptionButton = %TerrainOptions
 @onready var result_label: Label = %ResultLabel
@@ -10,6 +12,7 @@ var build_data: TopBuildData
 
 
 func _ready() -> void:
+	theme = UI_THEME_FACTORY.create_graffiti_theme()
 	_populate_options()
 	build_data = _game_state().get_build_data()
 	top_model.configure(

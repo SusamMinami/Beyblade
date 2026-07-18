@@ -1,11 +1,14 @@
 extends Control
 
+const UI_THEME_FACTORY := preload("res://scripts/ui/ui_theme_factory.gd")
+
 @onready var ring_color_picker: ColorPickerButton = %RingColorPicker
 @onready var core_color_picker: ColorPickerButton = %CoreColorPicker
 @onready var style_options: OptionButton = %StyleOptions
 @onready var status_label: Label = %StatusLabel
 
 func _ready() -> void:
+	theme = UI_THEME_FACTORY.create_graffiti_theme()
 	_populate_styles()
 	ring_color_picker.color = _game_state().custom_ring_color
 	core_color_picker.color = _game_state().custom_core_color

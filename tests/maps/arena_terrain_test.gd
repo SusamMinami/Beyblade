@@ -1,5 +1,8 @@
 extends SceneTree
 
+const ARENA_MAP_CATALOG := preload("res://scripts/maps/arena_map_catalog.gd")
+const ARENA_TERRAIN := preload("res://scripts/maps/arena_terrain.gd")
+
 var _failures: Array[String] = []
 
 
@@ -14,8 +17,8 @@ func _run() -> void:
 
 
 func _test_height_profiles() -> void:
-	var bowl := ArenaMapCatalog.get_by_name("标准碗形竞技场")
-	var speed_slope := ArenaMapCatalog.get_by_name("金属高速竞技场")
+	var bowl: ArenaMapResource = ARENA_MAP_CATALOG.get_by_name("标准碗形竞技场")
+	var speed_slope: ArenaMapResource = ARENA_MAP_CATALOG.get_by_name("金属高速竞技场")
 	_expect(bowl != null, "必须能加载标准碗形地图")
 	_expect(speed_slope != null, "必须能加载金属高速地图")
 	if bowl == null or speed_slope == null:
@@ -40,8 +43,8 @@ func _test_height_profiles() -> void:
 
 
 func _test_slope_acceleration() -> void:
-	var arena_map := ArenaMapCatalog.get_by_name("金属高速竞技场")
-	var terrain := ArenaTerrain.new()
+	var arena_map: ArenaMapResource = ARENA_MAP_CATALOG.get_by_name("金属高速竞技场")
+	var terrain := ARENA_TERRAIN.new()
 	terrain.map_resource = arena_map
 	root.add_child(terrain)
 	await process_frame
