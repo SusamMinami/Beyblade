@@ -124,6 +124,25 @@ describe("BattleSimulation", () => {
     );
   });
 
+  it("较高发射位置会略增平移速度并带来更高初始倾斜", () => {
+    const createBattle = () =>
+      new BattleSimulation({
+        playerBuild: STANDARD_BUILD,
+        enemyBuild: STANDARD_BUILD,
+        arena: ARENAS.standard,
+        seed: 21,
+      });
+    const low = createBattle();
+    const high = createBattle();
+    low.launch({ power: 0.86, height: 0.1, angle: 0.25 });
+    high.launch({ power: 0.86, height: 0.9, angle: 0.25 });
+
+    expect(Math.hypot(high.player.velocity.x, high.player.velocity.y)).toBeGreaterThan(
+      Math.hypot(low.player.velocity.x, low.player.velocity.y),
+    );
+    expect(high.player.tilt).toBeGreaterThan(low.player.tilt);
+  });
+
   it("能判定停转、撞飞和击破三类结果", () => {
     const battle = new BattleSimulation({
       playerBuild: STANDARD_BUILD,

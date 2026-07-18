@@ -254,6 +254,14 @@ input[type="color"] {
   touch-action: none;
 }
 
+#three-stage canvas {
+  cursor: grab;
+}
+
+#three-stage canvas:active {
+  cursor: grabbing;
+}
+
 .stage-vignette {
   position: absolute;
   inset: 0;
@@ -322,6 +330,29 @@ input[type="color"] {
   border-radius: 50%;
   background: var(--accent);
   content: "";
+}
+
+.view-reset {
+  position: absolute;
+  z-index: 9;
+  right: 17px;
+  bottom: 42px;
+  min-width: 76px;
+  min-height: 36px;
+  padding: 7px 10px;
+  color: var(--muted);
+  border: 1px solid var(--line-bright);
+  border-radius: 18px;
+  background: rgba(255, 253, 247, 0.88);
+  font-size: 9px;
+  letter-spacing: 0.08em;
+  backdrop-filter: blur(8px);
+}
+
+.view-reset:hover,
+.view-reset:focus-visible {
+  color: var(--ink);
+  border-color: var(--accent);
 }
 
 .workspace {
@@ -461,6 +492,7 @@ input[type="color"] {
 }
 
 .variant {
+  position: relative;
   min-width: 0;
   min-height: 92px;
   padding: 10px;
@@ -479,7 +511,8 @@ input[type="color"] {
 
 .variant span,
 .variant b,
-.variant small {
+.variant small,
+.variant em {
   display: block;
 }
 
@@ -501,6 +534,7 @@ input[type="color"] {
   display: -webkit-box;
   overflow: hidden;
   font-size: 9px;
+  line-clamp: 2;
   line-height: 1.4;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -516,6 +550,57 @@ input[type="color"] {
 
 .variant.is-active span {
   color: var(--accent);
+}
+
+.variant.is-locked {
+  color: #7f8589;
+  border-color: #a8aaab;
+  background: rgba(224, 223, 217, 0.88);
+  filter: grayscale(0.84);
+}
+
+.variant.is-locked b,
+.variant.is-locked span {
+  color: #777c80;
+}
+
+.variant.is-affordable {
+  border-color: #c38a0a;
+  box-shadow: inset 0 0 0 1px rgba(229, 166, 24, 0.3);
+}
+
+.part-price {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex !important;
+  align-items: center;
+  gap: 4px;
+  color: #787d80;
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 750;
+}
+
+.part-price i {
+  display: inline-block;
+  width: 9px;
+  height: 9px;
+  border: 2px solid currentColor;
+  border-radius: 50%;
+}
+
+.variant.is-affordable .part-price {
+  color: #b87900;
+}
+
+.variant.is-affordable .part-price i {
+  background: #f3ba2f;
+  box-shadow: 0 0 0 2px rgba(243, 186, 47, 0.16);
+}
+
+.variant.is-owned .part-price i {
+  display: none;
 }
 
 .metric-panel {
@@ -1062,6 +1147,231 @@ input[type="range"] {
   gap: 8px;
 }
 
+.toast {
+  position: absolute;
+  z-index: 70;
+  right: 18px;
+  bottom: 16px;
+  left: 18px;
+  width: fit-content;
+  max-width: calc(100% - 36px);
+  margin: 0 auto;
+  padding: 10px 14px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.24);
+  border-radius: 7px;
+  background: rgba(18, 21, 26, 0.94);
+  box-shadow: 0 10px 32px rgba(0, 0, 0, 0.3);
+  font-size: 10px;
+  text-align: center;
+  backdrop-filter: blur(12px);
+}
+
+.purchase-layer {
+  position: absolute;
+  z-index: 80;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 18px;
+}
+
+.purchase-scrim {
+  position: absolute;
+  inset: 0;
+  border: 0;
+  background: rgba(18, 21, 26, 0.56);
+  backdrop-filter: blur(5px);
+}
+
+.purchase-card {
+  position: relative;
+  width: min(100%, 390px);
+  padding: 20px;
+  color: #12151a;
+  border: 3px solid #12151a;
+  border-radius: 5px;
+  background: #fffdf7;
+  box-shadow: 8px 8px 0 #238cff;
+}
+
+.purchase-card > span {
+  color: #238cff;
+  font-size: 8px;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+}
+
+.purchase-card h2 {
+  margin: 5px 0 7px;
+  font-family: Impact, "Arial Black", "Microsoft YaHei UI", sans-serif;
+  font-size: 26px;
+}
+
+.purchase-card > p {
+  margin: 0;
+  color: #4e555c;
+  font-size: 10px;
+  line-height: 1.55;
+}
+
+.purchase-deltas {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 5px;
+  margin: 15px 0;
+}
+
+.purchase-deltas span {
+  padding: 7px 3px;
+  border: 1px solid #aeb1b1;
+  background: #f4f0e7;
+  text-align: center;
+}
+
+.purchase-deltas small,
+.purchase-deltas b {
+  display: block;
+}
+
+.purchase-deltas small {
+  color: #676d72;
+  font-size: 8px;
+}
+
+.purchase-deltas b {
+  margin-top: 3px;
+  font-size: 12px;
+}
+
+.purchase-deltas .is-positive {
+  color: #08785f;
+}
+
+.purchase-deltas .is-negative {
+  color: #c7442b;
+}
+
+.purchase-balance {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+  padding-top: 10px;
+  border-top: 2px solid #12151a;
+  font-size: 10px;
+}
+
+.purchase-balance b {
+  color: #b87900;
+  font-size: 16px;
+}
+
+.purchase-actions {
+  display: grid;
+  grid-template-columns: 0.8fr 1.2fr;
+  gap: 8px;
+}
+
+.purchase-card .button {
+  min-height: 44px;
+  color: #12151a;
+  border: 2px solid #12151a;
+  border-radius: 4px;
+  background: #fffdf7;
+  box-shadow: 3px 3px 0 #12151a;
+}
+
+.purchase-card .button.primary {
+  color: #fff;
+  background: #238cff;
+}
+
+.tutorial-card {
+  position: absolute;
+  z-index: 60;
+  top: 126px;
+  left: 16px;
+  width: min(52%, 280px);
+  padding: 10px 11px 11px;
+  color: #12151a;
+  border: 3px solid #12151a;
+  border-radius: 4px;
+  background: rgba(255, 253, 247, 0.95);
+  box-shadow: 5px 5px 0 #f45b2a;
+  backdrop-filter: blur(12px);
+}
+
+.tutorial-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+}
+
+.tutorial-head > span {
+  color: #238cff;
+  font-size: 8px;
+  font-weight: 850;
+  letter-spacing: 0.12em;
+}
+
+.tutorial-head button {
+  min-height: 36px;
+  padding: 0 8px;
+  color: #52595f;
+  border: 1px solid #8e9294;
+  border-radius: 3px;
+  background: transparent;
+  font-size: 8px;
+}
+
+.tutorial-head button:hover,
+.tutorial-head button:focus-visible {
+  color: #12151a;
+  border-color: #12151a;
+  background: #f1ede4;
+}
+
+.tutorial-card h2 {
+  margin: 6px 0 4px;
+  font-family: Impact, "Arial Black", "Microsoft YaHei UI", sans-serif;
+  font-size: 18px;
+  line-height: 1.05;
+}
+
+.tutorial-card p {
+  margin: 0;
+  color: #4a5157;
+  font-size: 8px;
+  line-height: 1.4;
+}
+
+.tutorial-action {
+  width: 100%;
+  min-height: 44px;
+  margin-top: 11px;
+  color: #fff;
+  border: 2px solid #12151a;
+  border-radius: 3px;
+  background: #238cff;
+  box-shadow: 3px 3px 0 #12151a;
+  font-size: 10px;
+  font-weight: 800;
+}
+
+.game-shell[data-tutorial-stage="buy_first_part"] .variant.is-affordable {
+  animation: affordable-pulse 1.4s ease-in-out infinite alternate;
+}
+
+@keyframes affordable-pulse {
+  to {
+    box-shadow:
+      3px 3px 0 #d89c14,
+      0 0 0 4px rgba(216, 156, 20, 0.2);
+  }
+}
+
 .tuning-drawer {
   position: absolute;
   z-index: 50;
@@ -1398,6 +1708,33 @@ input[type="range"] {
   display: none;
 }
 
+.game-shell[data-screen="assembly"] .assembly-view-tools {
+  position: absolute;
+  z-index: 9;
+  top: 220px;
+  left: 18px;
+  display: grid;
+  width: min(48%, 220px);
+  justify-items: start;
+  gap: 8px;
+}
+
+.game-shell[data-screen="assembly"] .drag-hint {
+  position: static;
+  max-width: none;
+  color: #3e454d;
+}
+
+.game-shell[data-screen="assembly"] .view-reset {
+  position: static;
+  min-height: 40px;
+  color: #12151a;
+  border: 2px solid #12151a;
+  border-radius: 3px;
+  background: rgba(255, 253, 247, 0.92);
+  box-shadow: 2px 2px 0 #12151a;
+}
+
 .game-shell[data-screen="assembly"] .workspace {
   position: absolute;
   z-index: 8;
@@ -1470,6 +1807,18 @@ input[type="range"] {
   background: rgba(255, 253, 247, 0.9);
   box-shadow: 3px 3px 0 #12151a;
   transform: rotate(1deg);
+}
+
+.game-shell[data-screen="assembly"] .variant.is-locked {
+  border-color: #777b7d;
+  background: rgba(218, 217, 211, 0.92);
+  box-shadow: 3px 3px 0 #777b7d;
+}
+
+.game-shell[data-screen="assembly"] .variant.is-affordable {
+  border-color: #12151a;
+  background: #fff7d9;
+  box-shadow: 3px 3px 0 #d89c14;
 }
 
 .game-shell[data-screen="assembly"] .variant:nth-child(2) {
@@ -1731,6 +2080,32 @@ input[type="range"] {
     font-size: 8px;
   }
 
+  .game-shell[data-screen="assembly"] .assembly-view-tools {
+    top: 190px;
+    left: 12px;
+  }
+
+  .game-shell[data-screen="assembly"] .view-reset {
+    min-width: 70px;
+    min-height: 40px;
+  }
+
+  .tutorial-card {
+    top: 116px;
+    left: 12px;
+    width: 60%;
+    padding: 9px 10px 10px;
+  }
+
+  .tutorial-head button {
+    min-height: 32px;
+  }
+
+  .tutorial-card h2 {
+    margin-top: 6px;
+    font-size: 18px;
+  }
+
   .control-feedback {
     max-width: 88%;
   }
@@ -1849,5 +2224,477 @@ input[type="range"] {
 
   .joystick b::after {
     inset: 11px;
+  }
+}
+
+/* Direct-manipulation layout */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.game-shell[data-screen="assembly"] .loadout-status {
+  position: absolute;
+  z-index: 12;
+  top: 14px;
+  left: 50%;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: center;
+  min-width: 210px;
+  color: #12151a;
+  text-align: center;
+  transform: translateX(-50%);
+}
+
+.loadout-status button {
+  position: absolute;
+  top: 18px;
+  display: grid;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  place-items: center;
+  color: #12151a;
+  color: #596169;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 28px;
+  opacity: 0.58;
+  line-height: 1;
+}
+
+.loadout-status button:first-child {
+  right: calc(100% + 54px);
+}
+
+.loadout-status button:last-child {
+  left: calc(100% + 54px);
+}
+
+.loadout-status span,
+.loadout-status b {
+  display: block;
+}
+
+.loadout-status span {
+  color: #238cff;
+  font-size: 8px;
+  letter-spacing: 0.16em;
+}
+
+.loadout-status b {
+  margin-top: 2px;
+  font-size: 14px;
+}
+
+.loadout-dots {
+  position: absolute;
+  z-index: 12;
+  top: 65px;
+  left: 50%;
+  display: flex;
+  gap: 7px;
+  transform: translateX(-50%);
+}
+
+.loadout-dots i {
+  width: 6px;
+  height: 6px;
+  border: 1px solid #12151a;
+  border-radius: 50%;
+  background: #fffdf7;
+}
+
+.loadout-dots i.is-active {
+  background: #f45b2a;
+}
+
+.game-shell[data-screen="assembly"] .assembly-customizer {
+  position: absolute;
+  inset: 0;
+}
+
+.game-shell[data-screen="assembly"] .assembly-view-tools {
+  top: auto;
+  bottom: 84px;
+  width: min(48%, 230px);
+}
+
+.game-shell[data-screen="assembly"]
+  .assembly-customizer:not(.is-hidden)
+  ~ .assembly-view-tools {
+  display: none;
+}
+
+.game-shell[data-screen="assembly"] .view-reset {
+  min-width: 44px;
+  min-height: 34px;
+  padding: 5px 9px;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+  opacity: 0.5;
+}
+
+.game-shell[data-screen="assembly"] .drag-hint {
+  max-width: 205px;
+  padding: 5px 7px;
+  background: transparent;
+  opacity: 0.58;
+}
+
+.game-shell[data-screen="assembly"] .part-heading {
+  top: 105px;
+  width: min(52%, 300px);
+}
+
+.game-shell[data-screen="assembly"] .variant-list {
+  top: auto;
+  right: 16px;
+  bottom: 82px;
+  left: 16px;
+  display: grid;
+  width: auto;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 7px;
+}
+
+.game-shell[data-screen="assembly"] .metric-panel {
+  display: none;
+}
+
+.game-shell[data-screen="assembly"] .variant {
+  min-height: 72px;
+  padding: 8px;
+}
+
+.game-shell[data-screen="assembly"] .variant b {
+  margin-top: 16px;
+  font-size: 9px;
+}
+
+.game-shell[data-screen="assembly"] .variant.is-active {
+  transform: translateY(-4px) rotate(-1deg);
+}
+
+.game-shell[data-screen="assembly"] .action-row {
+  grid-template-columns: 1fr;
+}
+
+.game-shell[data-screen="assembly"] .action-row .button {
+  width: 100%;
+  min-height: 52px;
+}
+
+.game-shell[data-screen="map"] {
+  grid-template-rows: 66px minmax(0, 1fr);
+}
+
+.game-shell[data-screen="map"] .stage-shell {
+  grid-row: 2;
+}
+
+.game-shell[data-screen="map"] .workspace {
+  position: absolute;
+  z-index: 10;
+  inset: 66px 0 0;
+  overflow: hidden;
+  background: transparent;
+  pointer-events: none;
+}
+
+.game-shell[data-screen="map"] [data-panel="map"] {
+  position: relative;
+  height: 100%;
+  padding: 0;
+  pointer-events: none;
+}
+
+.game-shell[data-screen="map"] .arena-list {
+  position: absolute;
+  top: 54%;
+  right: 0;
+  left: 0;
+  display: flex;
+  gap: 12px;
+  padding: 16px 11%;
+  overflow-x: auto;
+  pointer-events: auto;
+  scroll-padding-inline: 11%;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  transform: translateY(-50%);
+}
+
+.game-shell[data-screen="map"] .arena-list::-webkit-scrollbar {
+  display: none;
+}
+
+.game-shell[data-screen="map"] .arena-card {
+  display: grid;
+  min-width: 78%;
+  min-height: 132px;
+  grid-template-columns: 42px minmax(0, 1fr);
+  scroll-snap-align: center;
+  opacity: 0.48;
+  background: rgba(255, 253, 247, 0.9);
+  transform: scale(0.92);
+  transition:
+    opacity 180ms ease,
+    transform 180ms ease;
+}
+
+.game-shell[data-screen="map"] .arena-card.is-active {
+  opacity: 1;
+  transform: scale(1) rotate(-0.5deg);
+}
+
+.game-shell[data-screen="map"] .arena-copy b {
+  margin-block: 7px;
+  font-size: 18px;
+}
+
+.game-shell[data-screen="map"] .arena-copy em {
+  white-space: normal;
+}
+
+.game-shell[data-screen="map"] .arena-card > i {
+  grid-column: 1 / -1;
+  width: auto;
+  height: auto;
+  justify-self: center;
+  color: #596169;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  font-size: 8px;
+  font-style: normal;
+  letter-spacing: 0.12em;
+}
+
+.game-shell[data-screen="map"] .action-row {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  display: block;
+  pointer-events: auto;
+}
+
+.game-shell[data-screen="map"] .action-row .button {
+  width: 100%;
+  min-height: 54px;
+}
+
+.game-shell[data-screen="battle"] {
+  grid-template-rows: 58px minmax(0, 1fr);
+}
+
+.game-shell[data-screen="battle"] .stage-shell {
+  grid-row: 2;
+}
+
+.game-shell[data-screen="battle"] .workspace {
+  display: none;
+}
+
+.launch-controls {
+  position: absolute;
+  z-index: 24;
+  inset: 0;
+  max-width: none;
+  margin: 0;
+  pointer-events: none;
+}
+
+.launcher-heading {
+  position: absolute;
+  top: 84px;
+  left: 18px;
+  display: grid;
+  color: #fff;
+  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.55);
+}
+
+.launcher-heading span {
+  color: var(--accent);
+  font-size: 8px;
+  letter-spacing: 0.16em;
+}
+
+.launcher-heading b {
+  margin-top: 3px;
+  font-size: 15px;
+}
+
+.launcher-dial {
+  position: absolute;
+  display: grid;
+  gap: 6px;
+  width: 132px;
+  padding: 8px 10px;
+  color: #fff;
+  border: 1px solid color-mix(in srgb, var(--accent) 45%, transparent);
+  border-radius: 5px;
+  background: color-mix(in srgb, var(--battle-panel) 75%, transparent);
+  box-shadow: 3px 3px 0 rgba(0, 0, 0, 0.28);
+  pointer-events: auto;
+  backdrop-filter: blur(8px);
+}
+
+.launcher-dial span {
+  display: flex;
+  justify-content: space-between;
+  font-size: 8px;
+}
+
+.launcher-dial output {
+  color: var(--accent);
+}
+
+.dial-height {
+  top: 34%;
+  left: 16px;
+}
+
+.dial-direction {
+  right: 16px;
+  bottom: 148px;
+}
+
+.dial-angle {
+  top: 34%;
+  right: 16px;
+}
+
+.launch-controls .launch-button {
+  position: absolute;
+  right: 16px;
+  bottom: 16px;
+  left: 16px;
+  width: auto;
+  min-height: 58px;
+  margin: 0;
+  pointer-events: auto;
+  box-shadow: 4px 4px 0 rgba(0, 0, 0, 0.42);
+}
+
+.battle-controls {
+  position: absolute;
+  z-index: 26;
+  inset: 0;
+  display: block;
+  max-width: none;
+  margin: 0;
+  pointer-events: none;
+}
+
+.battle-controls .joystick {
+  position: absolute;
+  width: 96px;
+  height: 96px;
+  border: 2px solid color-mix(in srgb, var(--accent) 68%, transparent);
+  background: color-mix(in srgb, var(--battle-panel) 35%, transparent);
+  box-shadow:
+    inset 0 0 24px rgba(0, 0, 0, 0.34),
+    0 0 20px color-mix(in srgb, var(--accent) 16%, transparent);
+  opacity: 0.62;
+  pointer-events: auto;
+  transform: translate(-50%, -50%);
+  transition:
+    left 90ms linear,
+    top 90ms linear,
+    opacity 120ms ease;
+  backdrop-filter: blur(2px);
+}
+
+.battle-controls .joystick.is-active {
+  opacity: 0.94;
+  transition: opacity 120ms ease;
+}
+
+.battle-controls .joystick b {
+  width: 38px;
+  height: 38px;
+}
+
+.battle-controls .joystick b::after {
+  display: none;
+}
+
+.battle-controls .joystick b span {
+  display: grid;
+  height: 100%;
+  place-items: center;
+  color: var(--accent);
+  font-size: 8px;
+}
+
+.battle-utility {
+  position: absolute;
+  z-index: 30;
+  top: 82px;
+  right: 14px;
+  display: flex;
+  gap: 6px;
+}
+
+.battle-utility button {
+  min-width: 44px;
+  min-height: 34px;
+  color: #d8e1de;
+  border: 1px solid rgba(255, 255, 255, 0.18);
+  border-radius: 17px;
+  background: color-mix(in srgb, var(--battle-panel) 72%, transparent);
+  font-size: 8px;
+}
+
+.tune-button {
+  display: none !important;
+}
+
+@media (max-width: 420px) {
+  .game-shell[data-screen="assembly"] .loadout-status {
+    top: 9px;
+  }
+
+  .game-shell[data-screen="assembly"] .loadout-dots {
+    top: 58px;
+  }
+
+  .game-shell[data-screen="assembly"] .assembly-view-tools {
+    top: auto;
+    bottom: 82px;
+  }
+
+  .game-shell[data-screen="assembly"] .part-heading {
+    top: 102px;
+  }
+
+  .game-shell[data-screen="assembly"] .variant-list {
+    top: auto;
+    width: auto;
+  }
+
+  .launcher-dial {
+    width: 112px;
+    padding: 7px 8px;
+  }
+
+  .dial-height {
+    left: 10px;
+  }
+
+  .dial-angle,
+  .dial-direction {
+    right: 10px;
   }
 }

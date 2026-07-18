@@ -50,6 +50,7 @@ const definePart = (
     control,
     attack,
     durability,
+    price,
     description,
   },
 ) =>
@@ -68,6 +69,7 @@ const definePart = (
     control,
     attack,
     durability,
+    price,
     description,
   });
 
@@ -84,6 +86,7 @@ export const PARTS = Object.freeze([
     control: 1,
     attack: 1,
     durability: 100,
+    price: 0,
     description: "六向均衡接触轮廓，质量和攻击性适中。",
   }),
   definePart("attack_ring.smash_three", "三翼重击攻击环", "attackRing", {
@@ -98,6 +101,7 @@ export const PARTS = Object.freeze([
     control: 0.9,
     attack: 1.35,
     durability: 110,
+    price: 260,
     description: "三枚前倾重击翼提高碰撞强度，代价是稳定性和续航。",
   }),
   definePart("attack_ring.stamina_arc", "圆弧续航攻击环", "attackRing", {
@@ -112,6 +116,7 @@ export const PARTS = Object.freeze([
     control: 0.94,
     attack: 0.78,
     durability: 95,
+    price: 120,
     description: "连续圆弧降低碰撞损耗，偏向稳定和长时间旋转。",
   }),
   definePart("core_lock.standard", "标准核心锁扣", "coreLock", {
@@ -126,6 +131,7 @@ export const PARTS = Object.freeze([
     control: 1,
     attack: 1,
     durability: 100,
+    price: 0,
     description: "标准锁定结构，各项性能均衡。",
   }),
   definePart("core_lock.low_center", "低重心核心锁扣", "coreLock", {
@@ -140,6 +146,7 @@ export const PARTS = Object.freeze([
     control: 1.03,
     attack: 0.92,
     durability: 105,
+    price: 140,
     description: "降低核心高度，提升抗倾覆能力。",
   }),
   definePart("core_lock.reinforced", "强化核心锁扣", "coreLock", {
@@ -154,6 +161,7 @@ export const PARTS = Object.freeze([
     control: 0.95,
     attack: 0.98,
     durability: 140,
+    price: 240,
     description: "增加锁爪和结构厚度，大幅提高耐久。",
   }),
   definePart("weight_disc.standard", "标准金属配重盘", "weightDisc", {
@@ -167,6 +175,7 @@ export const PARTS = Object.freeze([
     control: 1,
     attack: 1,
     durability: 110,
+    price: 0,
     description: "质量均匀分布的标准配重基准。",
   }),
   definePart("weight_disc.heavy_outer", "重型外缘配重盘", "weightDisc", {
@@ -181,6 +190,7 @@ export const PARTS = Object.freeze([
     control: 0.78,
     attack: 1.12,
     durability: 130,
+    price: 360,
     description: "外缘集中配重，提高惯量和撞击动量，但启动和控制更迟钝。",
   }),
   definePart("weight_disc.eccentric", "偏心突击配重盘", "weightDisc", {
@@ -195,6 +205,7 @@ export const PARTS = Object.freeze([
     control: 0.82,
     attack: 1.32,
     durability: 105,
+    price: 300,
     description: "单侧偏心配重强化突击轨迹，同时显著增加失衡风险。",
   }),
   definePart("driver_shaft.standard", "标准驱动中轴", "driverShaft", {
@@ -209,6 +220,7 @@ export const PARTS = Object.freeze([
     control: 1,
     attack: 1,
     durability: 100,
+    price: 0,
     description: "标准高度中轴，兼顾倾角响应与稳定性。",
   }),
   definePart("driver_shaft.low_stable", "低位稳定中轴", "driverShaft", {
@@ -223,6 +235,7 @@ export const PARTS = Object.freeze([
     control: 1.1,
     attack: 0.86,
     durability: 112,
+    price: 160,
     description: "压低整体高度，提高稳定性与方向控制。",
   }),
   definePart("driver_shaft.high_attack", "高位突击中轴", "driverShaft", {
@@ -237,6 +250,7 @@ export const PARTS = Object.freeze([
     control: 0.88,
     attack: 1.2,
     durability: 92,
+    price: 220,
     description: "提高攻击环接触高度和进攻倾角，代价是更易失衡。",
   }),
   definePart("tip.rubber_balance", "橡胶平衡尖", "tip", {
@@ -251,6 +265,7 @@ export const PARTS = Object.freeze([
     control: 1.3,
     attack: 0.95,
     durability: 90,
+    price: 0,
     description: "高抓地橡胶接点，控制响应强但转速衰减较快。",
   }),
   definePart("tip.metal_stamina", "金属续航尖", "tip", {
@@ -265,6 +280,7 @@ export const PARTS = Object.freeze([
     control: 0.58,
     attack: 0.88,
     durability: 125,
+    price: 280,
     description: "低摩擦金属点接触，续航强但移动控制较弱。",
   }),
   definePart("tip.flat_attack", "攻击扁平尖", "tip", {
@@ -279,6 +295,7 @@ export const PARTS = Object.freeze([
     control: 1.08,
     attack: 1.24,
     durability: 96,
+    price: 180,
     description: "大接触面制造高速横移，攻击强但稳定和续航偏弱。",
   }),
 ]);

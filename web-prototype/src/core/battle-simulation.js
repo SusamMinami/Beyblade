@@ -80,13 +80,15 @@ export class BattleSimulation {
     Object.assign(this.tuning, nextTuning);
   }
 
-  launch({ power = 0.86, direction = 0, angle = 0 } = {}) {
+  launch({ power = 0.86, height = 0.45, direction = 0, angle = 0 } = {}) {
     this.reset();
     this.phase = "running";
     const launchPower = clamp(power, 0.35, 1);
+    const launchHeight = clamp(height, 0, 1);
     const launchAngle = clamp(angle, -1, 1);
     const playerSpeed =
       (3.4 + this.playerBuild.launchForwardImpulse * launchPower) *
+      (0.94 + launchHeight * 0.12) *
       this.tuning.speedScale;
     const enemyPower = 0.78 + this._seedUnit(3) * 0.16;
     const enemySpeed =
@@ -105,11 +107,17 @@ export class BattleSimulation {
     this.player.spin =
       this.playerBuild.maxSpinSpeed *
       launchPower *
-      (1 - Math.abs(launchAngle) * 0.08);
+      (1 - Math.abs(launchAngle) * 0.08) *
+      (1 - launchHeight * 0.035);
     this.enemy.spin = this.enemyBuild.maxSpinSpeed * enemyPower;
-    this.player.tilt = Math.abs(launchAngle) * 0.18;
+    this.player.tilt =
+      Math.abs(launchAngle) * 0.18 + Math.max(launchHeight - 0.55, 0) * 0.08;
     this.enemy.tilt = this._seedUnit(7) * 0.08;
-    this.events.push({ type: "launch", power: launchPower });
+    this.events.push({
+      type: "launch",
+      power: launchPower,
+      height: launchHeight,
+    });
   }
 
   step(delta, playerControl = { x: 0, y: 0 }) {
@@ -356,10 +364,10 @@ export class BattleSimulation {
 
   _checkResult() {
     const candidates = [
-      [this.player, this.enemy, "enemy"],
-      [this.enemy, this.player, "player"],
+      [this.player, "enemy"],
+      [this.enemy, "player"],
     ];
-    for (const [loser, winner, winnerId] of candidates) {
+    for (const [loser, winnerId] of candidates) {
       if (loser.durability <= 0) {
         this._finish(winnerId, BATTLE_RESULT.BREAK);
         return;

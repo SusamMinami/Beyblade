@@ -27,6 +27,18 @@ function material(color, metalness, roughness, extras = {}) {
 function createMaterials(colors) {
   const ringColor = new THREE.Color(colors.ring);
   const ringAccent = ringColor.clone().offsetHSL(0, 0.05, 0.18);
+  const woodFinish = colors.finish === "wood";
+  if (woodFinish) {
+    return {
+      polymer: material(ringColor, 0.02, 0.72),
+      polymerAccent: material(ringAccent, 0.03, 0.64),
+      core: material(colors.core, 0.02, 0.68),
+      metal: material(0x8c633f, 0.02, 0.76),
+      darkMetal: material(0x4d3524, 0.04, 0.72),
+      rubber: material(0x33251b, 0.01, 0.88),
+      shadow: material(0x6b4a31, 0.02, 0.82),
+    };
+  }
   return {
     polymer: material(ringColor, 0.14, 0.2, { clearcoat: 0.78 }),
     polymerAccent: material(ringAccent, 0.2, 0.16, { clearcoat: 0.88 }),
@@ -350,6 +362,11 @@ export function createTopModel(
     partGroup.name = slot;
     partGroup.position.y = SLOT_Y[slot];
     partGroup.userData.baseY = SLOT_Y[slot];
+    partGroup.traverse((child) => {
+      if (!child.isMesh) return;
+      child.material = child.material.clone();
+      top.userData.materials.push(child.material);
+    });
     top.userData.partGroups[slot] = partGroup;
     top.add(partGroup);
   });
@@ -359,8 +376,16 @@ export function createTopModel(
 export function setActivePart(top, activeSlot = null) {
   Object.entries(top.userData.partGroups ?? {}).forEach(([slot, group]) => {
     const active = slot === activeSlot;
-    group.position.y = group.userData.baseY + (active ? 0.1 : 0);
-    group.scale.setScalar(active ? 1.045 : 1);
+    const muted = Boolean(activeSlot) && !active;
+    group.position.y = group.userData.baseY + (active ? 0.12 : 0);
+    group.scale.setScalar(active ? 1.055 : 1);
+    group.traverse((child) => {
+      if (!child.isMesh) return;
+      child.material.transparent = muted;
+      child.material.opacity = muted ? 0.2 : 1;
+      child.material.depthWrite = !muted;
+      child.material.needsUpdate = true;
+    });
   });
 }
 
