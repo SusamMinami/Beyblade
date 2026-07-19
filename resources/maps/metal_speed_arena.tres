@@ -5,11 +5,15 @@
 
 [resource]
 script = ExtResource("1")
+map_id = &"metal"
 map_name = "金属高速竞技场"
 scene_path = "res://scenes/maps/MetalSpeedArena.tscn"
 default_surface = ExtResource("2")
 supports_composite_terrain = false
 terrain_radius = 7.0
+wall_radius = 6.9
+ring_out_radius = 7.45
+bowl_force = 0.68
 bowl_depth = 0.3
 bowl_curve = 1.7
 directional_slope_degrees = 4.5

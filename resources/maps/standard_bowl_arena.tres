@@ -5,11 +5,15 @@
 
 [resource]
 script = ExtResource("1")
+map_id = &"standard"
 map_name = "标准碗形竞技场"
 scene_path = "res://scenes/maps/StandardBowlArena.tscn"
 default_surface = ExtResource("2")
 supports_composite_terrain = false
 terrain_radius = 7.0
+wall_radius = 6.7
+ring_out_radius = 7.2
+bowl_force = 0.86
 bowl_depth = 0.95
 bowl_curve = 2.15
 directional_slope_degrees = 0.0

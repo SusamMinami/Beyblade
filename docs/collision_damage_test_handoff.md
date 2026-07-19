@@ -1,66 +1,70 @@
 # 碰撞损伤系统测试交接
 
-## 本次实现
+更新时间：2026-07-19
+
+## 当前定位
+
+项目现在有两层战斗逻辑：
+
+- `BattleSimulation`：确定性 1v1 规则权威，负责胜负、AI、碰撞冲量、总耐久和快照。
+- `BeybladeBody`：Godot / Jolt 表现与实验载体，负责分部件损伤、动态质心、破损视觉和碰撞音效。
+
+后续不要把 `BeybladeBody` 的刚体碰撞结果作为联网或异步 PVP 的结算依据。
+它仍然很重要，但职责是验证手感、受损表现和未来可能的局部破坏效果。
+
+## 已实现内容
 
 - `TopBattleSnapshot` 保存五个部件各自的耐久上限。
-- `BeybladeBody` 根据相对速度、约化质量、接触自旋速度和攻击方
-  `attack_power` 计算碰撞伤害。
-- 伤害按目标部件 82%、核心锁扣 12%、金属配重盘 6% 传导。
+- `BeybladeBody` 根据相对速度、约化质量、接触自旋速度和攻击方 `attack_power` 计算碰撞伤害。
+- 伤害会分配到具体部件，并改变有效质量、质心、惯量、攻击、控制和转速衰减。
 - 直立、倾斜和倒伏状态使用固定部件命中序列，避免随机结果。
-- 攻击环、配重、中轴和轴尖损坏会分别降低攻击、稳定、控制或续航。
-- 任意部件耐久归零都会触发 `Break`，停止主动控制并播放破坏音效。
-- 五件式模型提供受损、严重损坏和破坏三档视觉反馈。
-- 当前单人战斗场景把自身部件破坏按失败处理。
+- 部件耐久归零后会触发脱落视觉，但在当前确定性 1v1 中 Break 由 `BattleSimulation` 的总耐久归零判定。
+- 五件式模型提供轻伤、重伤和破损三档视觉反馈。
+- `BattleScreen` 会把确定性模拟中的总耐久比例同步到两个 `BeybladeBody` 表现节点。
 
-## Godot 安装
-
-```text
-应用：~/Applications/Godot.app
-命令：~/bin/godot
-版本：4.7.stable.official.5b4e0cb0f
-```
-
-## 明日自动化测试
-
-1. 执行项目导入，确认没有 GDScript 和场景解析错误。
-2. 执行现有 `five_part_top_model_test.gd`。
-3. 执行现有 `assembly_calculator_test.gd`，增加以下断言：
-   - 快照包含五个正数部件耐久。
-   - 高耐久零件的部件耐久大于低耐久零件。
-   - `apply_collision_damage()` 按 82/12/6 比例扣减。
-   - 攻击环损坏后 `attack_power` 下降。
-   - 轴尖损坏后控制力下降、转速衰减增大。
-   - 配重或中轴损坏后摆振强度增加。
-   - 部件耐久归零后只触发一次 `part_broken`。
-   - `reset_top()` 恢复全部耐久、性能和视觉状态。
-4. 创建两个 `BeybladeBody` 的碰撞测试：
-   - 高 `attack_power` 攻击者造成更多伤害。
-   - 相同质量和速度下结果保持确定性。
-   - 碰撞冷却期间不会重复扣血。
-5. 冒烟启动组装页、测试实验室、战斗场景和主入口。
-
-## 明日手动检查
-
-1. 高速撞墙时攻击环受损，普通落地不应产生明显伤害。
-2. 轻伤显示橙色覆盖，重伤显示红色覆盖，破坏后对应层明显脱位。
-3. 受损后确认移动控制、稳定性和停转时间有可感知差异。
-4. 轻撞、重撞和部件破坏分别播放正确音效。
-5. HUD 正确显示整体结构、最弱部件和 `Break` 结算。
-6. 重置回合后耐久、模型位置、覆盖材质和声音状态恢复。
-
-## 初始调参入口
-
-`BeybladeBody` 暴露以下参数：
+## 相关测试
 
 ```text
-collision_damage_scale
-environment_damage_multiplier
-minimum_damage_speed
-collision_damage_cooldown
-maximum_collision_damage
-spin_contact_speed_scale
+tests/battle/collision_damage_test.gd
+tests/battle/spin_mobility_test.gd
+tests/battle/battle_simulation_test.gd
+tests/battle/battle_screen_test.gd
 ```
 
-先保持当前值完成验证，再根据平均破坏所需的有效碰撞次数调节
-`collision_damage_scale`。建议基准为普通配置需要 7 到 12 次有效重击才触发
-`Break`，撞墙伤害应明显低于同速度的敌方攻击。
+`collision_damage_test.gd` 继续覆盖 Jolt 实体碰撞和部件损伤：
+
+- 轻微接触不扣耐久。
+- 高攻击配置造成更多伤害。
+- 耐久不会低于 0。
+- 单侧部件损伤会改变质心。
+- 部件脱落后 `BeybladeBody` 仍可继续存在。
+- `reset_top()` 会恢复耐久、质量、质心和视觉状态。
+- 两个 `BeybladeBody` 的真实物理碰撞会自动结算伤害。
+
+`battle_simulation_test.gd` 覆盖确定性规则：
+
+- 固定 seed 和输入得到 Web 金标快照。
+- 有效碰撞扣除双方总耐久。
+- 普通出射先被护圈反弹，不立即 Ring Out。
+- 低转速削弱平移速度和操控影响。
+- Spin Out、Ring Out、Break 三类结果可判定。
+
+## 调参边界
+
+`BeybladeBody` 暴露的损伤和移动参数只能影响 Jolt 表现层。若要改变正式 1v1 结果，应改：
+
+```text
+scripts/battle/battle_simulation.gd
+tests/battle/battle_simulation_test.gd
+web-prototype/src/core/battle-simulation.js
+web-prototype/tests/battle-simulation.test.js
+```
+
+修改正式规则时必须同步 Web 与 Godot 两端，并更新金标快照。
+
+## 手动检查建议
+
+1. 在战斗场景中确认两个陀螺的模型、转速、耐久和结算显示随模拟变化。
+2. 在 Jolt 测试或实验场景中确认局部损伤仍能改变质心和视觉。
+3. 轻撞、重撞、发射、旋转、胜利和失败音效是否区分清楚。
+4. 重置回合后模拟状态、模型姿态、HUD、音频和调参面板都恢复一致。

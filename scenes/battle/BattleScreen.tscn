@@ -1,8 +1,13 @@
-[gd_scene load_steps=6 format=3]
+[gd_scene load_steps=11 format=3]
 
 [ext_resource type="Script" path="res://scripts/battle/battle_screen.gd" id="1"]
 [ext_resource type="PackedScene" path="res://scenes/battle/BeybladeBody.tscn" id="2"]
 [ext_resource type="Script" path="res://scripts/maps/arena_terrain.gd" id="3"]
+[ext_resource type="AudioStream" path="res://audio/generated/batch_01/launcher_pull_release.wav" id="4"]
+[ext_resource type="AudioStream" path="res://audio/generated/batch_01/spin_loop_fast.wav" id="5"]
+[ext_resource type="AudioStream" path="res://audio/generated/batch_01/reward.wav" id="6"]
+[ext_resource type="AudioStream" path="res://audio/generated/batch_01/ring_out.wav" id="7"]
+[ext_resource type="AudioStream" path="res://audio/generated/batch_01/spin_out.wav" id="8"]
 
 [sub_resource type="StandardMaterial3D" id="StandardMaterial3D_center"]
 albedo_color = Color(0.55, 0.62, 0.68, 1)
@@ -45,6 +50,37 @@ surface_material_override/0 = SubResource("StandardMaterial3D_center")
 unique_name_in_owner = true
 position = Vector3(0, 0.45, 0)
 
+[node name="EnemyBeyblade" parent="." instance=ExtResource("2")]
+unique_name_in_owner = true
+position = Vector3(0, 0.45, 0)
+
+[node name="LaunchAudio" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("4")
+
+[node name="PlayerSpinAudio" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("5")
+volume_db = -12.0
+
+[node name="EnemySpinAudio" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("5")
+volume_db = -14.0
+pitch_scale = 0.92
+
+[node name="RewardAudio" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("6")
+
+[node name="RingOutAudio" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("7")
+
+[node name="SpinOutAudio" type="AudioStreamPlayer" parent="."]
+unique_name_in_owner = true
+stream = ExtResource("8")
+
 [node name="BattleUI" type="CanvasLayer" parent="."]
 
 [node name="Root" type="Control" parent="BattleUI"]
@@ -79,7 +115,104 @@ autowrap_mode = 3
 [node name="SpinLabel" type="Label" parent="BattleUI/Root/TopPanel/TopRow"]
 unique_name_in_owner = true
 layout_mode = 2
-text = "状态：待发射\n转速：0.0"
+text = "YOU\n待发射"
+horizontal_alignment = 1
+
+[node name="BattleTimeLabel" type="Label" parent="BattleUI/Root/TopPanel/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "ROUND 01\n00.0"
+horizontal_alignment = 1
+
+[node name="EnemySpinLabel" type="Label" parent="BattleUI/Root/TopPanel/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "AI\n待发射"
+horizontal_alignment = 1
+
+[node name="LaunchPanel" type="PanelContainer" parent="BattleUI/Root"]
+unique_name_in_owner = true
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 36.0
+offset_top = 260.0
+offset_right = -36.0
+offset_bottom = 550.0
+grow_horizontal = 2
+
+[node name="LaunchColumn" type="VBoxContainer" parent="BattleUI/Root/LaunchPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="LaunchTitle" type="Label" parent="BattleUI/Root/LaunchPanel/LaunchColumn"]
+layout_mode = 2
+text = "LAUNCH CONTROL / 设定发射"
+horizontal_alignment = 1
+
+[node name="LaunchGrid" type="GridContainer" parent="BattleUI/Root/LaunchPanel/LaunchColumn"]
+layout_mode = 2
+columns = 3
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 12
+
+[node name="PowerLabel" type="Label" parent="BattleUI/Root/LaunchPanel/LaunchColumn/LaunchGrid"]
+layout_mode = 2
+text = "拉绳力度"
+
+[node name="LaunchPowerSlider" type="HSlider" parent="BattleUI/Root/LaunchPanel/LaunchColumn/LaunchGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.35
+max_value = 1.0
+step = 0.01
+value = 0.86
+
+[node name="LaunchPowerOutput" type="Label" parent="BattleUI/Root/LaunchPanel/LaunchColumn/LaunchGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "86%"
+horizontal_alignment = 2
+
+[node name="DirectionLabel" type="Label" parent="BattleUI/Root/LaunchPanel/LaunchColumn/LaunchGrid"]
+layout_mode = 2
+text = "发射方向"
+
+[node name="LaunchDirectionSlider" type="HSlider" parent="BattleUI/Root/LaunchPanel/LaunchColumn/LaunchGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -30.0
+max_value = 30.0
+step = 1.0
+
+[node name="LaunchDirectionOutput" type="Label" parent="BattleUI/Root/LaunchPanel/LaunchColumn/LaunchGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "0°"
+horizontal_alignment = 2
+
+[node name="AngleLabel" type="Label" parent="BattleUI/Root/LaunchPanel/LaunchColumn/LaunchGrid"]
+layout_mode = 2
+text = "入场倾角"
+
+[node name="LaunchAngleSlider" type="HSlider" parent="BattleUI/Root/LaunchPanel/LaunchColumn/LaunchGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = -12.0
+max_value = 12.0
+step = 1.0
+
+[node name="LaunchAngleOutput" type="Label" parent="BattleUI/Root/LaunchPanel/LaunchColumn/LaunchGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(64, 0)
+layout_mode = 2
+text = "0°"
+horizontal_alignment = 2
 
 [node name="BattleLogLabel" type="Label" parent="BattleUI/Root"]
 unique_name_in_owner = true
@@ -99,6 +232,7 @@ autowrap_mode = 3
 
 [node name="JoystickArea" type="Panel" parent="BattleUI/Root"]
 unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
@@ -110,6 +244,8 @@ offset_bottom = -30.0
 grow_vertical = 0
 
 [node name="ControlFeedbackPanel" type="PanelContainer" parent="BattleUI/Root"]
+unique_name_in_owner = true
+visible = false
 layout_mode = 1
 anchors_preset = 2
 anchor_top = 1.0
@@ -163,6 +299,18 @@ grow_horizontal = 0
 grow_vertical = 0
 theme_override_constants/separation = 10
 
+[node name="SoundButton" type="Button" parent="BattleUI/Root/ButtonColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "声音：开"
+
+[node name="TuneButton" type="Button" parent="BattleUI/Root/ButtonColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "调参"
+
 [node name="LaunchButton" type="Button" parent="BattleUI/Root/ButtonColumn"]
 layout_mode = 2
 size_flags_vertical = 3
@@ -173,12 +321,202 @@ layout_mode = 2
 size_flags_vertical = 3
 text = "重置"
 
+[node name="PauseButton" type="Button" parent="BattleUI/Root/ButtonColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_vertical = 3
+text = "暂停"
+
 [node name="BackButton" type="Button" parent="BattleUI/Root/ButtonColumn"]
 layout_mode = 2
 size_flags_vertical = 3
 text = "返回地图"
 
+[node name="TuningPanel" type="PanelContainer" parent="BattleUI/Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 6
+anchor_left = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = -420.0
+offset_top = 250.0
+offset_right = -24.0
+offset_bottom = -330.0
+grow_horizontal = 0
+grow_vertical = 2
+
+[node name="TuningColumn" type="VBoxContainer" parent="BattleUI/Root/TuningPanel"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="TuningTitle" type="Label" parent="BattleUI/Root/TuningPanel/TuningColumn"]
+layout_mode = 2
+text = "LIVE TUNING / 实时调参"
+horizontal_alignment = 1
+
+[node name="TuningGrid" type="GridContainer" parent="BattleUI/Root/TuningPanel/TuningColumn"]
+layout_mode = 2
+columns = 3
+theme_override_constants/h_separation = 10
+theme_override_constants/v_separation = 10
+
+[node name="DamageTuningLabel" type="Label" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid"]
+layout_mode = 2
+text = "碰撞伤害"
+
+[node name="TuningDamageSlider" type="HSlider" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.5
+max_value = 1.8
+step = 0.05
+value = 1.0
+
+[node name="TuningDamageOutput" type="Label" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="SpinTuningLabel" type="Label" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid"]
+layout_mode = 2
+text = "转速衰减"
+
+[node name="TuningSpinSlider" type="HSlider" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.6
+max_value = 1.6
+step = 0.05
+value = 1.0
+
+[node name="TuningSpinOutput" type="Label" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="ControlTuningLabel" type="Label" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid"]
+layout_mode = 2
+text = "控制响应"
+
+[node name="TuningControlSlider" type="HSlider" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.5
+max_value = 1.8
+step = 0.05
+value = 1.0
+
+[node name="TuningControlOutput" type="Label" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="SpeedTuningLabel" type="Label" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid"]
+layout_mode = 2
+text = "移动速度"
+
+[node name="TuningSpeedSlider" type="HSlider" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+min_value = 0.7
+max_value = 1.4
+step = 0.05
+value = 1.0
+
+[node name="TuningSpeedOutput" type="Label" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(58, 0)
+layout_mode = 2
+text = "100%"
+horizontal_alignment = 2
+
+[node name="TuningActions" type="HBoxContainer" parent="BattleUI/Root/TuningPanel/TuningColumn"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="ResetTuningButton" type="Button" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningActions"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "恢复基准"
+
+[node name="CloseTuningButton" type="Button" parent="BattleUI/Root/TuningPanel/TuningColumn/TuningActions"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "关闭"
+
+[node name="ResultPanel" type="PanelContainer" parent="BattleUI/Root"]
+unique_name_in_owner = true
+visible = false
+layout_mode = 1
+anchors_preset = 8
+anchor_left = 0.5
+anchor_top = 0.5
+anchor_right = 0.5
+anchor_bottom = 0.5
+offset_left = -270.0
+offset_top = -145.0
+offset_right = 270.0
+offset_bottom = 145.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="ResultColumn" type="VBoxContainer" parent="BattleUI/Root/ResultPanel"]
+layout_mode = 2
+theme_override_constants/separation = 16
+
+[node name="ResultKicker" type="Label" parent="BattleUI/Root/ResultPanel/ResultColumn"]
+layout_mode = 2
+text = "BATTLE COMPLETE"
+horizontal_alignment = 1
+
+[node name="ResultLabel" type="Label" parent="BattleUI/Root/ResultPanel/ResultColumn"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "对战结束"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="ResultActions" type="HBoxContainer" parent="BattleUI/Root/ResultPanel/ResultColumn"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="ResultAssemblyButton" type="Button" parent="BattleUI/Root/ResultPanel/ResultColumn/ResultActions"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "返回改装"
+
+[node name="ResultRestartButton" type="Button" parent="BattleUI/Root/ResultPanel/ResultColumn/ResultActions"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "再次对战"
+
 [connection signal="gui_input" from="BattleUI/Root/JoystickArea" to="." method="_on_joystick_area_gui_input"]
+[connection signal="value_changed" from="BattleUI/Root/LaunchPanel/LaunchColumn/LaunchGrid/LaunchPowerSlider" to="." method="_on_launch_parameter_changed"]
+[connection signal="value_changed" from="BattleUI/Root/LaunchPanel/LaunchColumn/LaunchGrid/LaunchDirectionSlider" to="." method="_on_launch_parameter_changed"]
+[connection signal="value_changed" from="BattleUI/Root/LaunchPanel/LaunchColumn/LaunchGrid/LaunchAngleSlider" to="." method="_on_launch_parameter_changed"]
+[connection signal="pressed" from="BattleUI/Root/ButtonColumn/SoundButton" to="." method="_on_sound_button_pressed"]
+[connection signal="pressed" from="BattleUI/Root/ButtonColumn/TuneButton" to="." method="_on_tune_button_pressed"]
 [connection signal="pressed" from="BattleUI/Root/ButtonColumn/LaunchButton" to="." method="_on_launch_button_pressed"]
 [connection signal="pressed" from="BattleUI/Root/ButtonColumn/RestartButton" to="." method="_on_restart_button_pressed"]
+[connection signal="pressed" from="BattleUI/Root/ButtonColumn/PauseButton" to="." method="_on_pause_button_pressed"]
 [connection signal="pressed" from="BattleUI/Root/ButtonColumn/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="value_changed" from="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid/TuningDamageSlider" to="." method="_on_damage_tuning_changed"]
+[connection signal="value_changed" from="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid/TuningSpinSlider" to="." method="_on_spin_tuning_changed"]
+[connection signal="value_changed" from="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid/TuningControlSlider" to="." method="_on_control_tuning_changed"]
+[connection signal="value_changed" from="BattleUI/Root/TuningPanel/TuningColumn/TuningGrid/TuningSpeedSlider" to="." method="_on_speed_tuning_changed"]
+[connection signal="pressed" from="BattleUI/Root/TuningPanel/TuningColumn/TuningActions/ResetTuningButton" to="." method="_on_reset_tuning_pressed"]
+[connection signal="pressed" from="BattleUI/Root/TuningPanel/TuningColumn/TuningActions/CloseTuningButton" to="." method="_on_close_tuning_pressed"]
+[connection signal="pressed" from="BattleUI/Root/ResultPanel/ResultColumn/ResultActions/ResultAssemblyButton" to="." method="_on_result_assembly_pressed"]
+[connection signal="pressed" from="BattleUI/Root/ResultPanel/ResultColumn/ResultActions/ResultRestartButton" to="." method="_on_result_restart_pressed"]

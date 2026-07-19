@@ -1,66 +1,103 @@
-# 五件式陀螺物理参数基线
+# 五件式陀螺参数基线
 
-## 单位
+更新时间：2026-07-19
 
-`TopPartResource` 使用 SI 单位，避免把显示分数与物理量混在一起：
+## 当前口径
 
-| 字段 | 单位 | 含义 |
-| --- | --- | --- |
-| `mass` | kg | 零件质量 |
-| `center_of_mass_offset` | m | 零件质心相对组合原点的位置 |
-| `moment_of_inertia` | kg·m² | 绕竖直自旋轴的惯量 |
-| `transverse_moment_of_inertia` | kg·m² | 绕横向轴的惯量 |
-| `contact_area` | m² | 正常直立时轴尖与场地的近似接触面积 |
-| `upper_stack_height_offset` | m | 中轴带来的上层堆叠高度变化 |
-
-现有战斗碰撞体半径为 `0.55` Godot 单位，远大于真实约 `35 mm`
-半径。`BeybladeBody` 因此使用相似换算：
+正式资源现在只保留 `PartDatabase` 引用的 15 个零件：
 
 ```text
-长度缩放 = 0.55 / 0.035
-质量缩放 = 1.4 / 0.0416
-惯量缩放 = 质量缩放 × 长度缩放²
+resources/parts/attack_rings/*.tres
+resources/parts/core_locks/*.tres
+resources/parts/weight_discs/*.tres
+resources/parts/driver_shafts/*.tres
+resources/parts/tips/*.tres
 ```
 
-这样可以保留现有场景尺度，同时让不同组合之间的质量、质心和惯量比例
-来自真实参数。
+旧的 `TopPartCatalog` 和旧制单位资源已经删除。后续不要再维护两套零件数据。
+
+当前数值是 Web / Godot 共用的原型平衡单位，不再宣称为严格 SI 单位。这样做是为了让
+确定性二维规则、Godot 竖屏场景尺度和 15 件零件差异保持一致。
+
+## 字段含义
+
+| 字段 | 当前口径 | 含义 |
+| --- | --- | --- |
+| `mass` | 平衡质量单位 | 影响碰撞冲量、控制加速度和启动动量 |
+| `center_of_mass_offset` | 规则空间偏移 | 影响稳定性和偏心扰动 |
+| `moment_of_inertia` | 轴向惯量单位 | 影响最大转速和续航表现 |
+| `transverse_moment_of_inertia` | 预留 | 当前正式合成主要使用轴向惯量 |
+| `friction` | 0 到约 1.5 | 与地形共同影响平移阻力 |
+| `restitution` | 0 到 1 | 碰撞回弹倾向 |
+| `contact_area` | 相对接触面积 | 主要用于零件差异展示和后续扩展 |
+| `spin_damping_multiplier` | 无量纲倍率 | 影响转速衰减 |
+| `stability` | 无量纲倍率 | 影响倾角、偏心惩罚和续航 |
+| `control_response` | 无量纲倍率 | 影响摇杆或传感器控制响应 |
+| `attack_power` | 无量纲倍率 | 影响碰撞伤害和 AI 进攻倾向 |
+| `durability` | 结构耐久单位 | 影响 Break 所需伤害 |
 
 ## 组合规则
 
+`AssemblyCalculator` 同步存在于：
+
+```text
+scripts/assembly/assembly_calculator.gd
+web-prototype/src/core/assembly-calculator.js
+```
+
+核心规则：
+
 - 总质量为五个零件质量之和。
 - 总质心为各零件质心按质量加权的平均值。
-- 三轴惯量使用各零件自身惯量，并通过平行轴定理平移到总质心。
-- 地面摩擦和接触面积来自轴尖；当前单碰撞体的回弹系数来自攻击环。
-- 衰减、稳定、控制和攻击系数使用按部位职责设置权重的几何平均。
-- 耐久以最弱结构件为基础，并用总质量对瞬时碰撞加速度做小幅修正。
+- 轴向惯量为五个零件惯量之和。
+- 摩擦主要来自轴尖，攻击环和配重盘少量参与。
+- 回弹主要来自攻击环，配重盘和轴尖少量参与。
+- 稳定、控制、攻击、耐久按部位职责加权。
+- 最大转速随惯量增加而降低。
+- 发射前向动量随总质量增加而上升。
+- 偏心质心会扣稳定性，并在战斗模拟中产生周期性扰动。
 
-## 初始平衡依据
+## 正式基准
 
-- 现代竞技陀螺的主攻击层常约 `30–37 g`，连接件约 `6–7 g`，轴尖约
-  `2–3 g`。本项目把主攻击层拆为攻击环、核心锁扣和配重盘，因此三者
-  合计约 `34.7–41.8 g`。
-- 质量远离自旋轴会提高轴向惯量和角动量，通常改善抗扰与续航，但降低
-  启动和方向响应。
-- 低中轴降低总质心和横向受击杠杆；高中轴增强倾压和高位接触，也更易
-  失稳或刮地。
-- 窄金属尖接触面积小、抓地弱、损耗低；橡胶尖抓地与控制较强，但材料
-  形变增加能耗；宽平尖把自旋更强地耦合为平移动作，攻击性高而续航差。
-- 偏心盘通过横向质心偏移制造周期性扰动，不会凭空增加能量，因此同时
-  提高攻击轨迹和自损耗。
+标准组合：
 
-初始数据用于建立可解释的差异，不代表最终竞技平衡。后续应通过固定
-发射条件的回归场景记录停转时间、最大倾角、平均速度和碰撞冲量，再调
-整无量纲乘数，不应随意改动物理单位。
+```text
+attack_ring.balance_six
+core_lock.standard
+weight_disc.standard
+driver_shaft.standard
+tip.rubber_balance
+```
 
-## 参考资料
+派生基准约为：
 
-- Godot `RigidBody3D` 文档：
-  <https://docs.godotengine.org/en/stable/classes/class_rigidbody3d.html>
-- World Beyblade Organization 的 Metal Fight 部件说明：
-  <http://wiki.worldbeyblade.org/index.php?title=Metal_Fight_Beyblade>
-- World Beyblade Organization 的轴尖尺寸与表现记录：
-  <http://wiki.worldbeyblade.org/index.php?title=List_of_Bottoms>
-- Beyblade X 部件重量样本：
-  <https://www.beybase.com/bx-15-leon-claw-beyblade-review/>
-- 现代 Blade、Ratchet、Bit 重量与性能样本：
-  <https://beyblade.gobamm.com/>
+```text
+total_mass = 1.22
+moment_of_inertia = 0.89
+max_spin_speed = 65
+launch_forward_impulse = 4.5
+```
+
+这些值是 Web 金标和 Godot 金标共同依赖的稳定基线。修改它们前必须同步两端测试。
+
+## 设计依据
+
+- 重外圈提高质量、惯量和撞击动量，但降低控制和启动转速。
+- 低重心提高稳定性，但降低进攻倾角。
+- 橡胶尖控制强，代价是转速衰减更快。
+- 金属尖续航强、摩擦低，代价是控制弱。
+- 扁平尖制造更强横移与攻击性，稳定和续航偏弱。
+- 偏心配重强化突击轨迹，同时显著增加失衡和自损耗。
+
+## 修改规则
+
+修改零件参数时必须同时检查：
+
+```text
+tests/assembly/assembly_calculator_test.gd
+web-prototype/tests/assembly-calculator.test.js
+tests/battle/battle_simulation_test.gd
+web-prototype/tests/battle-simulation.test.js
+```
+
+如果影响 `BattleSimulation` 金标快照，应重新生成并审查快照，而不是直接放宽容差。

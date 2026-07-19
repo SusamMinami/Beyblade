@@ -13,6 +13,8 @@ config_version=5
 config/name="战斗陀螺"
 config/features=PackedStringArray("4.7", "GL Compatibility")
 config/icon="res://icon.svg"
+config/use_custom_user_dir=true
+config/custom_user_dir_name="Beyblade"
 run/main_scene="res://scenes/assembly/AssemblyScreen.tscn"
 
 [autoload]

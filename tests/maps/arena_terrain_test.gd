@@ -12,6 +12,7 @@ func _initialize() -> void:
 
 func _run() -> void:
 	_test_height_profiles()
+	await _test_composite_visual_regions()
 	await _test_slope_acceleration()
 	_finish()
 
@@ -81,6 +82,50 @@ func _test_slope_acceleration() -> void:
 		"坡面必须把重力转化为水平速度"
 	)
 	body.free()
+	terrain.free()
+	await process_frame
+
+
+func _test_composite_visual_regions() -> void:
+	var arena_map: ArenaMapResource = ARENA_MAP_CATALOG.get_by_name(
+		"复合材质竞技场"
+	)
+	var terrain := ARENA_TERRAIN.new()
+	terrain.configure(arena_map, Color.WHITE)
+	root.add_child(terrain)
+	await process_frame
+
+	var center_color: Color = terrain.get_surface_color_at_radius(1.0)
+	var middle_color: Color = terrain.get_surface_color_at_radius(4.0)
+	var edge_color: Color = terrain.get_surface_color_at_radius(6.2)
+	_expect(
+		not center_color.is_equal_approx(middle_color),
+		"复合地图中央金属和中圈橡胶必须使用不同颜色"
+	)
+	_expect(
+		not middle_color.is_equal_approx(edge_color),
+		"复合地图中圈橡胶和边缘减速带必须使用不同颜色"
+	)
+
+	var terrain_mesh := terrain.get_node_or_null("TerrainMesh") as MeshInstance3D
+	_expect(terrain_mesh != null, "地形必须生成可视网格")
+	if terrain_mesh != null and terrain_mesh.mesh != null:
+		var arrays := terrain_mesh.mesh.surface_get_arrays(0)
+		var colors: PackedColorArray = arrays[Mesh.ARRAY_COLOR]
+		_expect(not colors.is_empty(), "复合地形网格必须包含顶点颜色")
+		_expect(
+			colors.size() == arrays[Mesh.ARRAY_VERTEX].size(),
+			"每个地形顶点必须具有对应颜色"
+		)
+	var boundary := terrain.get_node_or_null("Boundary")
+	_expect(boundary != null and boundary.get_child_count() > 0, "地形必须生成护圈")
+	if boundary != null and boundary.get_child_count() > 0:
+		var wall_position: Vector3 = boundary.get_child(0).position
+		var wall_radius := Vector2(wall_position.x, wall_position.z).length()
+		_expect(
+			is_equal_approx(wall_radius, arena_map.wall_radius + 0.12),
+			"护圈几何必须使用规则层 wall_radius"
+		)
 	terrain.free()
 	await process_frame
 

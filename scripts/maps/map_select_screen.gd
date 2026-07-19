@@ -16,8 +16,13 @@ func _ready() -> void:
 
 func _populate_maps() -> void:
 	map_options.clear()
-	for arena_map in ARENA_MAP_CATALOG.get_all():
+	var maps := ARENA_MAP_CATALOG.get_all()
+	for arena_map in maps:
 		map_options.add_item(arena_map.map_name)
+	for map_index in range(maps.size()):
+		if maps[map_index].map_name == _game_state().selected_map:
+			map_options.select(map_index)
+			break
 
 
 func _game_state():

@@ -1,15 +1,26 @@
-[gd_resource type="Resource" script_class="ArenaMapResource" load_steps=3 format=3]
+[gd_resource type="Resource" script_class="ArenaMapResource" load_steps=5 format=3]
 
 [ext_resource type="Script" path="res://scripts/maps/arena_map_resource.gd" id="1"]
-[ext_resource type="Resource" path="res://resources/terrain_surfaces/standard_surface.tres" id="2"]
+[ext_resource type="Resource" path="res://resources/terrain_surfaces/metal_surface.tres" id="2"]
+[ext_resource type="Resource" path="res://resources/terrain_surfaces/rubber_surface.tres" id="3"]
+[ext_resource type="Resource" path="res://resources/terrain_surfaces/brake_surface.tres" id="4"]
 
 [resource]
 script = ExtResource("1")
+map_id = &"composite"
 map_name = "复合材质竞技场"
 scene_path = "res://scenes/maps/CompositeArena.tscn"
 default_surface = ExtResource("2")
 supports_composite_terrain = true
+center_surface = ExtResource("2")
+middle_surface = ExtResource("3")
+edge_surface = ExtResource("4")
+center_surface_radius = 3.1
+middle_surface_radius = 5.9
 terrain_radius = 7.0
+wall_radius = 6.8
+ring_out_radius = 7.3
+bowl_force = 0.78
 bowl_depth = 1.25
 bowl_curve = 3.0
 directional_slope_degrees = -3.0

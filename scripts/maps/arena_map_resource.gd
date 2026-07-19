@@ -1,11 +1,20 @@
 class_name ArenaMapResource
 extends Resource
 
+@export var map_id: StringName = &"standard"
 @export var map_name: String = ""
 @export var scene_path: String = ""
 @export var default_surface: TerrainSurfaceResource
 @export var supports_composite_terrain: bool = false
+@export var center_surface: TerrainSurfaceResource
+@export var middle_surface: TerrainSurfaceResource
+@export var edge_surface: TerrainSurfaceResource
+@export_range(0.0, 12.0, 0.1) var center_surface_radius: float = 0.0
+@export_range(0.0, 12.0, 0.1) var middle_surface_radius: float = 0.0
 @export_range(4.0, 12.0, 0.1) var terrain_radius: float = 7.0
+@export_range(4.0, 12.0, 0.05) var wall_radius: float = 6.7
+@export_range(4.0, 12.0, 0.05) var ring_out_radius: float = 7.2
+@export_range(0.0, 3.0, 0.01) var bowl_force: float = 0.86
 @export_range(0.0, 2.5, 0.05) var bowl_depth: float = 0.6
 @export_range(1.0, 4.0, 0.1) var bowl_curve: float = 2.0
 @export_range(-12.0, 12.0, 0.25) var directional_slope_degrees: float = 0.0
@@ -14,6 +23,18 @@ extends Resource
 @export_range(24, 96, 1) var angular_segments: int = 64
 @export var recommended_players: int = 2
 @export_multiline var description: String = ""
+
+
+func get_surface_at_radius(radius: float) -> TerrainSurfaceResource:
+	if not supports_composite_terrain:
+		return default_surface
+	if center_surface != null and radius < center_surface_radius:
+		return center_surface
+	if middle_surface != null and radius < middle_surface_radius:
+		return middle_surface
+	if edge_surface != null:
+		return edge_surface
+	return default_surface
 
 
 func get_height_at(local_position: Vector3) -> float:

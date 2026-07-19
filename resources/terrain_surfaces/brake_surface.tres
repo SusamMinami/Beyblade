@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TerrainSurfaceResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/maps/terrain_surface_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+surface_name = "边缘减速带"
+surface_friction = 1.55
+spin_damping_multiplier = 1.46
+linear_drag_multiplier = 1.45
+bounce_multiplier = 0.68
+stability_modifier = 0.9
+damage_multiplier = 0.92
+control_modifier = 1.08
+noise_strength = 0.035
+description = "靠近护圈的高阻力区域，用于抑制持续贴边高速滑行。"

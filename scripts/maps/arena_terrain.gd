@@ -37,6 +37,7 @@ func rebuild() -> void:
 		add_child(_boundary_root)
 
 	var vertices := PackedVector3Array()
+	var colors := PackedColorArray()
 	var radial_segments := maxi(map_resource.radial_segments, 1)
 	var angular_segments := maxi(map_resource.angular_segments, 3)
 	for radial_index in range(radial_segments):
@@ -57,22 +58,33 @@ func rebuild() -> void:
 			var outer_start := _surface_point(outer_radius, start_angle)
 			var outer_end := _surface_point(outer_radius, end_angle)
 			var inner_end := _surface_point(inner_radius, end_angle)
-			vertices.append_array(PackedVector3Array([
+			var quad_vertices := PackedVector3Array([
 				inner_start,
 				outer_start,
 				outer_end,
 				inner_start,
 				outer_end,
 				inner_end
+			])
+			vertices.append_array(quad_vertices)
+			colors.append_array(PackedColorArray([
+				get_surface_color_at_radius(inner_radius),
+				get_surface_color_at_radius(outer_radius),
+				get_surface_color_at_radius(outer_radius),
+				get_surface_color_at_radius(inner_radius),
+				get_surface_color_at_radius(outer_radius),
+				get_surface_color_at_radius(inner_radius)
 			]))
 
 	var array_mesh := ArrayMesh.new()
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = vertices
+	arrays[Mesh.ARRAY_COLOR] = colors
 	array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	var material := StandardMaterial3D.new()
-	material.albedo_color = surface_color
+	material.albedo_color = Color.WHITE
+	material.vertex_color_use_as_albedo = true
 	material.roughness = 0.55
 	array_mesh.surface_set_material(0, material)
 	_mesh_instance.mesh = array_mesh
@@ -89,6 +101,23 @@ func get_spawn_height(local_position: Vector3) -> float:
 	if map_resource == null:
 		return 0.0
 	return map_resource.get_height_at(local_position)
+
+
+func get_surface_color_at_radius(radius: float) -> Color:
+	if map_resource == null or not map_resource.supports_composite_terrain:
+		return surface_color
+	var surface := map_resource.get_surface_at_radius(radius)
+	if surface == null:
+		return surface_color
+	match surface.surface_name:
+		"低摩擦金属地面":
+			return Color("465861")
+		"高抓地橡胶":
+			return Color("263b37")
+		"边缘减速带":
+			return Color("4d302c")
+		_:
+			return surface_color
 
 
 func _surface_point(radius: float, angle: float) -> Vector3:
@@ -114,7 +143,7 @@ func _rebuild_boundary() -> void:
 
 	var segment_count := 48
 	var segment_length := (
-		TAU * (map_resource.terrain_radius + 0.12) / float(segment_count)
+		TAU * (map_resource.wall_radius + 0.12) / float(segment_count)
 		+ 0.08
 	)
 	var wall_material := StandardMaterial3D.new()
@@ -122,7 +151,7 @@ func _rebuild_boundary() -> void:
 	wall_material.roughness = 0.7
 	for segment_index in range(segment_count):
 		var angle := TAU * float(segment_index) / float(segment_count)
-		var edge_point := _surface_point(map_resource.terrain_radius, angle)
+		var edge_point := _surface_point(map_resource.wall_radius, angle)
 		var wall := StaticBody3D.new()
 		wall.name = "BoundaryWall%d" % segment_index
 		wall.position = edge_point + Vector3(

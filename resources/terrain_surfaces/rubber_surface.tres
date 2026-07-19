@@ -1,0 +1,16 @@
+[gd_resource type="Resource" script_class="TerrainSurfaceResource" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/maps/terrain_surface_resource.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+surface_name = "高抓地橡胶"
+surface_friction = 1.35
+spin_damping_multiplier = 1.28
+linear_drag_multiplier = 1.22
+bounce_multiplier = 0.72
+stability_modifier = 1.08
+damage_multiplier = 0.86
+control_modifier = 1.2
+noise_strength = 0.0
+description = "高摩擦、高控制的橡胶区域，会明显加快转速和平移速度衰减。"
