@@ -10,6 +10,10 @@ const MIN_ACTIVE_SPIN = 2;
 const MIN_DAMAGE_IMPULSE = 0.35;
 const DAMAGE_PER_IMPULSE = 1.1;
 const MAX_BATTLE_TIME = 75;
+const TILT_WARNING = 0.38;
+const TILT_CRITICAL = 0.62;
+const MAX_TILT = 0.9;
+const MAX_COLLISION_LOGS = 200;
 
 const clamp = (value, min, max) => Math.min(Math.max(value, min), max);
 const smoothstep = (edge0, edge1, value) => {
@@ -41,6 +45,12 @@ function createTop(build, position) {
     surfaceName: "",
     controlInput: { x: 0, y: 0 },
     controlInfluence: 0,
+    imbalance: 0,
+    spinLossRate: 0,
+    ringOutRisk: 0,
+    stabilityState: "stable",
+    ringRiskState: "safe",
+    spinRiskState: "safe",
   };
 }
 
@@ -51,11 +61,16 @@ export class BattleSimulation {
     arena,
     seed = 20260718,
     tuning = {},
+    diagnostics = false,
+    logger = console.debug,
   }) {
     this.playerBuild = playerBuild;
     this.enemyBuild = enemyBuild;
     this.arena = arena;
     this.seed = seed >>> 0;
+    this.diagnostics = diagnostics;
+    this.logger = logger;
+    this.collisionLog = [];
     this.tuning = {
       damageScale: 1,
       spinScale: 1,
@@ -72,6 +87,7 @@ export class BattleSimulation {
     this.result = null;
     this.events = [];
     this.collisionCooldown = 0;
+    this.collisionLog = [];
     this.player = createTop(this.playerBuild, { x: 0, y: 4.45 });
     this.enemy = createTop(this.enemyBuild, { x: 0, y: -4.45 });
   }
@@ -134,6 +150,8 @@ export class BattleSimulation {
     this._resolveCollision();
     this._updateTilt(this.player, dt);
     this._updateTilt(this.enemy, dt);
+    this._updateRiskStates(this.player, "player");
+    this._updateRiskStates(this.enemy, "enemy");
     this._checkResult();
   }
 
@@ -141,6 +159,7 @@ export class BattleSimulation {
     const radius = length(top.position);
     const currentSurface = this.arena.surfaceAt(radius);
     top.surfaceName = currentSurface.name;
+    const spinBefore = top.spin;
 
     top.spin = Math.max(
       top.spin -
@@ -159,11 +178,18 @@ export class BattleSimulation {
     const controlMagnitude = clamp(length(rawControl), 0, 1);
     const control = normalize(rawControl);
     const mobility = smoothstep(0.02, 0.55, spinRatio);
+    const scrapeRatio = smoothstep(0.48, 0.82, top.tilt);
+    const balanceControl = clamp(
+      1 - top.imbalance * 0.45 - scrapeRatio * 0.35,
+      0.35,
+      1,
+    );
     const controlAcceleration =
       (top.build.controlForce / top.build.totalMass) *
       currentSurface.control *
       this.tuning.controlScale *
-      mobility;
+      mobility *
+      balanceControl;
     top.velocity.x += control.x * controlAcceleration * dt;
     top.velocity.y += control.y * controlAcceleration * dt;
     top.controlInput = scale(control, controlMagnitude);
@@ -171,7 +197,8 @@ export class BattleSimulation {
       controlMagnitude *
         mobility *
         currentSurface.control *
-        top.build.controlResponse,
+        top.build.controlResponse *
+        balanceControl,
       0,
       1,
     );
@@ -206,6 +233,19 @@ export class BattleSimulation {
       top.velocity.y -= noise * 0.7 * dt;
     }
 
+    if (scrapeRatio > 0) {
+      const scrapeSpinLoss =
+        (1.25 + top.build.friction * currentSurface.friction * 1.8) *
+        scrapeRatio *
+        dt;
+      top.spin = Math.max(top.spin - scrapeSpinLoss, 0);
+      const scrapePhase =
+        this.time * 12.7 + this.seed * 0.0007 + (isEnemy ? 1.9 : 0.2);
+      const scrapeDrift = scrapeRatio * (0.3 + top.imbalance * 0.9) * dt;
+      top.velocity.x += Math.cos(scrapePhase) * scrapeDrift;
+      top.velocity.y += Math.sin(scrapePhase) * scrapeDrift;
+    }
+
     const drag =
       0.17 *
       top.build.friction *
@@ -226,6 +266,7 @@ export class BattleSimulation {
     top.position.x += top.velocity.x * dt;
     top.position.y += top.velocity.y * dt;
     this._resolveArenaRim(top, currentSurface);
+    top.spinLossRate = Math.max((spinBefore - top.spin) / Math.max(dt, 1e-6), 0);
   }
 
   _resolveArenaRim(top, surface) {
@@ -319,6 +360,10 @@ export class BattleSimulation {
     this.enemy.velocity.y += normal.y * impulse * inverseEnemyMass;
 
     if (this.collisionCooldown <= 0 && impulse > MIN_DAMAGE_IMPULSE) {
+      const collisionBefore = {
+        player: this._collisionTopState(this.player),
+        enemy: this._collisionTopState(this.enemy),
+      };
       const baseDamage =
         (impulse - MIN_DAMAGE_IMPULSE) *
         DAMAGE_PER_IMPULSE *
@@ -337,7 +382,36 @@ export class BattleSimulation {
       );
       this.player.spin = Math.max(this.player.spin - impulse * 0.19, 0);
       this.enemy.spin = Math.max(this.enemy.spin - impulse * 0.19, 0);
+      this._applyCollisionImbalance(
+        this.player,
+        this.enemy.build.attackPower,
+        playerSurface,
+        impulse,
+      );
+      this._applyCollisionImbalance(
+        this.enemy,
+        this.player.build.attackPower,
+        enemySurface,
+        impulse,
+      );
       this.collisionCooldown = 0.12;
+      const telemetry = this._createCollisionTelemetry(
+        impulse,
+        collisionBefore,
+        {
+          player: this._collisionTopState(this.player),
+          enemy: this._collisionTopState(this.enemy),
+        },
+        damageToPlayer,
+        damageToEnemy,
+      );
+      this.collisionLog.push(telemetry);
+      if (this.collisionLog.length > MAX_COLLISION_LOGS) {
+        this.collisionLog.shift();
+      }
+      if (this.diagnostics) {
+        this.logger("[BattleSimulation] collision", telemetry);
+      }
       this.events.push({
         type: "collision",
         impulse,
@@ -346,20 +420,174 @@ export class BattleSimulation {
           x: (this.player.position.x + this.enemy.position.x) * 0.5,
           y: (this.player.position.y + this.enemy.position.y) * 0.5,
         },
+        telemetry,
       });
     }
+  }
+
+  _applyCollisionImbalance(top, incomingAttack, surface, impulse) {
+    const spinRatio = clamp(top.spin / top.build.maxSpinSpeed, 0, 1);
+    const effectiveStability = Math.max(
+      top.build.stability * surface.stability,
+      0.2,
+    );
+    const lowSpinVulnerability = 0.72 + (1 - spinRatio) * 0.55;
+    const gain = clamp(
+      ((impulse - MIN_DAMAGE_IMPULSE) / 7) *
+        (incomingAttack / effectiveStability) *
+        lowSpinVulnerability *
+        0.48,
+      0,
+      0.5,
+    );
+    top.imbalance = clamp(top.imbalance + gain, 0, 1);
+    top.tilt = clamp(top.tilt + gain * 0.28, 0, MAX_TILT);
+  }
+
+  _collisionTopState(top) {
+    return {
+      tilt: round(top.tilt),
+      spin: round(top.spin),
+      imbalance: round(top.imbalance),
+      durability: round(top.durability),
+    };
+  }
+
+  _createCollisionTelemetry(
+    impulse,
+    before,
+    after,
+    damageToPlayer,
+    damageToEnemy,
+  ) {
+    const topDelta = (previous, next, damage) => ({
+      tiltBefore: previous.tilt,
+      tiltAfter: next.tilt,
+      tiltDelta: round(next.tilt - previous.tilt),
+      spinBefore: previous.spin,
+      spinAfter: next.spin,
+      spinDelta: round(next.spin - previous.spin),
+      imbalanceBefore: previous.imbalance,
+      imbalanceAfter: next.imbalance,
+      imbalanceDelta: round(next.imbalance - previous.imbalance),
+      durabilityBefore: previous.durability,
+      durabilityAfter: next.durability,
+      damage: round(damage),
+    });
+    return {
+      time: round(this.time),
+      impulse: round(impulse),
+      intensity: round(clamp(impulse / 7, 0, 1)),
+      position: {
+        x: round((this.player.position.x + this.enemy.position.x) * 0.5),
+        y: round((this.player.position.y + this.enemy.position.y) * 0.5),
+      },
+      player: topDelta(before.player, after.player, damageToPlayer),
+      enemy: topDelta(before.enemy, after.enemy, damageToEnemy),
+    };
   }
 
   _updateTilt(top, dt) {
     const speed = length(top.velocity);
     const spinRatio = clamp(top.spin / top.build.maxSpinSpeed, 0, 1);
-    const instability = clamp(1.15 - top.build.stability, 0, 0.8);
-    const targetTilt = clamp(
-      instability * 0.5 + speed * 0.012 + (1 - spinRatio) * 0.32,
+    const surface = this.arena.surfaceAt(length(top.position));
+    const effectiveStability = top.build.stability * surface.stability;
+    const instability = clamp(
+      1.15 - effectiveStability + top.imbalance * 0.72,
       0,
-      0.62,
+      1.25,
+    );
+    const targetTilt = clamp(
+      instability * 0.48 +
+        speed * 0.012 +
+        (1 - spinRatio) * 0.32 +
+        top.imbalance * 0.2,
+      0,
+      MAX_TILT,
     );
     top.tilt += (targetTilt - top.tilt) * Math.min(dt * 4, 1);
+    const recovery =
+      (0.1 + effectiveStability * 0.16) * (0.55 + spinRatio * 0.45);
+    top.imbalance = Math.max(top.imbalance - recovery * dt, 0);
+    top.ringOutRisk = this._calculateRingOutRisk(top);
+  }
+
+  _calculateRingOutRisk(top) {
+    const radius = length(top.position);
+    const edgeRisk = smoothstep(
+      this.arena.wallRadius * 0.7,
+      this.arena.ringOutRadius,
+      radius,
+    );
+    const outward =
+      radius > 0.001
+        ? Math.max(dot(top.velocity, scale(top.position, 1 / radius)), 0)
+        : 0;
+    const momentumRisk = smoothstep(1.5, 9.2, outward);
+    const tiltRisk = smoothstep(TILT_WARNING, MAX_TILT, top.tilt);
+    return clamp(
+      edgeRisk * 0.58 + momentumRisk * 0.27 + tiltRisk * 0.15,
+      0,
+      1,
+    );
+  }
+
+  _updateRiskStates(top, actor) {
+    const nextStabilityState =
+      top.tilt >= TILT_CRITICAL
+        ? "critical"
+        : top.tilt >= TILT_WARNING
+          ? "wobble"
+          : "stable";
+    const nextRingRiskState =
+      top.ringOutRisk >= 0.78
+        ? "critical"
+        : top.ringOutRisk >= 0.5
+          ? "warning"
+          : "safe";
+    const spinRatio = clamp(top.spin / top.build.maxSpinSpeed, 0, 1);
+    const nextSpinRiskState =
+      spinRatio <= 0.16
+        ? "critical"
+        : spinRatio <= 0.32
+          ? "warning"
+          : "safe";
+
+    this._emitRiskTransition(
+      top,
+      actor,
+      "stabilityState",
+      nextStabilityState,
+      "stability",
+    );
+    this._emitRiskTransition(
+      top,
+      actor,
+      "ringRiskState",
+      nextRingRiskState,
+      "ring_out_risk",
+    );
+    this._emitRiskTransition(
+      top,
+      actor,
+      "spinRiskState",
+      nextSpinRiskState,
+      "spin_risk",
+    );
+  }
+
+  _emitRiskTransition(top, actor, property, nextState, type) {
+    if (top[property] === nextState) return;
+    top[property] = nextState;
+    this.events.push({
+      type,
+      actor,
+      state: nextState,
+      tilt: round(top.tilt),
+      spin: round(top.spin),
+      imbalance: round(top.imbalance),
+      ringOutRisk: round(top.ringOutRisk),
+    });
   }
 
   _checkResult() {
@@ -420,6 +648,13 @@ export class BattleSimulation {
       spin: round(top.spin),
       durability: round(top.durability),
       tilt: round(top.tilt),
+      imbalance: round(top.imbalance),
+      spinLossRate: round(top.spinLossRate),
+      spinRatio: round(
+        clamp(top.spin / Math.max(top.build.maxSpinSpeed, 0.001), 0, 1),
+      ),
+      ringOutRisk: round(top.ringOutRisk),
+      stabilityState: top.stabilityState,
       surfaceName: top.surfaceName,
       controlInfluence: round(top.controlInfluence),
     });

@@ -7,9 +7,17 @@ import {
 } from "./core/battle-simulation.js";
 import { migrateLoadouts } from "./core/loadouts.js";
 import {
+  DEFAULT_PART_CUSTOMIZATION,
+  normalizePartCustomization,
+  PART_MATERIAL_LIST,
+  SYMMETRY_OPTIONS,
+} from "./core/part-customization.js";
+import {
   getBattleReward,
+  getMaterialAccess,
   getPartAccess,
   migrateProgression,
+  purchaseMaterial,
   purchasePart,
   TUTORIAL_STAGE,
 } from "./core/progression.js";
@@ -93,6 +101,7 @@ function loadState() {
       ...loadoutState,
       build: activeLoadout.build,
       colors: activeLoadout.colors,
+      customizations: activeLoadout.customizations,
       tuning: { ...fallback.tuning, ...saved?.tuning },
     };
   } catch {
@@ -103,6 +112,7 @@ function loadState() {
       ...loadoutState,
       build: loadoutState.loadouts[0].build,
       colors: loadoutState.loadouts[0].colors,
+      customizations: loadoutState.loadouts[0].customizations,
     };
   }
 }
@@ -111,7 +121,10 @@ class BeybladeApp {
   constructor(root) {
     this.root = root;
     this.state = loadState();
-    this.playerBuild = calculateBuild(this.state.build);
+    this.playerBuild = calculateBuild(
+      this.state.build,
+      this.state.customizations,
+    );
     this.selectedArena = getArena(this.state.arenaId);
     this.activeSlot = null;
     this.screen = "assembly";
@@ -125,6 +138,15 @@ class BeybladeApp {
     this.accumulator = 0;
     this.lastTime = performance.now();
     this.lastHudUpdate = 0;
+    this.diyDraft = null;
+    this.diyPartId = null;
+    this.diyView = "front";
+    this.launchParams = {
+      height: 0.45,
+      direction: 0,
+      angle: 0,
+      power: 0.86,
+    };
 
     this._mount();
     this.stage = new ThreeStage(this.root.querySelector("#three-stage"));
@@ -157,6 +179,47 @@ class BeybladeApp {
             <span class="wallet"><small>赏金</small><b id="coin-count">0</b></span>
             <button class="icon-button" id="sound-toggle" aria-label="切换声音">声</button>
           </div>
+          <div class="battle-topbar is-hidden" id="battle-topbar">
+            <div class="battle-top-fighter player-card">
+              <span>YOU</span>
+              <b id="player-spin">0</b>
+              <i><em id="player-durability-bar"></em></i>
+              <small id="player-status">待发射</small>
+            </div>
+            <button class="battle-clock" id="pause-battle" aria-label="暂停或继续战斗">
+              <b id="battle-time">00.0</b>
+              <small id="battle-pause-label">暂停</small>
+            </button>
+            <div class="battle-top-fighter enemy-card">
+              <span>AI</span>
+              <b id="enemy-spin">0</b>
+              <i><em id="enemy-durability-bar"></em></i>
+              <small id="enemy-status">待发射</small>
+            </div>
+          </div>
+          <div class="diy-topbar is-hidden" id="diy-topbar">
+            <div class="diy-top-main">
+              <strong id="diy-title">零件深度改造</strong>
+              <div class="diy-view-switch" role="group" aria-label="三视图切换">
+                <button data-diy-view="front" class="is-active">正</button>
+                <button data-diy-view="top">俯</button>
+                <button data-diy-view="side">侧</button>
+              </div>
+              <div class="diy-top-metrics">
+                <span>质量 <b id="diy-mass-value">1.22</b></span>
+                <span>惯量 <b id="diy-inertia-value">0.89</b></span>
+              </div>
+            </div>
+            <div class="diy-symmetry">
+              <span>对称延展</span>
+              <div>
+                ${SYMMETRY_OPTIONS.map(
+                  (value) =>
+                    `<button data-diy-symmetry="${value}">${value === 2 ? "左右" : `${value} 边`}</button>`,
+                ).join("")}
+              </div>
+            </div>
+          </div>
         </header>
 
         <main class="stage-shell">
@@ -167,60 +230,41 @@ class BeybladeApp {
             <strong id="stage-title">五层结构实验</strong>
           </div>
 
-          <div class="battle-hud is-hidden" id="battle-hud">
-            <div class="fighter-card player-card">
-              <div class="fighter-head"><span>YOU</span><b id="player-spin">0</b></div>
-              <div class="meter durability"><i id="player-durability-bar"></i></div>
-              <small id="player-status">待发射</small>
-            </div>
-            <div class="battle-clock"><small>ROUND 01</small><b id="battle-time">00.0</b></div>
-            <div class="fighter-card enemy-card">
-              <div class="fighter-head"><b id="enemy-spin">0</b><span>AI</span></div>
-              <div class="meter durability"><i id="enemy-durability-bar"></i></div>
-              <small id="enemy-status">待发射</small>
-            </div>
-            <div class="surface-chip" id="surface-chip">标准地面</div>
-          </div>
-
           <div class="launch-controls is-hidden" id="launch-controls">
             <div class="launcher-heading">
-              <span>LAUNCHER / 03</span>
-              <b>调整发射器姿态</b>
+              <span>DIRECT LAUNCH</span>
+              <b>拖模型调倾角 · 拖箭头调方向与力度</b>
             </div>
-            <div class="launcher-dials">
-              <label class="launcher-dial dial-height">
-                <span>高度 <output id="launch-height-output">45%</output></span>
-                <input id="launch-height" type="range" min="0" max="100" value="45">
-              </label>
-              <label class="launcher-dial dial-direction">
-                <span>方向 <output id="launch-direction-output">0°</output></span>
-                <input id="launch-direction" type="range" min="-30" max="30" value="0">
-              </label>
-              <label class="launcher-dial dial-angle">
-                <span>倾角 <output id="launch-angle-output">0°</output></span>
-                <input id="launch-angle" type="range" min="-12" max="12" value="0">
-              </label>
+            <div class="launch-readout" aria-live="polite">
+              <span>力度 <output id="launch-power-output">86%</output></span>
+              <span>方向 <output id="launch-direction-output">0°</output></span>
+              <span>倾角 <output id="launch-angle-output">0°</output></span>
             </div>
             <button class="launch-button" id="launch-button">
-              <span>拉动发射</span><i></i>
+              <span>确认发射</span>
             </button>
           </div>
 
           <div class="battle-controls is-hidden" id="battle-controls">
+            <div class="joystick-caption">
+              <span>方向微调</span>
+              <b><output id="joystick-input-power">0</output>%</b>
+            </div>
             <div class="joystick" id="joystick" aria-label="战斗方向控制">
               <i class="joystick-axis axis-x"></i>
               <i class="joystick-axis axis-y"></i>
-              <b id="joystick-knob"><span id="joystick-power">0</span></b>
+              <b id="joystick-knob"></b>
             </div>
           </div>
-          <div class="battle-utility is-hidden" id="battle-utility">
-            <button id="pause-battle">暂停</button>
-            <button id="reset-battle">重置</button>
+          <div class="top-influence is-hidden" id="top-influence">
+            <span>控制影响</span>
+            <b id="top-influence-value">0%</b>
           </div>
           <div class="sr-only" aria-live="polite">
             <span id="battle-message-kicker">LIVE PHYSICS</span>
             <b id="battle-message">正在计算碰撞与转速</b>
             <span id="control-state"></span>
+            <span id="surface-chip">标准地面</span>
           </div>
 
           <button class="tune-button is-hidden" id="tune-open">调参</button>
@@ -269,7 +313,6 @@ class BeybladeApp {
               </div>
             </div>
             <div class="assembly-view-tools">
-              <button class="view-reset is-hidden" id="view-reset">重置视角</button>
               <div class="drag-hint" id="drag-hint">
                 <i></i>
                 <span>拖动环绕 · 轻点部件改装 · 横扫切换陀螺</span>
@@ -317,6 +360,26 @@ class BeybladeApp {
             </div>
           </section>
         </div>
+
+        <section class="diy-layer is-hidden" id="diy-layer" aria-label="零件深度 DIY 编辑器">
+          <div class="diy-direct-hint">
+            <span><i class="size-dot"></i>大小</span>
+            <span><i class="height-dot"></i>高度</span>
+            <span><i class="shape-dot"></i>轮廓</span>
+            <b>拖动模型手柄直接塑形</b>
+          </div>
+          <div class="diy-control-panel">
+            <div class="diy-material">
+              <span>材料 <b id="diy-material-name">原装材料</b></span>
+              <div class="diy-material-list" id="diy-material-list"></div>
+              <p id="diy-material-description"></p>
+            </div>
+            <div class="diy-actions">
+              <button class="button ghost" id="diy-cancel">取消</button>
+              <button class="button primary" id="diy-save">保存改造</button>
+            </div>
+          </div>
+        </section>
 
         <aside class="tuning-drawer" id="tuning-drawer" aria-hidden="true">
           <div class="drawer-head">
@@ -370,6 +433,7 @@ class BeybladeApp {
     this.root.querySelector("#three-stage").addEventListener(
       "partselect",
       (event) => {
+        if (this.diyDraft) return;
         if (!PART_TYPE_META[event.detail.slot]) return;
         this.activeSlot = event.detail.slot;
         this._renderAssembly();
@@ -380,6 +444,7 @@ class BeybladeApp {
     this.root
       .querySelector("#three-stage")
       .addEventListener("assemblyclear", () => {
+        if (this.diyDraft) return;
         if (!this.activeSlot) return;
         this.activeSlot = null;
         this._renderAssembly();
@@ -388,7 +453,27 @@ class BeybladeApp {
     this.root.querySelector("#three-stage").addEventListener(
       "topswipe",
       (event) => {
+        if (this.diyDraft) return;
         this._switchLoadout(event.detail.direction);
+      },
+    );
+    this.root.querySelector("#three-stage").addEventListener(
+      "launchchange",
+      (event) => {
+        this.launchParams = { ...this.launchParams, ...event.detail };
+        this._updateLaunchOutputs();
+      },
+    );
+    this.root.querySelector("#three-stage").addEventListener(
+      "diychange",
+      (event) => {
+        if (!this.diyDraft) return;
+        this.diyDraft = normalizePartCustomization({
+          ...this.diyDraft,
+          [event.detail.property]: event.detail.value,
+        });
+        this._renderDiyEditor();
+        this._previewDiy();
       },
     );
     this.root
@@ -397,10 +482,6 @@ class BeybladeApp {
     this.root
       .querySelector("#next-loadout")
       .addEventListener("click", () => this._switchLoadout("next"));
-    this.root.querySelector("#view-reset").addEventListener("click", () => {
-      this.stage.resetAssemblyView();
-      this.audio.playUi();
-    });
     this.root
       .querySelector("#variant-list")
       .addEventListener("click", (event) => {
@@ -409,8 +490,12 @@ class BeybladeApp {
         const part = getPart(button.dataset.partId);
         const access = getPartAccess(part, this.state);
         if (access.owned) {
+          if (part.id === this.state.build[this.activeSlot]) {
+            this._openPartEditor(part);
+            return;
+          }
           this.state.build[this.activeSlot] = part.id;
-          this._commitBuild();
+          this._commitBuild({ animatePart: true });
           return;
         }
         if (!access.affordable) {
@@ -473,19 +558,12 @@ class BeybladeApp {
         );
       });
     }
-    for (const key of ["height", "direction", "angle"]) {
-      const input = this.root.querySelector(`#launch-${key}`);
-      input.addEventListener("input", () => this._updateLaunchOutputs());
-    }
     this.root
       .querySelector("#launch-button")
       .addEventListener("click", () => this._launch());
     this.root
       .querySelector("#pause-battle")
       .addEventListener("click", () => this._togglePause());
-    this.root
-      .querySelector("#reset-battle")
-      .addEventListener("click", () => this._prepareBattle());
     this.root
       .querySelector("#result-restart")
       .addEventListener("click", () => this._prepareBattle());
@@ -540,8 +618,77 @@ class BeybladeApp {
       this._save();
     });
 
+    this.root
+      .querySelector("#diy-material-list")
+      .addEventListener("click", (event) => {
+        const button = event.target.closest("[data-diy-material]");
+        if (!button || !this.diyDraft) return;
+        const material = PART_MATERIAL_LIST.find(
+          (item) => item.id === button.dataset.diyMaterial,
+        );
+        if (!material) return;
+        const access = getMaterialAccess(material, this.state);
+        if (!access.owned) {
+          if (!access.affordable) {
+            this._showToast(`金币不足，还差 ${access.missingCoins} 枚`);
+            navigator.vibrate?.(18);
+            return;
+          }
+          const result = purchaseMaterial(
+            {
+              coins: this.state.coins,
+              ownedMaterialIds: this.state.ownedMaterialIds,
+            },
+            material.id,
+          );
+          if (!result.ok) return;
+          this.state.coins = result.progression.coins;
+          this.state.ownedMaterialIds =
+            result.progression.ownedMaterialIds;
+          this._save();
+          this._renderPersistentState();
+          this._showToast(`${material.name} 已解锁`);
+          navigator.vibrate?.(24);
+        }
+        this.diyDraft.material = material.id;
+        this._renderDiyEditor();
+        this._previewDiy();
+      });
+    this.root.querySelector(".diy-symmetry").addEventListener(
+      "click",
+      (event) => {
+        const button = event.target.closest("[data-diy-symmetry]");
+        if (!button || !this.diyDraft) return;
+        this.diyDraft.symmetry = Number(button.dataset.diySymmetry);
+        this._renderDiyEditor();
+        this._previewDiy();
+      },
+    );
+    this.root.querySelector(".diy-view-switch").addEventListener(
+      "click",
+      (event) => {
+        const button = event.target.closest("[data-diy-view]");
+        if (!button || !this.diyDraft) return;
+        this.diyView = button.dataset.diyView;
+        this.root.querySelectorAll("[data-diy-view]").forEach((item) => {
+          item.classList.toggle("is-active", item === button);
+        });
+        this.stage.setAssemblyOrthographicView(this.diyView);
+      },
+    );
+    this.root
+      .querySelector("#diy-save")
+      .addEventListener("click", () => this._closePartEditor(true));
+    this.root
+      .querySelector("#diy-cancel")
+      .addEventListener("click", () => this._closePartEditor(false));
+
     this._bindJoystick();
     window.addEventListener("keydown", (event) => {
+      if (event.key === "Escape" && this.diyDraft) {
+        this._closePartEditor(false);
+        return;
+      }
       if (event.key === "Escape" && this.pendingPurchaseId) {
         this._setPurchaseDialog(false);
         return;
@@ -571,7 +718,7 @@ class BeybladeApp {
       const x = (rawX * scale) / radius;
       const y = (rawY * scale) / radius;
       this.control = { x, y };
-      this.root.querySelector("#joystick-power").textContent = String(
+      this.root.querySelector("#joystick-input-power").textContent = String(
         Math.round(Math.min(magnitude / radius, 1) * 100),
       );
       knob.style.transform = `translate(calc(-50% + ${x * radius}px), calc(-50% + ${y * radius}px))`;
@@ -579,7 +726,7 @@ class BeybladeApp {
     const reset = () => {
       this.control = { x: 0, y: 0 };
       knob.style.transform = "translate(-50%, -50%)";
-      this.root.querySelector("#joystick-power").textContent = "0";
+      this.root.querySelector("#joystick-input-power").textContent = "0";
     };
     joystick.addEventListener("pointerdown", (event) => {
       this.joystickActive = true;
@@ -621,7 +768,7 @@ class BeybladeApp {
     const meta = PART_TYPE_META[this.activeSlot];
     const activePart = getPart(this.state.build[this.activeSlot]);
     this.root.querySelector("#active-part-index").textContent =
-      `${meta.index} / 05 · ${activePart.id}`;
+      `${meta.index} / 05`;
     this.root.querySelector("#active-part-name").textContent = meta.name;
     this.root.querySelector("#active-part-description").textContent =
       meta.description;
@@ -637,7 +784,7 @@ class BeybladeApp {
             : "is-locked";
         const priceLabel = access.owned
           ? part.id === activePart.id
-            ? "已装备"
+            ? "再次点击 DIY"
             : "已拥有"
           : String(part.price);
         return `
@@ -672,6 +819,132 @@ class BeybladeApp {
     this.root.querySelector("#core-color").value = this.state.colors.core;
   }
 
+  _openPartEditor(part) {
+    if (!part || part.id !== this.state.build[this.activeSlot]) return;
+    const saved = this.state.customizations?.[part.id] ??
+      DEFAULT_PART_CUSTOMIZATION;
+    this.diyPartId = part.id;
+    this.diyDraft = normalizePartCustomization(saved);
+    this.diyView = "front";
+    this.root.querySelector("#diy-layer").classList.remove("is-hidden");
+    this.root.querySelector("#diy-topbar").classList.remove("is-hidden");
+    this.root.querySelector(".game-shell").dataset.diyEditing = "true";
+    this._renderDiyEditor();
+    this._previewDiy();
+    this.root.querySelector('[data-diy-view="front"]').focus();
+  }
+
+  _renderDiyEditor() {
+    if (!this.diyDraft || !this.diyPartId) return;
+    const part = getPart(this.diyPartId);
+    this.root.querySelector("#diy-title").textContent =
+      part.name;
+    this.root.querySelectorAll("[data-diy-symmetry]").forEach((button) => {
+      button.classList.toggle(
+        "is-active",
+        Number(button.dataset.diySymmetry) === this.diyDraft.symmetry,
+      );
+    });
+    const material =
+      PART_MATERIAL_LIST.find(
+        (item) => item.id === this.diyDraft.material,
+      ) ?? PART_MATERIAL_LIST[0];
+    this.root.querySelector("#diy-material-name").textContent = material.name;
+    this.root.querySelector("#diy-material-description").textContent =
+      material.description;
+    this.root.querySelector("#diy-material-list").innerHTML =
+      PART_MATERIAL_LIST.map((item) => {
+        const access = getMaterialAccess(item, this.state);
+        const stateClass = access.owned
+          ? "is-owned"
+          : access.affordable
+            ? "is-affordable"
+            : "is-locked";
+        const price = access.owned ? "已拥有" : `${item.price}`;
+        return `
+          <button
+            class="${stateClass} ${item.id === material.id ? "is-active" : ""}"
+            data-diy-material="${item.id}"
+            aria-label="${item.name}，${access.owned ? "已拥有" : access.affordable ? `可用 ${item.price} 金币解锁` : `还差 ${access.missingCoins} 金币`}"
+          >
+            <b>${item.name}</b>
+            <small>${price}</small>
+          </button>
+        `;
+      }).join("");
+    this.root.querySelectorAll("[data-diy-view]").forEach((button) => {
+      button.classList.toggle(
+        "is-active",
+        button.dataset.diyView === this.diyView,
+      );
+    });
+  }
+
+  _previewDiy() {
+    if (!this.diyDraft || !this.diyPartId) return;
+    const loadout = this.state.loadouts[this.state.activeLoadoutIndex];
+    const draftCustomizations = {
+      ...loadout.customizations,
+      [this.diyPartId]: { ...this.diyDraft },
+    };
+    const previewLoadouts = this.state.loadouts.map((item, index) =>
+      index === this.state.activeLoadoutIndex
+        ? { ...item, customizations: draftCustomizations }
+        : item,
+    );
+    const previewBuild = calculateBuild(
+      this.state.build,
+      draftCustomizations,
+    );
+    this.stage.showAssembly(
+      previewLoadouts,
+      this.state.activeLoadoutIndex,
+      this.activeSlot,
+    );
+    this.stage.enterPartEditor(
+      this.activeSlot,
+      previewBuild.centerOfMass,
+      this.diyDraft,
+    );
+    this.stage.setAssemblyOrthographicView(this.diyView, true);
+    this.root.querySelector("#diy-mass-value").textContent =
+      previewBuild.totalMass.toFixed(2);
+    this.root.querySelector("#diy-inertia-value").textContent =
+      previewBuild.momentOfInertia.toFixed(2);
+  }
+
+  _closePartEditor(save) {
+    if (!this.diyDraft || !this.diyPartId) return;
+    const partName = getPart(this.diyPartId)?.name ?? "零件";
+    if (save) {
+      const loadout = this.state.loadouts[this.state.activeLoadoutIndex];
+      loadout.customizations = {
+        ...loadout.customizations,
+        [this.diyPartId]: { ...this.diyDraft },
+      };
+      this.state.customizations = loadout.customizations;
+      this.playerBuild = calculateBuild(
+        this.state.build,
+        this.state.customizations,
+      );
+      this._save();
+    }
+    this.diyDraft = null;
+    this.diyPartId = null;
+    this.root.querySelector("#diy-layer").classList.add("is-hidden");
+    this.root.querySelector("#diy-topbar").classList.add("is-hidden");
+    this.root.querySelector(".game-shell").dataset.diyEditing = "false";
+    this.stage.exitPartEditor();
+    this._renderAssembly();
+    this.stage.showAssembly(
+      this.state.loadouts,
+      this.state.activeLoadoutIndex,
+      this.activeSlot,
+    );
+    this.audio.playUi();
+    this._showToast(save ? `${partName} 的 DIY 改造已保存` : "已取消本次改造");
+  }
+
   _switchLoadout(direction) {
     const offset = direction === "next" ? 1 : -1;
     const length = this.state.loadouts.length;
@@ -680,12 +953,15 @@ class BeybladeApp {
     const loadout = this.state.loadouts[this.state.activeLoadoutIndex];
     this.state.build = loadout.build;
     this.state.colors = loadout.colors;
-    this.playerBuild = calculateBuild(this.state.build);
+    this.state.customizations = loadout.customizations;
+    this.playerBuild = calculateBuild(
+      this.state.build,
+      this.state.customizations,
+    );
     this.activeSlot = null;
     this._save();
     this._renderAssembly();
-    this.stage.showAssembly(
-      this.state.loadouts,
+    this.stage.switchAssemblyLoadout(
       this.state.activeLoadoutIndex,
       null,
     );
@@ -700,7 +976,9 @@ class BeybladeApp {
       [part.type]: part.id,
     };
     const currentRatings = getBuildRatings(this.playerBuild);
-    const candidateRatings = getBuildRatings(calculateBuild(candidateSelection));
+    const candidateRatings = getBuildRatings(
+      calculateBuild(candidateSelection, this.state.customizations),
+    );
     this.root.querySelector("#purchase-title").textContent = part.name;
     this.root.querySelector("#purchase-description").textContent =
       `${part.description} 解锁后会立即装备。`;
@@ -755,7 +1033,7 @@ class BeybladeApp {
     }
     this._setPurchaseDialog(false);
     this._renderPersistentState();
-    this._commitBuild();
+    this._commitBuild({ animatePart: true });
     this._renderTutorial();
     this._showToast(`${part.name} 已解锁并装备`);
     navigator.vibrate?.(24);
@@ -894,15 +1172,26 @@ class BeybladeApp {
     soundButton.textContent = this.state.sound ? "声" : "静";
   }
 
-  _commitBuild() {
-    this.playerBuild = calculateBuild(this.state.build);
+  _commitBuild({ animatePart = false } = {}) {
+    this.playerBuild = calculateBuild(
+      this.state.build,
+      this.state.customizations,
+    );
     this._save();
     this._renderAssembly();
-    this.stage.showAssembly(
-      this.state.loadouts,
-      this.state.activeLoadoutIndex,
-      this.activeSlot,
-    );
+    if (animatePart && this.screen === "assembly" && this.activeSlot) {
+      this.stage.replaceAssemblyPart(
+        this.state.loadouts,
+        this.state.activeLoadoutIndex,
+        this.activeSlot,
+      );
+    } else {
+      this.stage.showAssembly(
+        this.state.loadouts,
+        this.state.activeLoadoutIndex,
+        this.activeSlot,
+      );
+    }
     this.audio.playUi();
   }
 
@@ -950,13 +1239,10 @@ class BeybladeApp {
       .querySelector("#drag-hint")
       .classList.toggle("is-hidden", screen !== "assembly");
     this.root
-      .querySelector("#view-reset")
-      .classList.toggle("is-hidden", screen !== "assembly");
-    this.root
-      .querySelector("#battle-hud")
+      .querySelector("#battle-topbar")
       .classList.toggle("is-hidden", screen !== "battle");
     if (screen !== "battle") {
-      this.root.querySelector("#battle-utility").classList.add("is-hidden");
+      this.root.querySelector("#top-influence").classList.add("is-hidden");
     }
     this.root
       .querySelector("#tune-open")
@@ -980,7 +1266,13 @@ class BeybladeApp {
       this.state.arenaId = "standard";
     }
     const playerSelection = firstBattle ? DEFAULT_BUILD : this.state.build;
-    const battlePlayerBuild = calculateBuild(playerSelection);
+    const playerCustomizations = firstBattle
+      ? {}
+      : this.state.customizations;
+    const battlePlayerBuild = calculateBuild(
+      playerSelection,
+      playerCustomizations,
+    );
     const enemySelection = firstBattle
       ? DEFAULT_BUILD
       : ENEMY_BUILDS[this.selectedArena.id];
@@ -991,12 +1283,15 @@ class BeybladeApp {
       arena: this.selectedArena,
       seed: 20260718,
       tuning: this.state.tuning,
+      diagnostics: true,
+      logger: (message, telemetry) => console.info(message, telemetry),
     });
     this.stage.prepareBattle(
       this.selectedArena,
       playerSelection,
       enemySelection,
       firstBattle ? TRAINING_COLORS : this.state.colors,
+      playerCustomizations,
     );
     this.paused = false;
     this.resultHandled = false;
@@ -1004,9 +1299,9 @@ class BeybladeApp {
     this.accumulator = 0;
     this.root.querySelector("#launch-controls").classList.remove("is-hidden");
     this.root.querySelector("#battle-controls").classList.add("is-hidden");
-    this.root.querySelector("#battle-utility").classList.add("is-hidden");
     this.root.querySelector("#result-card").classList.add("is-hidden");
-    this.root.querySelector("#pause-battle").textContent = "暂停";
+    this.root.querySelector("#top-influence").classList.add("is-hidden");
+    this.root.querySelector("#battle-pause-label").textContent = "待发";
     this.root.querySelector("#battle-message").textContent = firstBattle
       ? "木质训练陀螺等待发射"
       : "等待发射参数";
@@ -1017,19 +1312,13 @@ class BeybladeApp {
   async _launch() {
     await this.audio.init();
     this.audio.setEnabled(this.state.sound);
-    const power = 0.86;
-    const height =
-      Number(this.root.querySelector("#launch-height").value) / 100;
-    const direction =
-      (Number(this.root.querySelector("#launch-direction").value) * Math.PI) /
-      180;
-    const angle = Number(this.root.querySelector("#launch-angle").value) / 12;
+    const { power, height, direction, angle } = this.launchParams;
     this.simulation.launch({ power, height, direction, angle });
     this.stage.launchBattleVisual();
     this.audio.playLaunch(power);
+    this.root.querySelector("#battle-pause-label").textContent = "暂停";
     this.root.querySelector("#launch-controls").classList.add("is-hidden");
     this.root.querySelector("#battle-controls").classList.remove("is-hidden");
-    this.root.querySelector("#battle-utility").classList.remove("is-hidden");
     this.root.querySelector("#battle-message").textContent =
       "拖动摇杆微调轨迹";
   }
@@ -1037,7 +1326,7 @@ class BeybladeApp {
   _togglePause() {
     if (!this.simulation || this.simulation.phase !== "running") return;
     this.paused = !this.paused;
-    this.root.querySelector("#pause-battle").textContent = this.paused
+    this.root.querySelector("#battle-pause-label").textContent = this.paused
       ? "继续"
       : "暂停";
     this.root.querySelector("#battle-message").textContent = this.paused
@@ -1046,21 +1335,13 @@ class BeybladeApp {
   }
 
   _updateLaunchOutputs() {
-    for (const key of ["height", "direction", "angle"]) {
-      const value = this.root.querySelector(`#launch-${key}`).value;
-      this.root.querySelector(`#launch-${key}-output`).value =
-        key === "height" ? `${value}%` : `${value}°`;
-    }
-    this.stage.updateLauncherPreview({
-      height: Number(this.root.querySelector("#launch-height").value) / 100,
-      direction:
-        (Number(this.root.querySelector("#launch-direction").value) *
-          Math.PI) /
-        180,
-      angle:
-        (Number(this.root.querySelector("#launch-angle").value) * Math.PI) /
-        180,
-    });
+    this.root.querySelector("#launch-power-output").value =
+      `${Math.round(this.launchParams.power * 100)}%`;
+    this.root.querySelector("#launch-direction-output").value =
+      `${Math.round((this.launchParams.direction * 180) / Math.PI)}°`;
+    this.root.querySelector("#launch-angle-output").value =
+      `${Math.round((this.launchParams.angle * 180) / Math.PI)}°`;
+    this.stage.updateLauncherPreview(this.launchParams);
   }
 
   _keyboardControl() {
@@ -1084,6 +1365,32 @@ class BeybladeApp {
           event.intensity > 0.58 ? "HEAVY IMPACT" : "CONTACT";
         this.root.querySelector("#battle-message").textContent =
           `碰撞冲量 ${event.impulse.toFixed(2)}`;
+      }
+      if (
+        event.actor === "player" &&
+        ["stability", "ring_out_risk", "spin_risk"].includes(event.type)
+      ) {
+        this.audio.playRisk(event.type, event.state);
+        if (event.state === "critical") navigator.vibrate?.([22, 26, 22]);
+        const messages = {
+          stability: {
+            wobble: "陀螺开始失衡，降低操控幅度可帮助恢复",
+            critical: "倾斜危机：正在擦地并加速掉转",
+            stable: "姿态已恢复稳定",
+          },
+          ring_out_risk: {
+            warning: "靠近护圈，注意外向速度",
+            critical: "Ring Out 风险极高",
+            safe: "已离开出界危险区",
+          },
+          spin_risk: {
+            warning: "转速进入衰退区",
+            critical: "转速过低，控制影响快速下降",
+            safe: "转速状态恢复",
+          },
+        };
+        this.root.querySelector("#battle-message").textContent =
+          messages[event.type]?.[event.state] ?? "风险状态变化";
       }
       if (event.type === "result") this._handleResult();
     }
@@ -1131,7 +1438,7 @@ class BeybladeApp {
       tutorialStage === TUTORIAL_STAGE.FIRST_BATTLE,
     );
     this.root.querySelector("#battle-controls").classList.add("is-hidden");
-    this.root.querySelector("#battle-utility").classList.add("is-hidden");
+    this.root.querySelector("#top-influence").classList.add("is-hidden");
     this.root.querySelector("#result-card").classList.remove("is-hidden");
   }
 
@@ -1147,27 +1454,26 @@ class BeybladeApp {
     this.root.querySelector("#enemy-durability-bar").style.width =
       `${(enemy.durability / enemy.build.durability) * 100}%`;
     this.root.querySelector("#player-status").textContent =
-      `${Math.ceil(player.durability)} DUR · ${player.surfaceName || "待机"}`;
+      `${Math.ceil(player.durability)} DUR`;
     this.root.querySelector("#enemy-status").textContent =
-      `${Math.ceil(enemy.durability)} DUR · ${enemy.surfaceName || "待机"}`;
+      `${Math.ceil(enemy.durability)} DUR`;
     this.root.querySelector("#battle-time").textContent = time.toFixed(1);
     this.root.querySelector("#surface-chip").textContent =
       player.surfaceName || this.selectedArena.surfaceAt(0).name;
-    const control = player.controlInput ?? { x: 0, y: 0 };
     const influence = Math.round((player.controlInfluence ?? 0) * 100);
-    if (!this.joystickActive) {
-      const screenPosition = this.stage.getPlayerScreenPosition();
-      if (screenPosition) {
-        const joystick = this.root.querySelector("#joystick");
-        const margin = 54;
-        joystick.style.left =
-          `${clamp(screenPosition.x, margin, screenPosition.width - margin)}px`;
-        joystick.style.top =
-          `${clamp(screenPosition.y, 110, screenPosition.height - margin)}px`;
-      }
+    const influenceBadge = this.root.querySelector("#top-influence");
+    const screenPosition = this.stage.getPlayerScreenPosition();
+    const showInfluence =
+      this.simulation.phase === "running" && Boolean(screenPosition);
+    influenceBadge.classList.toggle("is-hidden", !showInfluence);
+    if (showInfluence) {
+      influenceBadge.style.left =
+        `${clamp(screenPosition.x, 58, screenPosition.width - 58)}px`;
+      influenceBadge.style.top =
+        `${clamp(screenPosition.y - 54, 104, screenPosition.height - 154)}px`;
+      this.root.querySelector("#top-influence-value").textContent =
+        `${influence}%`;
     }
-    this.root.querySelector("#joystick-power").textContent =
-      Math.hypot(control.x, control.y) > 0.05 ? String(influence) : "0";
     const spinRatio = player.spin / Math.max(player.build.maxSpinSpeed, 0.001);
     this.root.querySelector("#control-state").textContent =
       this.simulation.phase !== "running"

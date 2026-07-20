@@ -46,4 +46,34 @@ describe("loadouts", () => {
     expect(result.activeLoadoutIndex).toBe(2);
     expect(result.loadouts[0].build.tip).toBe(DEFAULT_BUILD.tip);
   });
+
+  it("迁移并规范化每个出战槽的零件 DIY 参数", () => {
+    const result = migrateLoadouts({
+      loadouts: [
+        {
+          build: DEFAULT_BUILD,
+          customizations: {
+            "attack_ring.balance_six": {
+              shape: 180,
+              size: 2,
+              height: 0.2,
+              material: "unknown",
+              symmetry: 5,
+            },
+          },
+        },
+      ],
+    });
+
+    expect(
+      result.loadouts[0].customizations["attack_ring.balance_six"],
+    ).toEqual({
+      shape: 100,
+      size: 1.24,
+      height: 0.72,
+      material: "stock",
+      symmetry: 2,
+    });
+    expect(result.loadouts[1].customizations).toEqual({});
+  });
 });

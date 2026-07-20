@@ -1,4 +1,5 @@
 import { DEFAULT_BUILD, getPart, PARTS } from "../data/parts.js";
+import { PART_MATERIALS } from "./part-customization.js";
 
 export const STORAGE_VERSION = 2;
 
@@ -18,8 +19,10 @@ export const BATTLE_REWARDS = Object.freeze({
 export const INITIAL_OWNED_PART_IDS = Object.freeze(
   Object.values(DEFAULT_BUILD),
 );
+export const INITIAL_OWNED_MATERIAL_IDS = Object.freeze(["stock"]);
 
 const VALID_PART_IDS = new Set(PARTS.map((part) => part.id));
+const VALID_MATERIAL_IDS = new Set(Object.keys(PART_MATERIALS));
 const VALID_TUTORIAL_STAGES = new Set(Object.values(TUTORIAL_STAGE));
 
 export function createTutorialState() {
@@ -32,6 +35,7 @@ export function createTutorialState() {
 
 export function migrateProgression(saved = {}) {
   const ownedPartIds = new Set(INITIAL_OWNED_PART_IDS);
+  const ownedMaterialIds = new Set(INITIAL_OWNED_MATERIAL_IDS);
   for (const partId of saved.ownedPartIds ?? []) {
     if (VALID_PART_IDS.has(partId)) ownedPartIds.add(partId);
   }
@@ -41,6 +45,23 @@ export function migrateProgression(saved = {}) {
   for (const loadout of saved.loadouts ?? []) {
     for (const partId of Object.values(loadout.build ?? {})) {
       if (VALID_PART_IDS.has(partId)) ownedPartIds.add(partId);
+    }
+    for (const customization of Object.values(
+      loadout.customizations ?? {},
+    )) {
+      if (VALID_MATERIAL_IDS.has(customization?.material)) {
+        ownedMaterialIds.add(customization.material);
+      }
+    }
+  }
+  for (const materialId of saved.ownedMaterialIds ?? []) {
+    if (VALID_MATERIAL_IDS.has(materialId)) {
+      ownedMaterialIds.add(materialId);
+    }
+  }
+  for (const customization of Object.values(saved.customizations ?? {})) {
+    if (VALID_MATERIAL_IDS.has(customization?.material)) {
+      ownedMaterialIds.add(customization.material);
     }
   }
 
@@ -62,6 +83,7 @@ export function migrateProgression(saved = {}) {
     version: STORAGE_VERSION,
     coins: Math.max(0, Math.floor(Number(saved.coins) || 0)),
     ownedPartIds: [...ownedPartIds],
+    ownedMaterialIds: [...ownedMaterialIds],
     tutorial,
   };
 }
@@ -97,6 +119,44 @@ export function purchasePart(progression, partId) {
       ...progression,
       coins: progression.coins - part.price,
       ownedPartIds: [...progression.ownedPartIds, part.id],
+    },
+  };
+}
+
+export function getMaterialAccess(material, progression) {
+  const owned = progression.ownedMaterialIds.includes(material.id);
+  return {
+    owned,
+    affordable: !owned && progression.coins >= material.price,
+    missingCoins: owned
+      ? 0
+      : Math.max(0, material.price - progression.coins),
+  };
+}
+
+export function purchaseMaterial(progression, materialId) {
+  const material = PART_MATERIALS[materialId];
+  if (!material) return { ok: false, reason: "unknown_material" };
+
+  const access = getMaterialAccess(material, progression);
+  if (access.owned) return { ok: false, reason: "already_owned" };
+  if (!access.affordable) {
+    return {
+      ok: false,
+      reason: "insufficient_coins",
+      missingCoins: access.missingCoins,
+    };
+  }
+
+  return {
+    ok: true,
+    progression: {
+      ...progression,
+      coins: progression.coins - material.price,
+      ownedMaterialIds: [
+        ...progression.ownedMaterialIds,
+        material.id,
+      ],
     },
   };
 }

@@ -3,6 +3,7 @@ import {
   PART_TYPE_META,
   PART_TYPES,
 } from "../data/parts.js";
+import { applyPartCustomization } from "./part-customization.js";
 
 const REFERENCE_MASS = 1.22;
 const REFERENCE_INERTIA = 0.89;
@@ -28,28 +29,32 @@ function weighted(parts, property, weights) {
   );
 }
 
-export function calculateBuild(selection) {
-  const attackRing = requirePart(
+export function calculateBuild(selection, customizations = {}) {
+  const customizedPart = (partId, expectedType) =>
+    applyPartCustomization(
+      requirePart(partId, expectedType),
+      customizations[partId],
+    );
+  const attackRing = customizedPart(
     selection.attackRing,
     PART_TYPES.ATTACK_RING,
   );
-  const coreLock = requirePart(selection.coreLock, PART_TYPES.CORE_LOCK);
-  const weightDisc = requirePart(
+  const coreLock = customizedPart(
+    selection.coreLock,
+    PART_TYPES.CORE_LOCK,
+  );
+  const weightDisc = customizedPart(
     selection.weightDisc,
     PART_TYPES.WEIGHT_DISC,
   );
-  const driverShaft = requirePart(
+  const driverShaft = customizedPart(
     selection.driverShaft,
     PART_TYPES.DRIVER_SHAFT,
   );
-  const tip = requirePart(selection.tip, PART_TYPES.TIP);
+  const tip = customizedPart(selection.tip, PART_TYPES.TIP);
   const parts = [attackRing, coreLock, weightDisc, driverShaft, tip];
 
   const totalMass = parts.reduce((total, part) => total + part.mass, 0);
-  const momentOfInertia = parts.reduce(
-    (total, part) => total + part.inertia,
-    0,
-  );
   const contactArea = parts.reduce(
     (total, part) => total + part.contactArea,
     0,
@@ -61,6 +66,15 @@ export function calculateBuild(selection) {
         0,
       ) / totalMass,
   );
+  const momentOfInertia = parts.reduce((total, part) => {
+    const offsetX = part.center[0] - centerOfMass[0];
+    const offsetZ = part.center[2] - centerOfMass[2];
+    return (
+      total +
+      part.inertia +
+      part.mass * (offsetX ** 2 + offsetZ ** 2)
+    );
+  }, 0);
 
   const friction = clamp(
     attackRing.friction * 0.15 +
@@ -122,6 +136,7 @@ export function calculateBuild(selection) {
 
   return Object.freeze({
     selection: Object.freeze({ ...selection }),
+    customizations: Object.freeze({ ...customizations }),
     parts,
     totalMass,
     centerOfMass,

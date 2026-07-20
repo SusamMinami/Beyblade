@@ -2,13 +2,17 @@ import { describe, expect, it } from "vitest";
 import {
   BATTLE_REWARDS,
   getBattleReward,
+  getMaterialAccess,
   getPartAccess,
+  INITIAL_OWNED_MATERIAL_IDS,
   INITIAL_OWNED_PART_IDS,
   migrateProgression,
+  purchaseMaterial,
   purchasePart,
   STORAGE_VERSION,
   TUTORIAL_STAGE,
 } from "../src/core/progression.js";
+import { PART_MATERIALS } from "../src/core/part-customization.js";
 import { getPart } from "../src/data/parts.js";
 
 describe("progression", () => {
@@ -43,6 +47,32 @@ describe("progression", () => {
         "tip.metal_stamina",
         "attack_ring.smash_three",
       ]),
+    );
+  });
+
+  it("默认只拥有原装材料，并保留旧存档已经使用的材料", () => {
+    const fresh = migrateProgression({
+      version: STORAGE_VERSION,
+    });
+    const migrated = migrateProgression({
+      version: STORAGE_VERSION,
+      loadouts: [
+        {
+          customizations: {
+            "attack_ring.balance_six": { material: "alloy" },
+          },
+        },
+      ],
+      customizations: {
+        "tip.round_balance": { material: "rubber" },
+      },
+    });
+
+    expect(fresh.ownedMaterialIds).toEqual(
+      INITIAL_OWNED_MATERIAL_IDS,
+    );
+    expect(migrated.ownedMaterialIds).toEqual(
+      expect.arrayContaining(["stock", "alloy", "rubber"]),
     );
   });
 
@@ -82,6 +112,45 @@ describe("progression", () => {
       missingCoins: 100,
     });
     expect(progression.coins).toBe(180);
+  });
+
+  it("材料购买会原子扣款并添加所有权", () => {
+    const progression = migrateProgression({
+      version: STORAGE_VERSION,
+      coins: 360,
+    });
+    const access = getMaterialAccess(
+      PART_MATERIALS.alloy,
+      progression,
+    );
+    const purchased = purchaseMaterial(progression, "alloy");
+
+    expect(access).toMatchObject({
+      owned: false,
+      affordable: true,
+      missingCoins: 0,
+    });
+    expect(purchased.ok).toBe(true);
+    expect(purchased.progression.coins).toBe(0);
+    expect(purchased.progression.ownedMaterialIds).toContain("alloy");
+    expect(progression.coins).toBe(360);
+    expect(progression.ownedMaterialIds).toEqual(["stock"]);
+  });
+
+  it("材料余额不足时返回差额且不改变进度", () => {
+    const progression = migrateProgression({
+      version: STORAGE_VERSION,
+      coins: 100,
+    });
+    const rejected = purchaseMaterial(progression, "carbon");
+
+    expect(rejected).toMatchObject({
+      ok: false,
+      reason: "insufficient_coins",
+      missingCoins: 320,
+    });
+    expect(progression.coins).toBe(100);
+    expect(progression.ownedMaterialIds).toEqual(["stock"]);
   });
 
   it("首战无论胜负固定奖励 180，之后区分胜负奖励", () => {

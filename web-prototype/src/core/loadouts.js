@@ -1,4 +1,5 @@
 import { DEFAULT_BUILD, getPart } from "../data/parts.js";
+import { normalizeCustomizationMap } from "./part-customization.js";
 
 export const LOADOUT_COUNT = 3;
 
@@ -35,6 +36,7 @@ export function createDefaultLoadouts(build = DEFAULT_BUILD, colors = {}) {
       index === 0 ? colors : DEFAULT_COLORS[index],
       DEFAULT_COLORS[index],
     ),
+    customizations: {},
   }));
 }
 
@@ -42,12 +44,22 @@ export function migrateLoadouts(saved = {}) {
   const fallback = createDefaultLoadouts(saved.build, saved.colors);
   const loadouts = fallback.map((item, index) => {
     const savedLoadout = saved.loadouts?.[index];
-    if (!savedLoadout) return item;
+    if (!savedLoadout) {
+      return index === 0
+        ? {
+            ...item,
+            customizations: normalizeCustomizationMap(saved.customizations),
+          }
+        : item;
+    }
     return {
       ...item,
       name: savedLoadout.name || item.name,
       build: normalizeBuild(savedLoadout.build),
       colors: normalizeColors(savedLoadout.colors, item.colors),
+      customizations: normalizeCustomizationMap(
+        savedLoadout.customizations ?? saved.customizations,
+      ),
     };
   });
   const activeLoadoutIndex = Math.min(

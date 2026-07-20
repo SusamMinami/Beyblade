@@ -54,6 +54,22 @@ export class AudioEngine {
       envelope: { attack: 0.001, decay: 0.25, sustain: 0 },
       volume: -9,
     }).connect(this.master);
+    this.warningSynth = new Tone.Synth({
+      oscillator: { type: "square" },
+      envelope: { attack: 0.002, decay: 0.08, sustain: 0, release: 0.05 },
+      volume: -17,
+    }).connect(this.master);
+    this.scrapeNoise = new Tone.NoiseSynth({
+      noise: { type: "pink" },
+      envelope: { attack: 0.003, decay: 0.12, sustain: 0, release: 0.04 },
+      volume: -20,
+    }).connect(
+      new Tone.Filter({
+        frequency: 1450,
+        type: "bandpass",
+        Q: 2.2,
+      }).connect(this.master),
+    );
     this.rewardSynth = new Tone.PolySynth(Tone.Synth, {
       oscillator: { type: "triangle" },
       envelope: { attack: 0.004, decay: 0.12, sustain: 0.05, release: 0.18 },
@@ -112,6 +128,41 @@ export class AudioEngine {
       0.1 + amount * 0.18,
       now + 0.006,
       amount,
+    );
+  }
+
+  playRisk(type, state) {
+    if (!this.ready || !this.enabled || state === "safe" || state === "stable") {
+      return;
+    }
+    const now = Tone.now();
+    if (type === "stability") {
+      this.scrapeNoise.triggerAttackRelease(
+        state === "critical" ? 0.18 : 0.1,
+        now,
+        state === "critical" ? 0.62 : 0.35,
+      );
+      this.warningSynth.triggerAttackRelease(
+        state === "critical" ? "D3" : "A3",
+        0.08,
+        now,
+        0.32,
+      );
+      return;
+    }
+    const note =
+      type === "ring_out_risk"
+        ? state === "critical"
+          ? "C6"
+          : "G5"
+        : state === "critical"
+          ? "E3"
+          : "B3";
+    this.warningSynth.triggerAttackRelease(
+      note,
+      state === "critical" ? 0.12 : 0.07,
+      now,
+      state === "critical" ? 0.48 : 0.28,
     );
   }
 

@@ -1,4 +1,5 @@
 import * as THREE from "three";
+import { normalizePartCustomization } from "../core/part-customization.js";
 
 const SLOT_Y = Object.freeze({
   attackRing: 0.24,
@@ -24,12 +25,13 @@ function material(color, metalness, roughness, extras = {}) {
   });
 }
 
-function createMaterials(colors) {
+function createMaterials(colors, materialType = "stock") {
   const ringColor = new THREE.Color(colors.ring);
   const ringAccent = ringColor.clone().offsetHSL(0, 0.05, 0.18);
   const woodFinish = colors.finish === "wood";
+  let materials;
   if (woodFinish) {
-    return {
+    materials = {
       polymer: material(ringColor, 0.02, 0.72),
       polymerAccent: material(ringAccent, 0.03, 0.64),
       core: material(colors.core, 0.02, 0.68),
@@ -38,40 +40,77 @@ function createMaterials(colors) {
       rubber: material(0x33251b, 0.01, 0.88),
       shadow: material(0x6b4a31, 0.02, 0.82),
     };
+  } else {
+    materials = {
+      polymer: material(ringColor, 0.14, 0.2, { clearcoat: 0.78 }),
+      polymerAccent: material(ringAccent, 0.2, 0.16, { clearcoat: 0.88 }),
+      core: material(colors.core, 0.42, 0.2, { clearcoat: 0.7 }),
+      metal: material(METAL, 0.96, 0.16),
+      darkMetal: material(DARK_METAL, 0.9, 0.25),
+      rubber: material(RUBBER, 0.05, 0.82),
+      shadow: material(0x263138, 0.48, 0.46),
+    };
   }
-  return {
-    polymer: material(ringColor, 0.14, 0.2, { clearcoat: 0.78 }),
-    polymerAccent: material(ringAccent, 0.2, 0.16, { clearcoat: 0.88 }),
-    core: material(colors.core, 0.42, 0.2, { clearcoat: 0.7 }),
-    metal: material(METAL, 0.96, 0.16),
-    darkMetal: material(DARK_METAL, 0.9, 0.25),
-    rubber: material(RUBBER, 0.05, 0.82),
-    shadow: material(0x263138, 0.48, 0.46),
-  };
+
+  for (const item of Object.values(materials)) {
+    if (materialType === "polymer") {
+      item.metalness *= 0.35;
+      item.roughness = Math.max(item.roughness, 0.48);
+      item.clearcoat = Math.max(item.clearcoat, 0.45);
+    } else if (materialType === "alloy") {
+      item.metalness = Math.max(item.metalness, 0.78);
+      item.roughness = Math.min(item.roughness, 0.24);
+      item.color.lerp(new THREE.Color(0xb9c4c8), 0.2);
+    } else if (materialType === "carbon") {
+      item.metalness = Math.min(item.metalness, 0.35);
+      item.roughness = Math.max(item.roughness, 0.52);
+      item.color.multiplyScalar(0.48);
+    } else if (materialType === "rubber") {
+      item.metalness = Math.min(item.metalness, 0.08);
+      item.roughness = Math.max(item.roughness, 0.78);
+      item.color.multiplyScalar(0.72);
+    }
+    item.needsUpdate = true;
+  }
+  return materials;
 }
 
-function outerRadius(angle, slot, id) {
+function outerRadius(angle, slot, id, customization) {
+  let radius;
   if (slot === "attackRing") {
     if (id === "attack_ring.smash_three") {
       const pulse = Math.max(0, Math.cos(angle * 3 - 0.28)) ** 4;
-      return 0.91 + pulse * 0.3;
+      radius = 0.91 + pulse * 0.3;
+    } else if (id === "attack_ring.stamina_arc") {
+      radius = 1.01 + Math.cos(angle * 8) * 0.022;
+    } else {
+      const pulse = (0.5 + 0.5 * Math.cos(angle * 6)) ** 2;
+      radius = 0.94 + pulse * 0.12;
     }
-    if (id === "attack_ring.stamina_arc") {
-      return 1.01 + Math.cos(angle * 8) * 0.022;
-    }
-    const pulse = (0.5 + 0.5 * Math.cos(angle * 6)) ** 2;
-    return 0.94 + pulse * 0.12;
+  } else if (id === "weight_disc.heavy_outer") {
+    radius = 0.82 + Math.cos(angle * 8) * 0.018;
+  } else if (id === "weight_disc.eccentric") {
+    radius = 0.74 + Math.cos(angle) * 0.075 + Math.cos(angle * 5) * 0.018;
+  } else {
+    radius = 0.74 + Math.cos(angle * 6) * 0.012;
   }
-  if (id === "weight_disc.heavy_outer") {
-    return 0.82 + Math.cos(angle * 8) * 0.018;
-  }
-  if (id === "weight_disc.eccentric") {
-    return 0.74 + Math.cos(angle) * 0.075 + Math.cos(angle * 5) * 0.018;
-  }
-  return 0.74 + Math.cos(angle * 6) * 0.012;
+
+  const shapeStrength = customization.shape / 100;
+  if (shapeStrength <= 0) return radius;
+  const customPulse =
+    Math.max(0, Math.cos(angle * customization.symmetry)) **
+    (2.4 + shapeStrength * 2.6);
+  return radius + customPulse * 0.18 * shapeStrength;
 }
 
-function radialRingGeometry(innerRadius, height, segments, slot, id) {
+function radialRingGeometry(
+  innerRadius,
+  height,
+  segments,
+  slot,
+  id,
+  customization,
+) {
   const positions = [];
   const halfHeight = height * 0.5;
   const point = (angle, radius, y) => [
@@ -88,8 +127,8 @@ function radialRingGeometry(innerRadius, height, segments, slot, id) {
   for (let index = 0; index < segments; index += 1) {
     const angleA = (Math.PI * 2 * index) / segments;
     const angleB = (Math.PI * 2 * (index + 1)) / segments;
-    const outerA = outerRadius(angleA, slot, id);
-    const outerB = outerRadius(angleB, slot, id);
+    const outerA = outerRadius(angleA, slot, id, customization);
+    const outerB = outerRadius(angleB, slot, id, customization);
     const innerBottomA = point(angleA, innerRadius, -halfHeight);
     const innerBottomB = point(angleB, innerRadius, -halfHeight);
     const outerBottomA = point(angleA, outerA, -halfHeight);
@@ -150,25 +189,34 @@ function addRadialDetails(
   }
 }
 
-function buildAttackRing(id, materials) {
+function buildAttackRing(id, materials, customization) {
   const group = new THREE.Group();
   group.add(
     mesh(
-      radialRingGeometry(0.5, 0.22, 96, "attackRing", id),
+      radialRingGeometry(
+        0.5,
+        0.22,
+        96,
+        "attackRing",
+        id,
+        customization,
+      ),
       materials.polymer,
     ),
   );
 
-  const lobeCount =
-    id === "attack_ring.smash_three"
+  const lobeCount = customization.shape > 0
+    ? customization.symmetry
+    : id === "attack_ring.smash_three"
       ? 3
       : id === "attack_ring.stamina_arc"
         ? 8
         : 6;
+  const shapeStrength = customization.shape / 100;
   const contactSize =
     id === "attack_ring.smash_three"
-      ? [0.44, 0.1, 0.18]
-      : [0.26, 0.08, 0.14];
+      ? [0.44 + shapeStrength * 0.12, 0.1, 0.18]
+      : [0.26 + shapeStrength * 0.12, 0.08, 0.14];
   addRadialDetails(
     group,
     lobeCount,
@@ -197,7 +245,7 @@ function buildAttackRing(id, materials) {
   return group;
 }
 
-function buildCoreLock(id, materials) {
+function buildCoreLock(id, materials, customization) {
   const group = new THREE.Group();
   let radius = 0.37;
   let height = 0.18;
@@ -229,7 +277,11 @@ function buildCoreLock(id, materials) {
   group.add(emblem);
   addRadialDetails(
     group,
-    id === "core_lock.reinforced" ? 6 : 3,
+    customization.shape > 0
+      ? customization.symmetry
+      : id === "core_lock.reinforced"
+        ? 6
+        : 3,
     0.31,
     offsetY + 0.015,
     new THREE.BoxGeometry(0.15, 0.075, 0.08),
@@ -238,11 +290,18 @@ function buildCoreLock(id, materials) {
   return group;
 }
 
-function buildWeightDisc(id, materials) {
+function buildWeightDisc(id, materials, customization) {
   const group = new THREE.Group();
   const offset = id === "weight_disc.eccentric" ? 0.065 : 0;
   const disc = mesh(
-    radialRingGeometry(0.29, 0.14, 80, "weightDisc", id),
+    radialRingGeometry(
+      0.29,
+      0.14,
+      80,
+      "weightDisc",
+      id,
+      customization,
+    ),
     materials.metal,
   );
   disc.position.x = offset;
@@ -254,7 +313,11 @@ function buildWeightDisc(id, materials) {
   insetGroup.position.x = offset;
   addRadialDetails(
     insetGroup,
-    id === "weight_disc.heavy_outer" ? 8 : 6,
+    customization.shape > 0
+      ? customization.symmetry
+      : id === "weight_disc.heavy_outer"
+        ? 8
+        : 6,
     0.58,
     0.085,
     cylinder(0.05, 0.05, 0.025, 16),
@@ -264,7 +327,7 @@ function buildWeightDisc(id, materials) {
   return group;
 }
 
-function buildDriverShaft(id, materials) {
+function buildDriverShaft(id, materials, customization) {
   const group = new THREE.Group();
   let height = 0.4;
   let radius = 0.17;
@@ -296,7 +359,7 @@ function buildDriverShaft(id, materials) {
   group.add(lower);
   addRadialDetails(
     group,
-    6,
+    customization.shape > 0 ? customization.symmetry : 6,
     radius,
     offsetY,
     new THREE.BoxGeometry(0.04, height * 0.58, 0.055),
@@ -305,7 +368,7 @@ function buildDriverShaft(id, materials) {
   return group;
 }
 
-function buildTip(id, materials) {
+function buildTip(id, materials, customization) {
   const group = new THREE.Group();
   if (id === "tip.metal_stamina") {
     const housing = mesh(cylinder(0.17, 0.07, 0.22), materials.darkMetal);
@@ -337,31 +400,55 @@ function buildTip(id, materials) {
     contact.position.y = -0.12;
     group.add(contact);
   }
+  if (customization.shape > 0) {
+    addRadialDetails(
+      group,
+      customization.symmetry,
+      0.18,
+      0.02,
+      new THREE.BoxGeometry(
+        0.035 + customization.shape * 0.00045,
+        0.13,
+        0.045,
+      ),
+      materials.shadow,
+    );
+  }
   return group;
 }
 
 export function createTopModel(
   selection,
   colors = { ring: "#23c8b2", core: "#efbd3c" },
+  customizations = {},
 ) {
-  const materials = createMaterials(colors);
   const top = new THREE.Group();
-  top.userData.materials = Object.values(materials);
+  top.userData.materials = [];
   top.userData.partGroups = {};
 
   const builders = {
-    attackRing: () => buildAttackRing(selection.attackRing, materials),
-    coreLock: () => buildCoreLock(selection.coreLock, materials),
-    weightDisc: () => buildWeightDisc(selection.weightDisc, materials),
-    driverShaft: () => buildDriverShaft(selection.driverShaft, materials),
-    tip: () => buildTip(selection.tip, materials),
+    attackRing: buildAttackRing,
+    coreLock: buildCoreLock,
+    weightDisc: buildWeightDisc,
+    driverShaft: buildDriverShaft,
+    tip: buildTip,
   };
 
   Object.entries(builders).forEach(([slot, builder]) => {
-    const partGroup = builder();
+    const partId = selection[slot];
+    const customization = normalizePartCustomization(customizations[partId]);
+    const materials = createMaterials(colors, customization.material);
+    top.userData.materials.push(...Object.values(materials));
+    const partGroup = builder(partId, materials, customization);
     partGroup.name = slot;
     partGroup.position.y = SLOT_Y[slot];
     partGroup.userData.baseY = SLOT_Y[slot];
+    partGroup.userData.baseScale = new THREE.Vector3(
+      customization.size,
+      customization.height,
+      customization.size,
+    );
+    partGroup.scale.copy(partGroup.userData.baseScale);
     partGroup.traverse((child) => {
       if (!child.isMesh) return;
       child.material = child.material.clone();
@@ -373,17 +460,55 @@ export function createTopModel(
   return top;
 }
 
-export function setActivePart(top, activeSlot = null) {
+export function setActivePart(top, activeSlot = null, immediate = true) {
   Object.entries(top.userData.partGroups ?? {}).forEach(([slot, group]) => {
     const active = slot === activeSlot;
     const muted = Boolean(activeSlot) && !active;
-    group.position.y = group.userData.baseY + (active ? 0.12 : 0);
-    group.scale.setScalar(active ? 1.055 : 1);
+    const factor = active ? 1.055 : 1;
+    const baseScale = group.userData.baseScale ?? new THREE.Vector3(1, 1, 1);
+    group.userData.focusTargetY =
+      group.userData.baseY + (active ? 0.12 : 0);
+    group.userData.focusTargetScale = new THREE.Vector3(
+      baseScale.x * factor,
+      baseScale.y * factor,
+      baseScale.z * factor,
+    );
+    group.userData.focusTargetOpacity = muted ? 0.2 : 1;
+    if (immediate) {
+      group.position.y = group.userData.focusTargetY;
+      group.scale.copy(group.userData.focusTargetScale);
+    }
     group.traverse((child) => {
       if (!child.isMesh) return;
-      child.material.transparent = muted;
-      child.material.opacity = muted ? 0.2 : 1;
-      child.material.depthWrite = !muted;
+      child.material.transparent = muted || !immediate;
+      if (immediate) {
+        child.material.opacity = group.userData.focusTargetOpacity;
+      }
+      child.material.depthWrite = !muted && immediate;
+      child.material.needsUpdate = true;
+    });
+  });
+}
+
+export function updateTopPartFocus(top, delta) {
+  const ease = Math.min(delta * 11, 1);
+  Object.values(top.userData.partGroups ?? {}).forEach((group) => {
+    const targetScale = group.userData.focusTargetScale;
+    const targetY = group.userData.focusTargetY;
+    const targetOpacity = group.userData.focusTargetOpacity;
+    if (!targetScale || targetY === undefined || targetOpacity === undefined) {
+      return;
+    }
+    group.position.y += (targetY - group.position.y) * ease;
+    group.scale.lerp(targetScale, ease);
+    group.traverse((child) => {
+      if (!child.isMesh) return;
+      child.material.transparent =
+        targetOpacity < 0.999 || child.material.opacity < 0.999;
+      child.material.opacity +=
+        (targetOpacity - child.material.opacity) * ease;
+      child.material.depthWrite =
+        targetOpacity >= 0.999 && child.material.opacity >= 0.985;
       child.material.needsUpdate = true;
     });
   });

@@ -62,6 +62,74 @@ describe("BattleSimulation", () => {
     );
   });
 
+  it("诊断模式记录碰撞前后的倾角、转速与失衡变化", () => {
+    const diagnostics = [];
+    const battle = new BattleSimulation({
+      playerBuild: STANDARD_BUILD,
+      enemyBuild: STANDARD_BUILD,
+      arena: ARENAS.standard,
+      seed: 17,
+      diagnostics: true,
+      logger: (message, telemetry) => diagnostics.push({ message, telemetry }),
+    });
+    battle.launch({ power: 1, direction: 0, angle: 0 });
+    battle.player.position = { x: -0.45, y: 0 };
+    battle.enemy.position = { x: 0.45, y: 0 };
+    battle.player.velocity = { x: 7, y: 0 };
+    battle.enemy.velocity = { x: -7, y: 0 };
+    battle.player.tilt = 0.12;
+    battle.enemy.tilt = 0.08;
+
+    battle.step(1 / 60, { x: 0, y: 0 });
+
+    const collision = battle.events.find((event) => event.type === "collision");
+    expect(diagnostics).toHaveLength(1);
+    expect(diagnostics[0].message).toContain("BattleSimulation");
+    expect(collision.telemetry.player).toMatchObject({
+      tiltBefore: expect.any(Number),
+      tiltAfter: expect.any(Number),
+      tiltDelta: expect.any(Number),
+      spinBefore: expect.any(Number),
+      spinAfter: expect.any(Number),
+      spinDelta: expect.any(Number),
+      imbalanceBefore: expect.any(Number),
+      imbalanceAfter: expect.any(Number),
+    });
+    expect(collision.telemetry.player.spinDelta).toBeLessThan(0);
+    expect(collision.telemetry.player.tiltDelta).toBeGreaterThan(0);
+    expect(collision.telemetry.player.imbalanceDelta).toBeGreaterThan(0);
+    expect(battle.collisionLog).toEqual([collision.telemetry]);
+  });
+
+  it("失衡会抬高倾角、削弱控制，并随稳定性逐步恢复", () => {
+    const battle = new BattleSimulation({
+      playerBuild: STANDARD_BUILD,
+      enemyBuild: STANDARD_BUILD,
+      arena: ARENAS.standard,
+    });
+    battle.launch({ power: 1, direction: 0, angle: 0 });
+    battle.player.position = { x: 0, y: 0 };
+    battle.player.velocity = { x: 2, y: 0 };
+    battle.player.imbalance = 0.8;
+    battle.player.tilt = 0.55;
+    const initialImbalance = battle.player.imbalance;
+
+    battle._integrateTop(
+      battle.player,
+      { x: 1, y: 0 },
+      1 / 60,
+      false,
+    );
+    const impairedInfluence = battle.player.controlInfluence;
+
+    for (let frame = 0; frame < 240; frame += 1) {
+      battle._updateTilt(battle.player, 1 / 60);
+    }
+
+    expect(impairedInfluence).toBeLessThan(0.75);
+    expect(battle.player.imbalance).toBeLessThan(initialImbalance * 0.25);
+  });
+
   it("普通出射会被护圈反弹而不是立即判定撞飞", () => {
     const battle = new BattleSimulation({
       playerBuild: STANDARD_BUILD,
