@@ -223,7 +223,7 @@ class BeybladeApp {
         </header>
 
         <main class="stage-shell">
-          <div id="three-stage" aria-label="Three.js 三维预览"></div>
+          <div id="three-stage" role="application" tabindex="0" aria-label="可直接操作的三维预览"></div>
           <div class="stage-vignette"></div>
           <div class="stage-caption">
             <span id="stage-kicker">ASSEMBLY / 01</span>
@@ -233,7 +233,7 @@ class BeybladeApp {
           <div class="launch-controls is-hidden" id="launch-controls">
             <div class="launcher-heading">
               <span>DIRECT LAUNCH</span>
-              <b>拖模型调倾角 · 拖箭头调方向与力度</b>
+              <b>拖模型调倾角 · 拖箭头末端圆点调方向与力度</b>
             </div>
             <div class="launch-readout" aria-live="polite">
               <span>力度 <output id="launch-power-output">86%</output></span>
@@ -272,11 +272,17 @@ class BeybladeApp {
             <span id="result-kicker">BATTLE COMPLETE</span>
             <h2 id="result-title">对战结束</h2>
             <p id="result-copy"></p>
+            <div class="result-reward">
+              <small>本局赏金</small>
+              <strong>+<span id="result-reward">0</span></strong>
+              <em>金币已到账</em>
+            </div>
             <div class="result-actions">
               <button class="button ghost" id="result-assembly">返回改装</button>
               <button class="button primary" id="result-restart">再次对战</button>
             </div>
           </div>
+          <div class="victory-celebration is-hidden" id="victory-celebration" aria-hidden="true"></div>
           <div class="toast is-hidden" id="toast" role="status" aria-live="polite"></div>
         </main>
 
@@ -412,6 +418,11 @@ class BeybladeApp {
 
   _bindEvents() {
     this.root.addEventListener("click", (event) => {
+      const button = event.target.closest("button");
+      if (!button || button.disabled) return;
+      void this._playButtonFeedback(button);
+    });
+    this.root.addEventListener("click", (event) => {
       const goTarget = event.target.closest("[data-go]")?.dataset.go;
       if (!goTarget) return;
       if (!this._canNavigateTo(goTarget)) {
@@ -518,30 +529,7 @@ class BeybladeApp {
       this.goTo("map");
     });
     const arenaList = this.root.querySelector("#arena-list");
-    arenaList.addEventListener("click", (event) => {
-      const card = event.target.closest("[data-arena]");
-      if (!card) return;
-      card.scrollIntoView({ behavior: "smooth", inline: "center" });
-      this._selectArena(card.dataset.arena);
-    });
-    arenaList.addEventListener("scroll", () => {
-      window.cancelAnimationFrame(this.arenaScrollFrame);
-      this.arenaScrollFrame = window.requestAnimationFrame(() => {
-        const bounds = arenaList.getBoundingClientRect();
-        const center = bounds.left + bounds.width * 0.5;
-        const cards = [...arenaList.querySelectorAll("[data-arena]")];
-        const closest = cards.reduce((best, card) => {
-          const cardBounds = card.getBoundingClientRect();
-          const distance = Math.abs(
-            cardBounds.left + cardBounds.width * 0.5 - center,
-          );
-          return !best || distance < best.distance
-            ? { card, distance }
-            : best;
-        }, null);
-        if (closest) this._selectArena(closest.card.dataset.arena);
-      });
-    });
+    this._bindArenaCarousel(arenaList);
     this.root.querySelector("#start-battle").addEventListener("click", () => {
       this.goTo("battle");
     });
@@ -703,6 +691,123 @@ class BeybladeApp {
     window.addEventListener("keyup", (event) => {
       this.keys.delete(event.key.toLowerCase());
     });
+  }
+
+  async _playButtonFeedback(button) {
+    await this.audio.init();
+    this.audio.setEnabled(this.state.sound);
+    const tone =
+      button.classList.contains("primary") ||
+      button.classList.contains("launch-button") ||
+      button.id === "purchase-confirm"
+        ? "confirm"
+        : button.classList.contains("ghost")
+          ? "soft"
+          : "tap";
+    this.audio.playUi(tone);
+  }
+
+  _bindArenaCarousel(arenaList) {
+    const getCards = () => [...arenaList.querySelectorAll("[data-arena]")];
+    const getClosestCard = () => {
+      const bounds = arenaList.getBoundingClientRect();
+      const center = bounds.left + bounds.width * 0.5;
+      return getCards().reduce((best, card) => {
+        const cardBounds = card.getBoundingClientRect();
+        const distance = Math.abs(
+          cardBounds.left + cardBounds.width * 0.5 - center,
+        );
+        return !best || distance < best.distance
+          ? { card, distance }
+          : best;
+      }, null)?.card;
+    };
+    const settleOnCard = (card) => {
+      if (!card) return;
+      this._selectArena(card.dataset.arena);
+      this._centerArenaCard(card);
+    };
+
+    arenaList.addEventListener("pointerdown", (event) => {
+      if (!event.target.closest("[data-arena]")) return;
+      this.arenaDrag = {
+        pointerId: event.pointerId,
+        startX: event.clientX,
+        startY: event.clientY,
+        startScrollLeft: arenaList.scrollLeft,
+        startArenaId: this.selectedArena.id,
+        moved: false,
+      };
+      arenaList.classList.add("is-dragging");
+      arenaList.setPointerCapture(event.pointerId);
+    });
+    arenaList.addEventListener("pointermove", (event) => {
+      if (this.arenaDrag?.pointerId !== event.pointerId) return;
+      const deltaX = event.clientX - this.arenaDrag.startX;
+      const deltaY = event.clientY - this.arenaDrag.startY;
+      if (
+        !this.arenaDrag.moved &&
+        Math.abs(deltaX) < 6 &&
+        Math.abs(deltaY) < 6
+      ) {
+        return;
+      }
+      if (Math.abs(deltaY) > Math.abs(deltaX) * 1.2) return;
+      this.arenaDrag.moved = true;
+      arenaList.scrollLeft = this.arenaDrag.startScrollLeft - deltaX;
+      event.preventDefault();
+    });
+    const releaseArenaDrag = (event) => {
+      const drag = this.arenaDrag;
+      if (!drag || drag.pointerId !== event.pointerId) return;
+      const deltaX = event.clientX - drag.startX;
+      if (arenaList.hasPointerCapture(event.pointerId)) {
+        arenaList.releasePointerCapture(event.pointerId);
+      }
+      arenaList.classList.remove("is-dragging");
+      this.arenaDrag = null;
+      if (!drag.moved) return;
+
+      this.suppressArenaClickUntil = performance.now() + 280;
+      const cards = getCards();
+      const startIndex = cards.findIndex(
+        (card) => card.dataset.arena === drag.startArenaId,
+      );
+      let target = getClosestCard();
+      if (Math.abs(deltaX) >= 38 && startIndex >= 0) {
+        const nextIndex = Math.max(
+          0,
+          Math.min(cards.length - 1, startIndex + (deltaX < 0 ? 1 : -1)),
+        );
+        target = cards[nextIndex];
+      }
+      settleOnCard(target);
+    };
+    arenaList.addEventListener("pointerup", releaseArenaDrag);
+    arenaList.addEventListener("pointercancel", releaseArenaDrag);
+    arenaList.addEventListener("click", (event) => {
+      if (performance.now() < (this.suppressArenaClickUntil ?? 0)) {
+        event.preventDefault();
+        event.stopPropagation();
+        return;
+      }
+      settleOnCard(event.target.closest("[data-arena]"));
+    });
+    arenaList.addEventListener("scroll", () => {
+      if (this.arenaDrag) return;
+      window.cancelAnimationFrame(this.arenaScrollFrame);
+      this.arenaScrollFrame = window.requestAnimationFrame(() => {
+        this._selectArena(getClosestCard()?.dataset.arena);
+      });
+    });
+  }
+
+  _centerArenaCard(card, behavior = "smooth") {
+    if (!card) return;
+    const arenaList = this.root.querySelector("#arena-list");
+    const left =
+      card.offsetLeft - (arenaList.clientWidth - card.offsetWidth) * 0.5;
+    arenaList.scrollTo({ left, behavior });
   }
 
   _bindJoystick() {
@@ -900,13 +1005,14 @@ class BeybladeApp {
       previewLoadouts,
       this.state.activeLoadoutIndex,
       this.activeSlot,
+      { preserveCamera: true },
     );
     this.stage.enterPartEditor(
       this.activeSlot,
       previewBuild.centerOfMass,
       this.diyDraft,
     );
-    this.stage.setAssemblyOrthographicView(this.diyView, true);
+    this.stage.setAssemblyOrthographicView(this.diyView);
     this.root.querySelector("#diy-mass-value").textContent =
       previewBuild.totalMass.toFixed(2);
     this.root.querySelector("#diy-inertia-value").textContent =
@@ -940,6 +1046,7 @@ class BeybladeApp {
       this.state.loadouts,
       this.state.activeLoadoutIndex,
       this.activeSlot,
+      { preserveCamera: true },
     );
     this.audio.playUi();
     this._showToast(save ? `${partName} 的 DIY 改造已保存` : "已取消本次改造");
@@ -964,8 +1071,8 @@ class BeybladeApp {
     this.stage.switchAssemblyLoadout(
       this.state.activeLoadoutIndex,
       null,
+      direction,
     );
-    this._showToast(`${loadout.name}陀螺已设为出战配置`);
     navigator.vibrate?.(12);
   }
 
@@ -1147,7 +1254,7 @@ class BeybladeApp {
   }
 
   _selectArena(arenaId) {
-    if (arenaId === this.selectedArena.id) return;
+    if (!arenaId || arenaId === this.selectedArena.id) return;
     this.selectedArena = getArena(arenaId);
     this.state.arenaId = this.selectedArena.id;
     this.root.querySelector(".game-shell").dataset.arena =
@@ -1158,6 +1265,10 @@ class BeybladeApp {
         card.dataset.arena === this.selectedArena.id,
       );
     });
+    if (this.screen === "map") {
+      this.root.querySelector("#stage-title").textContent =
+        this.selectedArena.shortName;
+    }
     this.stage.showArena(this.selectedArena);
     this._save();
     this.audio.playUi();
@@ -1200,9 +1311,12 @@ class BeybladeApp {
       this._renderMaps();
       this.stage.showArena(this.selectedArena);
       requestAnimationFrame(() => {
-        this.root
-          .querySelector(`[data-arena="${this.selectedArena.id}"]`)
-          ?.scrollIntoView({ inline: "center" });
+        this._centerArenaCard(
+          this.root.querySelector(
+            `[data-arena="${this.selectedArena.id}"]`,
+          ),
+          "auto",
+        );
       });
     } else if (screen === "assembly") {
       this.simulation = null;
@@ -1222,6 +1336,8 @@ class BeybladeApp {
     shell.dataset.arena = this.selectedArena.id;
     if (screen !== "battle") {
       this.root.querySelector("#result-card").classList.add("is-hidden");
+      this.root.querySelector("#result-card").classList.remove("is-victory");
+      this._showVictoryCelebration(false);
       this.resultHandled = false;
     }
     this.root.querySelectorAll("[data-panel]").forEach((panel) => {
@@ -1300,6 +1416,8 @@ class BeybladeApp {
     this.root.querySelector("#launch-controls").classList.remove("is-hidden");
     this.root.querySelector("#battle-controls").classList.add("is-hidden");
     this.root.querySelector("#result-card").classList.add("is-hidden");
+    this.root.querySelector("#result-card").classList.remove("is-victory");
+    this._showVictoryCelebration(false);
     this.root.querySelector("#top-influence").classList.add("is-hidden");
     this.root.querySelector("#battle-pause-label").textContent = "待发";
     this.root.querySelector("#battle-message").textContent = firstBattle
@@ -1427,6 +1545,10 @@ class BeybladeApp {
       tutorialStage === TUTORIAL_STAGE.FIRST_BATTLE
         ? `${time.toFixed(1)} 秒 · 已获得 ${reward} 金币，下一步去解锁你的第一个零件。`
         : `${time.toFixed(1)} 秒 · ${won ? "你的配置完成了验证。" : `对手通过${RESULT_LABELS[reason]}结束回合。`}`;
+    this.root.querySelector("#result-reward").textContent = String(reward);
+    this.root
+      .querySelector("#result-card")
+      .classList.toggle("is-victory", won);
     const assemblyButton = this.root.querySelector("#result-assembly");
     const restartButton = this.root.querySelector("#result-restart");
     assemblyButton.textContent =
@@ -1440,6 +1562,34 @@ class BeybladeApp {
     this.root.querySelector("#battle-controls").classList.add("is-hidden");
     this.root.querySelector("#top-influence").classList.add("is-hidden");
     this.root.querySelector("#result-card").classList.remove("is-hidden");
+    this._showVictoryCelebration(won);
+  }
+
+  _showVictoryCelebration(visible) {
+    const celebration = this.root.querySelector("#victory-celebration");
+    celebration.classList.toggle("is-hidden", !visible);
+    if (!visible) {
+      celebration.replaceChildren();
+      return;
+    }
+    const colors = ["#ffd23f", "#37a8ff", "#f45b2a", "#55dac0", "#ffffff"];
+    const bursts = [18, 50, 82]
+      .map((x, burstIndex) => {
+        const sparks = Array.from({ length: 12 }, (_, index) => {
+          const angle = index * 30 + burstIndex * 7;
+          return `<i style="--angle:${angle}deg;--spark:${colors[(index + burstIndex) % colors.length]}"></i>`;
+        }).join("");
+        return `<span class="firework" style="--x:${x}%;--delay:${burstIndex * 0.18}s">${sparks}</span>`;
+      })
+      .join("");
+    const confetti = Array.from({ length: 38 }, (_, index) => {
+      const left = (index * 37) % 100;
+      const delay = ((index * 13) % 19) / 20;
+      const drift = ((index % 7) - 3) * 16;
+      const turn = 280 + (index % 5) * 90;
+      return `<b class="confetti" style="--left:${left}%;--delay:${delay}s;--drift:${drift}px;--turn:${turn}deg;--confetti:${colors[index % colors.length]}"></b>`;
+    }).join("");
+    celebration.innerHTML = bursts + confetti;
   }
 
   _updateHud() {

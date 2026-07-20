@@ -47,6 +47,20 @@ input {
 
 button {
   color: inherit;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    color 120ms ease,
+    background-color 120ms ease,
+    border-color 120ms ease,
+    filter 120ms ease,
+    transform 120ms ease;
+}
+
+button:not(:disabled):active {
+  color: #12151a !important;
+  background-color: #ffd23f !important;
+  filter: saturate(1.18) brightness(0.98);
+  transform: translateY(2px) scale(0.985) !important;
 }
 
 button:focus-visible,
@@ -2742,11 +2756,11 @@ input[type="range"] {
 }
 
 .loadout-status button:first-child {
-  right: calc(100% + 54px);
+  right: calc(50% + 60px);
 }
 
 .loadout-status button:last-child {
-  left: calc(100% + 54px);
+  left: calc(50% + 60px);
 }
 
 .loadout-status span,
@@ -2790,6 +2804,11 @@ input[type="range"] {
 .game-shell[data-screen="assembly"] .assembly-customizer {
   position: absolute;
   inset: 0;
+  pointer-events: none;
+}
+
+.game-shell[data-screen="assembly"] .assembly-customizer > * {
+  pointer-events: auto;
 }
 
 .game-shell[data-screen="assembly"] .assembly-view-tools {
@@ -2857,11 +2876,14 @@ input[type="range"] {
 
 .game-shell[data-screen="assembly"] .action-row {
   grid-template-columns: 1fr;
+  left: auto;
+  width: min(42%, 168px);
 }
 
 .game-shell[data-screen="assembly"] .action-row .button {
   width: 100%;
-  min-height: 52px;
+  min-height: 44px;
+  padding-inline: 12px;
 }
 
 .game-shell[data-screen="map"] {
@@ -2870,6 +2892,15 @@ input[type="range"] {
 
 .game-shell[data-screen="map"] .stage-shell {
   grid-row: 2;
+}
+
+.game-shell[data-screen="map"] .stage-caption {
+  color: #fffdf7;
+  text-shadow: 2px 2px 0 rgba(0, 0, 0, 0.72);
+}
+
+.game-shell[data-screen="map"] .stage-caption span {
+  color: #37a8ff;
 }
 
 .game-shell[data-screen="map"] .workspace {
@@ -2895,13 +2926,30 @@ input[type="range"] {
   left: 0;
   display: flex;
   gap: 12px;
-  padding: 16px 11%;
+  padding: 16px 0;
   overflow-x: auto;
   pointer-events: auto;
+  cursor: grab;
+  overscroll-behavior-x: contain;
   scroll-padding-inline: 11%;
+  scroll-behavior: smooth;
   scroll-snap-type: x mandatory;
   scrollbar-width: none;
+  touch-action: pan-y;
+  user-select: none;
   transform: translateY(-50%);
+}
+
+.game-shell[data-screen="map"] .arena-list::before,
+.game-shell[data-screen="map"] .arena-list::after {
+  flex: 0 0 calc(11% - 12px);
+  content: "";
+}
+
+.game-shell[data-screen="map"] .arena-list.is-dragging {
+  cursor: grabbing;
+  scroll-behavior: auto;
+  scroll-snap-type: none;
 }
 
 .game-shell[data-screen="map"] .arena-list::-webkit-scrollbar {
@@ -2910,7 +2958,8 @@ input[type="range"] {
 
 .game-shell[data-screen="map"] .arena-card {
   display: grid;
-  min-width: 78%;
+  min-width: 0;
+  flex: 0 0 78%;
   min-height: 132px;
   grid-template-columns: 42px minmax(0, 1fr);
   scroll-snap-align: center;
@@ -3714,6 +3763,144 @@ input[type="range"] {
   transform: translate(-50%, -50%) rotate(-1deg);
 }
 
+.result-reward {
+  display: grid;
+  margin: 12px 0 15px;
+  padding: 10px 12px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: center;
+  color: #12151a;
+  border: 3px solid #12151a;
+  background: #ffd23f;
+  box-shadow: 4px 4px 0 #12151a;
+  transform: rotate(-1deg);
+}
+
+.result-reward small,
+.result-reward em {
+  font-size: 8px;
+  font-style: normal;
+  font-weight: 750;
+  letter-spacing: 0.08em;
+}
+
+.result-reward strong {
+  grid-row: 1 / 3;
+  grid-column: 2;
+  color: #f45b2a;
+  font-family: Impact, "Arial Black", "Microsoft YaHei UI", sans-serif;
+  font-size: clamp(30px, 9vw, 54px);
+  font-weight: 500;
+  line-height: 0.9;
+  text-shadow: 2px 2px 0 #fffdf7;
+}
+
+.result-reward em {
+  margin-top: 3px;
+  color: #6d5617;
+}
+
+.result-card.is-victory .result-reward {
+  animation: reward-pop 520ms cubic-bezier(0.2, 1.5, 0.35, 1) both;
+}
+
+.victory-celebration {
+  position: absolute;
+  z-index: 38;
+  inset: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.firework {
+  position: absolute;
+  top: 25%;
+  left: var(--x);
+  width: 4px;
+  height: 4px;
+  animation: firework-sequence 1.8s var(--delay) ease-out infinite;
+}
+
+.firework i {
+  position: absolute;
+  width: 5px;
+  height: 17px;
+  border-radius: 3px;
+  background: var(--spark);
+  box-shadow: 0 0 8px color-mix(in srgb, var(--spark) 72%, transparent);
+  opacity: 0;
+  transform: rotate(var(--angle)) translateY(0);
+  transform-origin: 50% 100%;
+  animation: firework-spark 1.8s var(--delay) ease-out infinite;
+}
+
+.confetti {
+  position: absolute;
+  top: -18px;
+  left: var(--left);
+  width: 8px;
+  height: 15px;
+  border: 2px solid #12151a;
+  background: var(--confetti);
+  animation: confetti-fall 2.5s var(--delay) cubic-bezier(0.2, 0.7, 0.35, 1)
+    infinite;
+}
+
+@keyframes reward-pop {
+  0% {
+    opacity: 0;
+    transform: scale(0.72) rotate(5deg);
+  }
+  70% {
+    opacity: 1;
+    transform: scale(1.06) rotate(-2deg);
+  }
+  100% {
+    transform: scale(1) rotate(-1deg);
+  }
+}
+
+@keyframes firework-sequence {
+  0%,
+  12% {
+    transform: translateY(180px) scale(0.4);
+  }
+  30%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+}
+
+@keyframes firework-spark {
+  0%,
+  28% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(0) scaleY(0.4);
+  }
+  34% {
+    opacity: 1;
+  }
+  72%,
+  100% {
+    opacity: 0;
+    transform: rotate(var(--angle)) translateY(-78px) scaleY(0.8);
+  }
+}
+
+@keyframes confetti-fall {
+  0% {
+    opacity: 0;
+    transform: translate3d(0, -20px, 0) rotate(0);
+  }
+  10% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.82;
+    transform: translate3d(var(--drift), 110vh, 0) rotate(var(--turn));
+  }
+}
+
 .game-shell[data-screen="battle"] .result-card h2 {
   color: #12151a;
   font-family: Impact, "Arial Black", "Microsoft YaHei UI", sans-serif;
@@ -3969,13 +4156,14 @@ input[type="range"] {
 }
 
 .game-shell[data-screen="assembly"] .part-heading {
-  top: 78px;
-  left: 12px;
-  width: min(42%, 190px);
+  top: 38px;
+  left: 6px;
+  width: min(38%, 174px);
   padding: 7px 9px 8px;
   border-width: 2px;
   box-shadow: 3px 3px 0 #238cff;
-  transform: none;
+  transform: rotate(-2.25deg);
+  transform-origin: top left;
 }
 
 .game-shell[data-screen="assembly"] .part-heading h1 {
@@ -4022,12 +4210,22 @@ input[type="range"] {
   }
 
   .game-shell[data-screen="assembly"] .part-heading {
-    top: 72px;
-    width: 44%;
+    top: 34px;
+    width: 40%;
   }
 
   .game-shell[data-screen="assembly"] .part-heading p,
   .game-shell[data-screen="assembly"] .part-heading .color-pair {
     display: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .victory-celebration {
+    display: none !important;
+  }
+
+  .result-card.is-victory .result-reward {
+    animation: none;
   }
 }

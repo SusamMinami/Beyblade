@@ -6,6 +6,10 @@ import {
   updateTopPartFocus,
 } from "./top-model.js";
 
+const LAUNCH_MIN_POWER = 0.35;
+const LAUNCH_MIN_LENGTH = 1.85;
+const LAUNCH_MAX_LENGTH = 4.4;
+
 function disposeGroup(group) {
   group.traverse((child) => {
     if (!child.isMesh) return;
@@ -17,6 +21,27 @@ function disposeGroup(group) {
     }
   });
   group.clear();
+}
+
+function arenaHeightAt(arena, radius, angle = 0) {
+  const normalized = THREE.MathUtils.clamp(radius / arena.wallRadius, 0, 1);
+  if (arena.id === "metal") {
+    return (
+      -0.46 +
+      normalized ** 1.5 * 0.76 +
+      Math.sin(angle * 6 + normalized * 8) * normalized * 0.012
+    );
+  }
+  if (arena.id === "composite") {
+    if (normalized < 0.46) {
+      return -0.52 + normalized ** 2 * 0.34;
+    }
+    if (normalized < 0.86) {
+      return -0.448 + (normalized - 0.46) * 0.72;
+    }
+    return -0.16 + (normalized - 0.86) * 3.25;
+  }
+  return -0.5 + normalized ** 2 * 0.82;
 }
 
 function createBowlGeometry(arena) {
@@ -37,10 +62,9 @@ function createBowlGeometry(arena) {
 
   for (let ring = 0; ring <= rings; ring += 1) {
     const radius = (arena.wallRadius * ring) / rings;
-    const normalized = radius / arena.wallRadius;
-    const height = -0.5 + normalized ** 2 * 0.82;
     for (let segment = 0; segment <= segments; segment += 1) {
       const angle = (Math.PI * 2 * segment) / segments;
+      const height = arenaHeightAt(arena, radius, angle);
       positions.push(
         Math.cos(angle) * radius,
         height,
@@ -72,6 +96,73 @@ function createBowlGeometry(arena) {
   return geometry;
 }
 
+function addArenaTerrainDetails(group, arena) {
+  const detailMaterial = new THREE.MeshStandardMaterial({
+    color: arena.accent,
+    emissive: arena.accent,
+    emissiveIntensity: 0.08,
+    metalness: arena.id === "metal" ? 0.92 : 0.38,
+    roughness: arena.id === "metal" ? 0.16 : 0.62,
+  });
+  if (arena.id === "metal") {
+    for (const radius of [1.35, 2.85, 4.4, 5.72]) {
+      const speedRail = new THREE.Mesh(
+        new THREE.TorusGeometry(radius, 0.045, 7, 96),
+        detailMaterial,
+      );
+      speedRail.rotation.x = Math.PI * 0.5;
+      speedRail.position.y = arenaHeightAt(arena, radius) + 0.045;
+      speedRail.castShadow = true;
+      group.add(speedRail);
+    }
+    return;
+  }
+  if (arena.id === "composite") {
+    const centerPlate = new THREE.Mesh(
+      new THREE.CylinderGeometry(2.9, 2.9, 0.055, 72),
+      new THREE.MeshStandardMaterial({
+        color: 0x687b83,
+        metalness: 0.9,
+        roughness: 0.18,
+      }),
+    );
+    centerPlate.position.y = arenaHeightAt(arena, 0) + 0.035;
+    centerPlate.receiveShadow = true;
+    group.add(centerPlate);
+
+    const brakeMaterial = new THREE.MeshStandardMaterial({
+      color: 0xb74336,
+      metalness: 0.08,
+      roughness: 0.92,
+    });
+    const brakeRadius = arena.wallRadius * 0.91;
+    for (let index = 0; index < 20; index += 1) {
+      const angle = (index / 20) * Math.PI * 2;
+      const brake = new THREE.Mesh(
+        new THREE.BoxGeometry(0.52, 0.12, 0.2),
+        brakeMaterial,
+      );
+      brake.position.set(
+        Math.cos(angle) * brakeRadius,
+        arenaHeightAt(arena, brakeRadius, angle) + 0.085,
+        Math.sin(angle) * brakeRadius,
+      );
+      brake.rotation.y = -angle;
+      brake.castShadow = true;
+      group.add(brake);
+    }
+    return;
+  }
+
+  const centerGuide = new THREE.Mesh(
+    new THREE.CylinderGeometry(0.62, 0.72, 0.07, 48),
+    detailMaterial,
+  );
+  centerGuide.position.y = arenaHeightAt(arena, 0) + 0.045;
+  centerGuide.receiveShadow = true;
+  group.add(centerGuide);
+}
+
 function createArenaModel(arena) {
   const group = new THREE.Group();
   const bowlMaterial = new THREE.MeshStandardMaterial({
@@ -97,7 +188,7 @@ function createArenaModel(arena) {
     rimMaterial,
   );
   rim.rotation.x = Math.PI * 0.5;
-  rim.position.y = 0.36;
+  rim.position.y = arenaHeightAt(arena, arena.wallRadius) + 0.04;
   rim.castShadow = true;
   group.add(rim);
 
@@ -114,7 +205,7 @@ function createArenaModel(arena) {
       lineMaterial,
     );
     line.rotation.x = Math.PI * 0.5;
-    line.position.y = -0.48 + (radius / arena.wallRadius) ** 2 * 0.82 + 0.02;
+    line.position.y = arenaHeightAt(arena, radius) + 0.025;
     group.add(line);
   }
 
@@ -122,8 +213,9 @@ function createArenaModel(arena) {
     new THREE.CylinderGeometry(0.2, 0.2, 0.018, 32),
     rimMaterial,
   );
-  center.position.y = -0.48;
+  center.position.y = arenaHeightAt(arena, 0) + 0.02;
   group.add(center);
+  addArenaTerrainDetails(group, arena);
   return group;
 }
 
@@ -271,9 +363,31 @@ export class ThreeStage {
       }),
     );
     this.launchVectorHandle.renderOrder = 16;
+    this.launchVectorHandleHalo = new THREE.Mesh(
+      new THREE.TorusGeometry(0.31, 0.026, 8, 36),
+      new THREE.MeshBasicMaterial({
+        color: 0xffffff,
+        transparent: true,
+        opacity: 0.72,
+        depthTest: false,
+      }),
+    );
+    this.launchVectorHandleHalo.renderOrder = 16;
+    this.launchVectorHitTarget = new THREE.Mesh(
+      new THREE.SphereGeometry(0.52, 12, 8),
+      new THREE.MeshBasicMaterial({
+        transparent: true,
+        opacity: 0,
+        depthTest: false,
+        depthWrite: false,
+      }),
+    );
+    this.launchVectorHitTarget.renderOrder = 17;
     this.launchVectorRoot.add(
       this.launchVectorArrow,
       this.launchVectorHandle,
+      this.launchVectorHandleHalo,
+      this.launchVectorHitTarget,
     );
     this.launchVectorRoot.visible = false;
     this.effectRoot.add(this.launchVectorRoot);
@@ -428,6 +542,7 @@ export class ThreeStage {
       this.dragStartX = event.clientX;
       this.dragStartY = event.clientY;
       this.dragDistance = 0;
+      this.draggedSlot = null;
       const hit = this._pickAssemblyPart(event.clientX, event.clientY);
       this.dragStartedOnModel = Boolean(hit);
       this.dragMode = this.partEditorSlot ? "locked" : "camera";
@@ -633,7 +748,7 @@ export class ThreeStage {
     event.preventDefault();
     const canvas = this.renderer.domElement;
     const handleHit = this._raycastObject(
-      this.launchVectorHandle,
+      this.launchVectorHitTarget,
       event.clientX,
       event.clientY,
     );
@@ -678,8 +793,11 @@ export class ThreeStage {
           Math.PI / 3,
         );
         this.launcherParams.power = THREE.MathUtils.clamp(
-          0.35 + ((distance - 1.2) / 3.2) * 0.65,
-          0.35,
+          LAUNCH_MIN_POWER +
+            ((distance - LAUNCH_MIN_LENGTH) /
+              (LAUNCH_MAX_LENGTH - LAUNCH_MIN_LENGTH)) *
+              (1 - LAUNCH_MIN_POWER),
+          LAUNCH_MIN_POWER,
           1,
         );
       }
@@ -865,9 +983,9 @@ export class ThreeStage {
       Math.max(...projected.map((point) => point.y)) -
       Math.min(...projected.map((point) => point.y));
     const scale = THREE.MathUtils.clamp(
-      Math.min(1.14 / projectedHeight, 1.88 / projectedWidth),
-      0.92,
-      1.52,
+      Math.min(1.34 / projectedHeight, 1.42 / projectedWidth),
+      0.58,
+      1.58,
     );
     this.assemblyFitScale = scale;
     this.assemblyTop.scale.setScalar(scale);
@@ -989,13 +1107,31 @@ export class ThreeStage {
     this._markAssemblyInteraction();
   }
 
-  switchAssemblyLoadout(activeLoadoutIndex, activeSlot = null) {
+  switchAssemblyLoadout(
+    activeLoadoutIndex,
+    activeSlot = null,
+    direction = "next",
+  ) {
     if (this.assemblyTops.length === 0) return;
     this.activeAssemblySlot = activeSlot;
     this.assemblyTops.forEach((top) => {
+      const previousOffset = top.userData.carouselOffset ?? 0;
       let offset = top.userData.loadoutIndex - activeLoadoutIndex;
       if (offset > 1) offset -= this.assemblyTops.length;
       if (offset < -1) offset += this.assemblyTops.length;
+      const wrappedAcross = Math.abs(offset - previousOffset) > 1;
+      if (wrappedAcross) {
+        const stagingOffset = direction === "next" ? 1.42 : -1.42;
+        top.position.set(stagingOffset * 2.05, -0.18, 0.55);
+        top.scale.setScalar(this.assemblyFitScale * 0.5);
+        top.rotation.z = -stagingOffset * 0.2;
+        top.traverse((child) => {
+          if (!child.isMesh) return;
+          child.material.transparent = true;
+          child.material.opacity = 0;
+          child.material.depthWrite = false;
+        });
+      }
       top.userData.carouselOffset = offset;
       top.userData.carouselTargetPosition = new THREE.Vector3(
         offset * 2.05,
@@ -1045,7 +1181,12 @@ export class ThreeStage {
     this._markAssemblyInteraction();
   }
 
-  enterPartEditor(slot, centerOfMass, customization = null) {
+  enterPartEditor(
+    slot,
+    centerOfMass,
+    customization = null,
+    immediate = false,
+  ) {
     this.partEditorSlot = slot;
     this.assemblyView = "front";
     this.diyCustomization = customization
@@ -1058,11 +1199,11 @@ export class ThreeStage {
       setActivePart(this.assemblyTop, slot);
       this._showCenterOfMass(centerOfMass);
     }
-    this.setAssemblyOrthographicView("front", true);
+    this.setAssemblyOrthographicView("front", immediate);
     this._positionDiyHandles();
   }
 
-  exitPartEditor() {
+  exitPartEditor(immediate = false) {
     this.partEditorSlot = null;
     this.diyCustomization = null;
     this.diyHandleRoot.visible = false;
@@ -1071,7 +1212,7 @@ export class ThreeStage {
       top.visible = true;
     });
     this._removeCenterOfMassMarker();
-    this.resetAssemblyView(true);
+    this.resetAssemblyView(immediate);
   }
 
   setAssemblyOrthographicView(view, immediate = false) {
@@ -1079,9 +1220,9 @@ export class ThreeStage {
     this.assemblyView = view;
     const target = this.assemblyTarget;
     const positions = {
-      front: new THREE.Vector3(0, 0.35, 5.7),
-      top: new THREE.Vector3(0, 5.9, 0.01),
-      side: new THREE.Vector3(5.7, 0.35, 0),
+      front: new THREE.Vector3(target.x, target.y + 0.2, 5.7),
+      top: new THREE.Vector3(target.x, target.y + 5.9, 0.01),
+      side: new THREE.Vector3(5.7, target.y + 0.2, target.z),
     };
     const position = positions[view] ?? positions.front;
     this.desiredCameraPosition.copy(position);
@@ -1228,18 +1369,14 @@ export class ThreeStage {
     Object.assign(this.launcherParams, params);
     if (this.mode !== "battle" || !this.playerTop) return;
     const { height, direction, angle } = this.launcherParams;
-    const launchHeight = 0.72 + height * 1.45;
+    const launcherHeight = 0.46 + height * 0.22;
     this.launcherRoot.position.set(
-      Math.sin(direction) * 0.85,
-      launchHeight,
-      3.85,
+      0,
+      launcherHeight,
+      4.92,
     );
     this.launcherRoot.rotation.set(angle, direction, 0);
-    this.playerTop.position.set(
-      this.launcherRoot.position.x - Math.sin(direction) * 0.45,
-      launchHeight - 0.42,
-      3.35,
-    );
+    this.playerTop.position.set(0, 0.08, 4.45);
     this.playerTop.rotation.set(angle, direction, 0);
     this._updateLaunchVectorPreview();
   }
@@ -1267,7 +1404,14 @@ export class ThreeStage {
       0,
       -Math.cos(this.launcherParams.direction),
     ).normalize();
-    const length = 1.2 + this.launcherParams.power * 3.2;
+    const normalizedPower =
+      (this.launcherParams.power - LAUNCH_MIN_POWER) /
+      (1 - LAUNCH_MIN_POWER);
+    const length = THREE.MathUtils.lerp(
+      LAUNCH_MIN_LENGTH,
+      LAUNCH_MAX_LENGTH,
+      THREE.MathUtils.clamp(normalizedPower, 0, 1),
+    );
     this.launchVectorRoot.visible = true;
     this.launchVectorArrow.position.copy(anchor);
     this.launchVectorArrow.setDirection(direction);
@@ -1275,6 +1419,9 @@ export class ThreeStage {
     this.launchVectorHandle.position
       .copy(anchor)
       .add(direction.multiplyScalar(length));
+    this.launchVectorHandleHalo.position.copy(this.launchVectorHandle.position);
+    this.launchVectorHandleHalo.lookAt(this.camera.position);
+    this.launchVectorHitTarget.position.copy(this.launchVectorHandle.position);
   }
 
   getPlayerScreenPosition() {

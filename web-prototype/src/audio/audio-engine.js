@@ -8,10 +8,18 @@ export class AudioEngine {
     this.enabled = true;
     this.playerSpin = null;
     this.enemySpin = null;
+    this.initPromise = null;
+    this.lastUiTime = -1;
   }
 
   async init() {
     if (this.ready) return;
+    if (this.initPromise) return this.initPromise;
+    this.initPromise = this._initialize();
+    return this.initPromise;
+  }
+
+  async _initialize() {
     await Tone.start();
     this.limiter = new Tone.Limiter(-1).toDestination();
     this.master = new Tone.Volume(-5).connect(this.limiter);
@@ -100,9 +108,25 @@ export class AudioEngine {
     if (this.master) this.master.mute = !enabled;
   }
 
-  playUi() {
+  playUi(tone = "tap") {
     if (!this.ready || !this.enabled) return;
-    this.uiSynth.triggerAttackRelease("E6", 0.055, Tone.now(), 0.38);
+    const now = Tone.now();
+    if (now - this.lastUiTime < 0.045) return;
+    this.lastUiTime = now;
+    const note = {
+      confirm: "G6",
+      soft: "C6",
+      tap: "E6",
+    }[tone] ?? "E6";
+    this.uiSynth.triggerAttackRelease(
+      note,
+      tone === "confirm" ? 0.07 : 0.05,
+      now,
+      tone === "soft" ? 0.28 : 0.42,
+    );
+    if (tone === "confirm") {
+      this.uiSynth.triggerAttackRelease("C7", 0.055, now + 0.075, 0.3);
+    }
   }
 
   playLaunch(power) {
