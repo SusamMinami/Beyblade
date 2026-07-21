@@ -1,69 +1,73 @@
-class_name BattleSession
 extends RefCounted
 
-signal phase_changed(new_phase: StringName)
-signal state_updated(snapshot: Dictionary)
-signal event_occurred(event: Dictionary)
-signal battle_finished(result: Dictionary)
-signal replay_ready(replay: Dictionary)
-signal error_occurred(code: int, message: String)
+const BattleProtocolRef := preload("res://scripts/battle/battle_protocol.gd")
+const BattleSimulationRef := preload("res://scripts/battle/battle_simulation.gd")
+
+signal phase_changed(new_phase)
+signal state_updated(snapshot)
+signal event_occurred(event)
+signal battle_finished(result)
+signal replay_ready(replay)
+signal error_occurred(code, message)
 signal connected_to_room
 signal disconnected_from_room
 
 var mode: StringName
-var transport: BattleTransport
-var sim: BattleSimulation
+var transport: RefCounted
+var sim: RefCounted
 var provider: RefCounted
-var my_slot: int = BattleProtocol.SLOT_PLAYER
-var player_build: TopBuildData
-var enemy_build: TopBuildData
-var arena: ArenaMapResource
+var my_slot: int = BattleProtocolRef.SLOT_PLAYER
+var player_build
+var enemy_build
+var arena
 var seed: int
-var phase: StringName = BattleProtocol.PHASE_INIT
+var phase: StringName = BattleProtocolRef.PHASE_INIT
 var local_ticket: Dictionary = {}
+var _local_input: Vector2 = Vector2.ZERO
 var _interpolated_snapshot: Dictionary = {}
-var _snapshot_history: Array[Dictionary] = []
+var _snapshot_history: Array = []
 var _max_history := 30
 
 
 static func create_local_ai_battle(
-	p_build: TopBuildData,
-	e_build: TopBuildData,
-	arena_res: ArenaMapResource,
+	p_build,
+	e_build,
+	arena_res,
 	battle_seed: int = 20260718
-) -> BattleSession:
-	var session := BattleSession.new()
-	session.mode = BattleProtocol.MODE_LOCAL
+):
+	var session_script := load("res://scripts/battle/battle_session.gd")
+	var session = session_script.new()
+	session.mode = BattleProtocolRef.MODE_LOCAL
 	session.player_build = p_build
 	session.enemy_build = e_build
 	session.arena = arena_res
 	session.seed = battle_seed
-	session.sim = BattleSimulation.new(p_build, e_build, arena_res, battle_seed)
-	session.my_slot = BattleProtocol.SLOT_PLAYER
-	var ai_source := StrategyInputSource.new(battle_seed + 1, 0.5)
-	session._setup_local_provider(ai_source)
-	session._set_phase(BattleProtocol.PHASE_READY)
+	session.sim = BattleSimulationRef.new(p_build, e_build, arena_res, battle_seed)
+	session.my_slot = BattleProtocolRef.SLOT_PLAYER
+	session._set_phase(BattleProtocolRef.PHASE_LAUNCH_WINDOW)
 	return session
 
 
 static func create_frame_sync_battle(
-	p_build: TopBuildData,
-	e_build: TopBuildData,
-	arena_res: ArenaMapResource,
+	p_build,
+	e_build,
+	arena_res,
 	battle_seed: int,
-	t: BattleTransport,
+	t,
 	slot: int
-) -> BattleSession:
-	var session := BattleSession.new()
-	session.mode = BattleProtocol.MODE_FRAME_SYNC
+):
+	var FrameSyncProviderRef := load("res://scripts/network/frame_sync_provider.gd")
+	var session_script := load("res://scripts/battle/battle_session.gd")
+	var session = session_script.new()
+	session.mode = BattleProtocolRef.MODE_FRAME_SYNC
 	session.player_build = p_build
 	session.enemy_build = e_build
 	session.arena = arena_res
 	session.seed = battle_seed
 	session.transport = t
-	session.sim = BattleSimulation.new(p_build, e_build, arena_res, battle_seed)
+	session.sim = BattleSimulationRef.new(p_build, e_build, arena_res, battle_seed)
 	session.my_slot = slot
-	var fp := FrameSyncProvider.new(session.sim, t, slot)
+	var fp = FrameSyncProviderRef.new(session.sim, t, slot)
 	session.provider = fp
 	fp.connect("phase_changed", Callable(session, "_on_provider_phase"))
 	fp.connect("event_occurred", Callable(session, "_on_provider_event"))
@@ -74,22 +78,24 @@ static func create_frame_sync_battle(
 
 
 static func create_async_verify_battle(
-	p_build: TopBuildData,
-	e_build: TopBuildData,
-	arena_res: ArenaMapResource,
+	p_build,
+	e_build,
+	arena_res,
 	battle_seed: int,
-	ghost_source: BattleInputSource = null,
-	slot: int = BattleProtocol.SLOT_PLAYER
-) -> BattleSession:
-	var session := BattleSession.new()
-	session.mode = BattleProtocol.MODE_ASYNC_VERIFY
+	ghost_source = null,
+	slot: int = BattleProtocolRef.SLOT_PLAYER
+):
+	var AsyncVerifyProviderRef := load("res://scripts/network/async_verify_provider.gd")
+	var session_script := load("res://scripts/battle/battle_session.gd")
+	var session = session_script.new()
+	session.mode = BattleProtocolRef.MODE_ASYNC_VERIFY
 	session.player_build = p_build
 	session.enemy_build = e_build
 	session.arena = arena_res
 	session.seed = battle_seed
-	session.sim = BattleSimulation.new(p_build, e_build, arena_res, battle_seed)
+	session.sim = BattleSimulationRef.new(p_build, e_build, arena_res, battle_seed)
 	session.my_slot = slot
-	var ap := AsyncVerifyProvider.new(session.sim, slot, battle_seed + 77)
+	var ap = AsyncVerifyProviderRef.new(session.sim, slot, battle_seed + 77)
 	if ghost_source != null:
 		ap.set_enemy_input_source(ghost_source)
 	session.provider = ap
@@ -108,48 +114,54 @@ func connect_to_room(url: String, ticket: Dictionary = {}) -> void:
 		emit_signal("error_occurred", -1, "No transport configured")
 		return
 	local_ticket = ticket
-	transport.connect("connected", Callable(self, "_on_transport_connected"))
-	transport.connect("disconnected", Callable(self, "_on_transport_disconnected"))
-	_set_phase(BattleProtocol.PHASE_CONNECTING)
+	if transport.has_signal("connected"):
+		transport.connect("connected", Callable(self, "_on_transport_connected"))
+	if transport.has_signal("disconnected"):
+		transport.connect("disconnected", Callable(self, "_on_transport_disconnected"))
+	_set_phase(BattleProtocolRef.PHASE_CONNECTING)
 	transport.connect_to_room(url, ticket)
 
 
 func submit_ready() -> void:
+	if mode == BattleProtocolRef.MODE_LOCAL:
+		_set_phase(BattleProtocolRef.PHASE_LAUNCH_WINDOW)
+		return
 	if provider and provider.has_method("submit_ready"):
 		provider.submit_ready()
 
 
 func submit_launch(power: float, height: float, direction: float, angle: float) -> void:
-	if mode == BattleProtocol.MODE_LOCAL:
+	if mode == BattleProtocolRef.MODE_LOCAL:
 		sim.launch(power, direction, angle, height)
-		_set_phase(BattleProtocol.PHASE_RUNNING)
+		_set_phase(BattleProtocolRef.PHASE_RUNNING)
 		return
 	if provider and provider.has_method("submit_launch"):
 		provider.submit_launch(power, height, direction, angle)
 
 
 func set_local_input(control: Vector2, flags: int = 0) -> void:
-	if mode == BattleProtocol.MODE_LOCAL:
+	_local_input = control
+	if mode == BattleProtocolRef.MODE_LOCAL:
 		return
 	if provider and provider.has_method("set_local_input"):
 		provider.set_local_input(control, flags)
 
 
 func poll(delta: float) -> Dictionary:
-	if mode == BattleProtocol.MODE_LOCAL:
+	if mode == BattleProtocolRef.MODE_LOCAL:
 		if sim.phase == &"running":
-			sim.step(delta)
+			sim.step(delta, _local_input)
 			for ev in sim.events:
 				emit_signal("event_occurred", ev)
 			if sim.phase == &"finished":
-				_set_phase(BattleProtocol.PHASE_FINISHED)
+				_set_phase(BattleProtocolRef.PHASE_FINISHED)
 				emit_signal("battle_finished", sim.result)
-		var snap := sim.snapshot()
+		var snap = sim.snapshot()
 		_track_snapshot(snap)
 		emit_signal("state_updated", snap)
 		return snap
 	if provider and provider.has_method("poll"):
-		var snap: Dictionary = provider.poll(delta)
+		var snap = provider.poll(delta)
 		_track_snapshot(snap)
 		emit_signal("state_updated", snap)
 		return snap
@@ -166,15 +178,11 @@ func get_my_slot() -> int:
 	return my_slot
 
 
-func disconnect() -> void:
-	if provider and provider.has_method("disconnect"):
-		provider.disconnect()
-	if transport:
-		transport.disconnect()
-
-
-func _setup_local_provider(ai_source: BattleInputSource) -> void:
-	pass
+func close_session() -> void:
+	if provider and provider.has_method("shutdown"):
+		provider.shutdown()
+	if transport and transport.has_method("shutdown"):
+		transport.shutdown()
 
 
 func _track_snapshot(snap: Dictionary) -> void:
@@ -191,28 +199,28 @@ func _set_phase(new_phase: StringName) -> void:
 	emit_signal("phase_changed", new_phase)
 
 
-func _on_provider_phase(new_phase: StringName) -> void:
+func _on_provider_phase(new_phase) -> void:
 	_set_phase(new_phase)
 
 
-func _on_state_updated(snap: Dictionary) -> void:
+func _on_state_updated(snap) -> void:
 	_track_snapshot(snap)
 
 
-func _on_provider_event(ev: Dictionary) -> void:
+func _on_provider_event(ev) -> void:
 	emit_signal("event_occurred", ev)
 
 
-func _on_provider_finished(result: Dictionary) -> void:
-	_set_phase(BattleProtocol.PHASE_FINISHED)
+func _on_provider_finished(result) -> void:
+	_set_phase(BattleProtocolRef.PHASE_FINISHED)
 	emit_signal("battle_finished", result)
 
 
-func _on_replay_ready(replay: Dictionary) -> void:
+func _on_replay_ready(replay) -> void:
 	emit_signal("replay_ready", replay)
 
 
-func _on_provider_error(code: int, message: String) -> void:
+func _on_provider_error(code, message) -> void:
 	emit_signal("error_occurred", code, message)
 
 

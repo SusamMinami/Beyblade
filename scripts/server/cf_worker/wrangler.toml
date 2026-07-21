@@ -1,6 +1,7 @@
 name = "beyblade-battle-server"
 main = "src/worker.ts"
-compatibility_date = "2024-06-20"
+compatibility_date = "2025-01-29"
+compatibility_flags = ["nodejs_compat"]
 
 [[durable_objects.bindings]]
 name = "BATTLE_ROOM"
@@ -12,12 +13,15 @@ class_name = "Matchmaker"
 
 [[migrations]]
 tag = "v1"
-new_sqlite_classes = ["BattleRoom", "Matchmaker"]
+new_classes = ["BattleRoom", "Matchmaker"]
 
 [vars]
-ENVIRONMENT = "development"
+ENVIRONMENT = "production"
 PROTOCOL_VERSION = 1
 SIMULATION_VERSION = "2026.07.21-web-v2"
+ROOM_IDLE_TIMEOUT_SEC = 60
+BATCH_FRAMES = 3
+DESYNC_CHECK_INTERVAL = 60
 
 [[r2_buckets]]
 binding = "REPLAYS"

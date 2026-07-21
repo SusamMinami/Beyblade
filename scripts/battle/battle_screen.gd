@@ -3,6 +3,12 @@ extends Node3D
 const BATTLE_SIMULATION := preload(
 	"res://scripts/battle/battle_simulation.gd"
 )
+const BattleSessionRef := preload(
+	"res://scripts/battle/battle_session.gd"
+)
+const BATTLE_PROTOCOL := preload(
+	"res://scripts/battle/battle_protocol.gd"
+)
 const UI_THEME_FACTORY := preload("res://scripts/ui/ui_theme_factory.gd")
 const ARENA_MAP_CATALOG := preload("res://scripts/maps/arena_map_catalog.gd")
 
@@ -95,7 +101,7 @@ const ENEMY_BUILD_IDS := {
 var arena_map: ArenaMapResource
 var player_build: TopBuildData
 var enemy_build: TopBuildData
-var simulation
+var session: RefCounted
 var accumulator := 0.0
 var paused := false
 var result_handled := false
@@ -104,6 +110,108 @@ var joystick_vector := Vector2.ZERO
 var joystick_dragging := false
 var player_spin_angle := 0.0
 var enemy_spin_angle := 0.0
+var _network_mode := false
+var _latest_snapshot: Dictionary = {}
+
+
+var simulation:
+	get:
+		if session != null:
+			return session.sim
+		return null
+
+
+func set_battle_session(battle_session: RefCounted) -> void:
+	if session != null:
+		_disconnect_session_signals()
+	session = battle_session
+	_network_mode = true
+	_connect_session_signals()
+	if session.has_method("submit_ready"):
+		session.submit_ready()
+	_set_phase_ui(BATTLE_PROTOCOL.PHASE_LAUNCH_WINDOW)
+	battle_summary_label.text = "网络对战\n%s\n连接中..." % arena_map.map_name
+
+
+func _connect_session_signals() -> void:
+	if session == null:
+		return
+	session.connect("phase_changed", Callable(self, "_on_session_phase"))
+	session.connect("state_updated", Callable(self, "_on_session_state"))
+	session.connect("event_occurred", Callable(self, "_on_session_event"))
+	session.connect("battle_finished", Callable(self, "_on_session_finished"))
+	session.connect("error_occurred", Callable(self, "_on_session_error"))
+
+
+func _disconnect_session_signals() -> void:
+	if session == null:
+		return
+	if session.is_connected("phase_changed", Callable(self, "_on_session_phase")):
+		session.disconnect("phase_changed", Callable(self, "_on_session_phase"))
+	if session.is_connected("state_updated", Callable(self, "_on_session_state")):
+		session.disconnect("state_updated", Callable(self, "_on_session_state"))
+	if session.is_connected("event_occurred", Callable(self, "_on_session_event")):
+		session.disconnect("event_occurred", Callable(self, "_on_session_event"))
+	if session.is_connected("battle_finished", Callable(self, "_on_session_finished")):
+		session.disconnect("battle_finished", Callable(self, "_on_session_finished"))
+	if session.is_connected("error_occurred", Callable(self, "_on_session_error")):
+		session.disconnect("error_occurred", Callable(self, "_on_session_error"))
+
+
+func _on_session_phase(new_phase: StringName) -> void:
+	match str(new_phase):
+		BATTLE_PROTOCOL.PHASE_READY:
+			battle_log_label.text = "双方已连接，准备发射。"
+		BATTLE_PROTOCOL.PHASE_LAUNCH_WINDOW:
+			_set_phase_ui(BATTLE_PROTOCOL.PHASE_LAUNCH_WINDOW)
+		BATTLE_PROTOCOL.PHASE_RUNNING:
+			_set_phase_ui(BATTLE_PROTOCOL.PHASE_RUNNING)
+		BATTLE_PROTOCOL.PHASE_FINISHED:
+			pass
+		BATTLE_PROTOCOL.PHASE_CLOSED:
+			battle_log_label.text = "连接已断开。"
+
+
+func _on_session_state(snap: Dictionary) -> void:
+	_latest_snapshot = snap
+
+
+func _on_session_event(ev: Dictionary) -> void:
+	_process_event_dict(ev)
+
+
+func _on_session_finished(result: Dictionary) -> void:
+	_sim_handle_result_from_dict(result)
+
+
+func _on_session_error(code: int, message: String) -> void:
+	battle_log_label.text = "网络错误：%s" % message
+
+
+func _set_phase_ui(phase: String) -> void:
+	match phase:
+		BATTLE_PROTOCOL.PHASE_LAUNCH_WINDOW, "ready":
+			launch_panel.visible = true
+			battle_summary_label.visible = true
+			joystick_area.visible = false
+			control_feedback_panel.visible = false
+			result_panel.visible = false
+			pause_button.disabled = true
+			$BattleUI/Root/ButtonColumn/LaunchButton.disabled = false
+			sound_button.visible = true
+			tune_button.visible = false
+		BATTLE_PROTOCOL.PHASE_RUNNING:
+			launch_panel.visible = false
+			battle_summary_label.visible = false
+			joystick_area.visible = true
+			control_feedback_panel.visible = true
+			result_panel.visible = false
+			pause_button.disabled = false
+			sound_button.visible = false
+			tune_button.visible = false
+			$BattleUI/Root/ButtonColumn/LaunchButton.disabled = true
+			beyblade.is_launched = true
+			enemy_beyblade.is_launched = true
 
 
 func _ready() -> void:
@@ -114,7 +222,7 @@ func _ready() -> void:
 	_configure_arena()
 	_configure_visual_body(beyblade, player_build, false)
 	_configure_visual_body(enemy_beyblade, enemy_build, true)
-	_create_simulation()
+	_create_local_session()
 	_restore_tuning_controls()
 	_update_sound_button()
 	tutorial_button.visible = not bool(_game_state().tutorial.completed)
@@ -157,14 +265,17 @@ func _create_enemy_build() -> TopBuildData:
 	)
 
 
-func _create_simulation() -> void:
-	simulation = BATTLE_SIMULATION.new(
+func _create_local_session() -> void:
+	_network_mode = false
+	session = BattleSessionRef.create_local_ai_battle(
 		player_build,
 		enemy_build,
 		arena_map,
-		20260718,
-		_game_state().get_battle_tuning()
+		20260718
 	)
+	session.sim.set_tuning(_game_state().get_battle_tuning())
+	_connect_session_signals()
+	_latest_snapshot = session.sim.snapshot()
 
 
 func _configure_visual_body(
@@ -307,7 +418,13 @@ func _add_feature_mesh(
 
 
 func _prepare_for_launch() -> void:
-	simulation.reset()
+	if not _network_mode:
+		if session != null:
+			_disconnect_session_signals()
+		_create_local_session()
+	else:
+		if session != null and session.sim != null:
+			session.sim.reset()
 	accumulator = 0.0
 	paused = false
 	result_handled = false
@@ -324,88 +441,98 @@ func _prepare_for_launch() -> void:
 	tuning_panel.visible = false
 	pause_button.disabled = true
 	sound_button.visible = true
-	tune_button.visible = true
+	tune_button.visible = not _network_mode
 	pause_button.text = "暂停"
 	$BattleUI/Root/ButtonColumn/LaunchButton.disabled = false
-	$BattleUI/Root/ResultPanel/ResultColumn/ResultActions/ResultRestartButton.visible = true
+	$BattleUI/Root/ResultPanel/ResultColumn/ResultActions/ResultRestartButton.visible = not _network_mode
 	$BattleUI/Root/ResultPanel/ResultColumn/ResultActions/ResultAssemblyButton.text = "返回改装"
-	battle_log_label.text = "拖动发射向量，或精调力度、高度、方向与入场倾角。"
+	battle_log_label.text = "拖动发射向量，或精调力度、高度、方向与入场倾角。" if not _network_mode else "等待双方发射..."
 	_sync_battle_visuals(0.0)
 	_update_hud()
 	_update_joystick_knob()
 
 
 func _advance_simulation(delta: float) -> void:
-	if simulation == null or simulation.phase != &"running" or paused:
+	if session == null or paused:
 		return
-	accumulator += clampf(delta, 0.0, MAX_FRAME_DELTA)
-	var control := _get_control_vector()
-	while accumulator + 0.0000001 >= FIXED_STEP:
-		simulation.step(FIXED_STEP, control)
-		_process_simulation_events()
-		accumulator -= FIXED_STEP
-		if simulation.phase != &"running":
-			break
+	var sim_ref = session.sim
+	if sim_ref == null or sim_ref.phase != &"running":
+		if _network_mode:
+			session.poll(delta)
+		return
+	if _network_mode:
+		var control := _get_control_vector()
+		session.set_local_input(control)
+		session.poll(delta)
+	else:
+		accumulator += clampf(delta, 0.0, MAX_FRAME_DELTA)
+		var control := _get_control_vector()
+		session.set_local_input(control)
+		while accumulator + 0.0000001 >= FIXED_STEP:
+			session.poll(FIXED_STEP)
+			accumulator -= FIXED_STEP
+			if sim_ref.phase != &"running":
+				break
+	if session.sim.phase == &"finished":
+		pass
 
 
-func _process_simulation_events() -> void:
-	for event in simulation.events:
-		if event.type == &"collision":
-			var intensity := float(event.intensity)
-			if _game_state().sound_enabled:
-				beyblade.call("_play_collision_sound", intensity * 12.0)
-			battle_log_label.text = "碰撞冲量 %.2f" % float(event.impulse)
-		elif event.type == &"stability" and event.actor == &"player":
-			battle_log_label.text = (
-				"严重失衡，控制正在衰减"
-				if event.state == &"critical"
-				else "陀螺开始摇晃" if event.state == &"wobble" else "姿态恢复稳定"
+func _process_event_dict(event: Dictionary) -> void:
+	if event.type == &"collision":
+		var intensity := float(event.intensity)
+		if _game_state().sound_enabled:
+			beyblade.call("_play_collision_sound", intensity * 12.0)
+		battle_log_label.text = "碰撞冲量 %.2f" % float(event.impulse)
+	elif event.type == &"stability" and event.actor == &"player":
+		battle_log_label.text = (
+			"严重失衡，控制正在衰减"
+			if event.state == &"critical"
+			else "陀螺开始摇晃" if event.state == &"wobble" else "姿态恢复稳定"
+		)
+	elif event.type == &"ring_out_risk" and event.actor == &"player":
+		if event.state != &"safe":
+			battle_log_label.text = "撞飞风险：%s" % (
+				"危险" if event.state == &"critical" else "警告"
 			)
-		elif event.type == &"ring_out_risk" and event.actor == &"player":
-			if event.state != &"safe":
-				battle_log_label.text = "撞飞风险：%s" % (
-					"危险" if event.state == &"critical" else "警告"
-				)
-		elif event.type == &"spin_risk" and event.actor == &"player":
-			if event.state != &"safe":
-				battle_log_label.text = "转速衰退：%s" % (
-					"临界" if event.state == &"critical" else "警告"
-				)
-		elif event.type == &"result":
-			_handle_result()
+	elif event.type == &"spin_risk" and event.actor == &"player":
+		if event.state != &"safe":
+			battle_log_label.text = "转速衰退：%s" % (
+				"临界" if event.state == &"critical" else "警告"
+			)
 
 
-func _handle_result() -> void:
-	if result_handled or simulation.result.is_empty():
+func _sim_handle_result_from_dict(result_dict: Dictionary) -> void:
+	if result_handled:
 		return
 	result_handled = true
-	var winner: StringName = simulation.result.winner
-	var reason: StringName = simulation.result.reason
+	var winner: StringName = result_dict.get("winner", &"enemy")
+	var reason: StringName = result_dict.get("reason", &"time")
 	var won := winner == &"player"
 	var reason_label: String = RESULT_LABELS.get(reason, "对战结束")
 	var reward := 0
 	var tutorial_stage_before: String = str(_game_state().tutorial.stage)
-	if not reward_granted:
+	if not reward_granted and not _network_mode:
 		reward_granted = true
 		reward = _game_state().apply_battle_result(won)
 	result_label.text = (
 		"%s\n%.1f 秒 · %s"
 		% [
 			reason_label if won else "本回合失败",
-			float(simulation.result.time),
-			"+%d 赏金" % reward
+			float(result_dict.get("time", 0.0)),
+			("+%d 赏金" % reward) if not _network_mode else "网络对战"
 		]
 	)
 	result_panel.visible = true
 	pause_button.disabled = true
-	battle_log_label.text = reason_label if won else "AI 获胜：%s" % reason_label
-	if tutorial_stage_before == _game_state().TUTORIAL_FIRST_BATTLE:
-		$BattleUI/Root/ResultPanel/ResultColumn/ResultActions/ResultRestartButton.visible = false
-		$BattleUI/Root/ResultPanel/ResultColumn/ResultActions/ResultAssemblyButton.text = "购买第一个零件"
-		battle_log_label.text = "首战训练完成，下一步购买并装备新零件。"
+	battle_log_label.text = reason_label if won else "对手获胜：%s" % reason_label
+	if not _network_mode:
+		if tutorial_stage_before == _game_state().TUTORIAL_FIRST_BATTLE:
+			$BattleUI/Root/ResultPanel/ResultColumn/ResultActions/ResultRestartButton.visible = false
+			$BattleUI/Root/ResultPanel/ResultColumn/ResultActions/ResultAssemblyButton.text = "购买第一个零件"
+			battle_log_label.text = "首战训练完成，下一步购买并装备新零件。"
 	tutorial_button.visible = not bool(_game_state().tutorial.completed)
 	_stop_spin_audio()
-	if _game_state().sound_enabled:
+	if _game_state().sound_enabled and not _network_mode:
 		if won or tutorial_stage_before == _game_state().TUTORIAL_FIRST_BATTLE:
 			reward_audio.play()
 		elif reason == &"ring_out":
@@ -415,29 +542,19 @@ func _handle_result() -> void:
 
 
 func _on_launch_button_pressed() -> void:
-	if simulation == null:
-		_create_simulation()
+	if session == null:
+		_create_local_session()
 	var power := float(launch_power_slider.value)
 	var height := float(launch_height_slider.value)
 	var direction := deg_to_rad(float(launch_direction_slider.value))
 	var angle := float(launch_angle_slider.value) / 12.0
-	simulation.launch(power, direction, angle, height)
+	session.submit_launch(power, height, direction, angle)
 	accumulator = 0.0
 	paused = false
 	result_handled = false
 	reward_granted = false
-	launch_panel.visible = false
-	battle_summary_label.visible = false
-	joystick_area.visible = true
-	control_feedback_panel.visible = true
-	result_panel.visible = false
-	pause_button.disabled = false
-	sound_button.visible = false
-	tune_button.visible = false
-	$BattleUI/Root/ButtonColumn/LaunchButton.disabled = true
-	beyblade.is_launched = true
-	enemy_beyblade.is_launched = true
-	battle_log_label.text = "发射完成。拖动摇杆微调轨迹。"
+	_set_phase_ui(BATTLE_PROTOCOL.PHASE_RUNNING)
+	battle_log_label.text = "发射完成。拖动摇杆微调轨迹。" if not _network_mode else "发射指令已发送。"
 	if _game_state().sound_enabled:
 		launch_audio.pitch_scale = lerpf(0.9, 1.08, power)
 		launch_audio.play()
@@ -445,12 +562,16 @@ func _on_launch_button_pressed() -> void:
 
 
 func _on_restart_button_pressed() -> void:
-	_create_simulation()
+	if _network_mode:
+		return
+	_create_local_session()
 	_prepare_for_launch()
 
 
 func _on_pause_button_pressed() -> void:
-	if simulation == null or simulation.phase != &"running":
+	if _network_mode:
+		return
+	if session == null or session.sim == null or session.sim.phase != &"running":
 		return
 	paused = not paused
 	pause_button.text = "继续" if paused else "暂停"
@@ -491,15 +612,15 @@ func _on_speed_tuning_changed(value: float) -> void:
 func _on_reset_tuning_pressed() -> void:
 	_game_state().reset_battle_tuning()
 	_restore_tuning_controls()
-	if simulation != null:
-		simulation.set_tuning(_game_state().get_battle_tuning())
+	if session != null and session.sim != null:
+		session.sim.set_tuning(_game_state().get_battle_tuning())
 
 
 func _set_tuning_value(key: String, value: float) -> void:
 	_game_state().set_battle_tuning(key, value)
 	var tuning: Dictionary = _game_state().get_battle_tuning()
-	if simulation != null:
-		simulation.set_tuning({key: tuning[key]})
+	if session != null and session.sim != null:
+		session.sim.set_tuning({key: tuning[key]})
 	_update_tuning_outputs()
 
 
@@ -547,7 +668,7 @@ func _on_result_assembly_pressed() -> void:
 
 
 func _on_result_restart_pressed() -> void:
-	_create_simulation()
+	_create_local_session()
 	_prepare_for_launch()
 
 
@@ -649,28 +770,38 @@ func _get_keyboard_control_vector() -> Vector2:
 	return vector.limit_length(1.0)
 
 
+func _get_sim():
+	if session != null and session.sim != null:
+		return session.sim
+	return null
+
+
 func _sync_battle_visuals(delta: float) -> void:
-	if simulation == null:
+	var sim_ref = _get_sim()
+	if sim_ref == null:
 		return
-	if simulation.phase == &"running":
-		player_spin_angle += simulation.player.spin * delta
-		enemy_spin_angle -= simulation.enemy.spin * delta
+	if sim_ref.phase == &"running":
+		player_spin_angle += sim_ref.player.spin * delta
+		enemy_spin_angle -= sim_ref.enemy.spin * delta
 	_sync_top_visual(
 		beyblade,
-		simulation.player,
-		player_spin_angle
+		sim_ref.player,
+		player_spin_angle,
+		sim_ref.phase
 	)
 	_sync_top_visual(
 		enemy_beyblade,
-		simulation.enemy,
-		enemy_spin_angle
+		sim_ref.enemy,
+		enemy_spin_angle,
+		sim_ref.phase
 	)
 
 
 func _sync_top_visual(
 	body: BeybladeBody,
 	state,
-	spin_angle: float
+	spin_angle: float,
+	phase: StringName
 ) -> void:
 	var terrain_position := Vector3(
 		state.position.x,
@@ -690,7 +821,7 @@ func _sync_top_visual(
 	)
 	body.spin_speed = state.spin
 	body.current_durability = state.durability
-	body.is_launched = simulation.phase == &"running"
+	body.is_launched = phase == &"running"
 	var surface := arena_map.get_surface_at_radius(state.position.length())
 	if surface != null and body.get_meta("simulation_surface", &"") != surface.surface_name:
 		body.set_meta("simulation_surface", surface.surface_name)
@@ -717,7 +848,8 @@ func _sync_damage_visual(body: BeybladeBody, state) -> void:
 
 
 func _update_camera(delta: float) -> void:
-	if simulation == null or simulation.phase == &"ready":
+	var sim_ref = _get_sim()
+	if sim_ref == null or sim_ref.phase == &"ready":
 		camera.global_position = PRE_LAUNCH_CAMERA_POSITION
 		camera.look_at(Vector3.ZERO, Vector3.UP)
 		return
@@ -740,25 +872,29 @@ func _update_camera(delta: float) -> void:
 
 
 func _update_hud() -> void:
-	if simulation == null:
+	var sim_ref = _get_sim()
+	if sim_ref == null:
 		return
+	var opponent_label := "AI" if not _network_mode else "对手"
 	spin_label.text = "YOU\n%.0f RPM\n%.0f DUR" % [
-		simulation.player.spin,
-		simulation.player.durability
+		sim_ref.player.spin,
+		sim_ref.player.durability
 	]
-	enemy_spin_label.text = "AI\n%.0f RPM\n%.0f DUR" % [
-		simulation.enemy.spin,
-		simulation.enemy.durability
+	enemy_spin_label.text = "%s\n%.0f RPM\n%.0f DUR" % [
+		opponent_label,
+		sim_ref.enemy.spin,
+		sim_ref.enemy.durability
 	]
-	battle_time_label.text = "ROUND 01\n%.1f" % simulation.time
-	_update_control_feedback(simulation.player.control_input)
+	battle_time_label.text = "ROUND 01\n%.1f" % sim_ref.time
+	_update_control_feedback(sim_ref.player.control_input)
 
 
 func _update_spin_audio() -> void:
+	var sim_ref = _get_sim()
 	var should_play: bool = (
 		_game_state().sound_enabled
-		and simulation != null
-		and simulation.phase == &"running"
+		and sim_ref != null
+		and sim_ref.phase == &"running"
 		and not paused
 	)
 	if not should_play:
@@ -766,14 +902,14 @@ func _update_spin_audio() -> void:
 		return
 	_update_spin_voice(
 		player_spin_audio,
-		simulation.player.spin,
-		simulation.player.build.max_spin_speed,
+		sim_ref.player.spin,
+		sim_ref.player.build.max_spin_speed,
 		1.0
 	)
 	_update_spin_voice(
 		enemy_spin_audio,
-		simulation.enemy.spin,
-		simulation.enemy.build.max_spin_speed,
+		sim_ref.enemy.spin,
+		sim_ref.enemy.build.max_spin_speed,
 		0.92
 	)
 
@@ -799,20 +935,21 @@ func _stop_spin_audio() -> void:
 
 
 func _update_control_feedback(control: Vector2) -> void:
+	var sim_ref = _get_sim()
 	var influence: float = (
-		simulation.player.control_influence * 100.0
-		if simulation != null
+		sim_ref.player.control_influence * 100.0
+		if sim_ref != null
 		else 0.0
 	)
 	var state_text := "拖动摇杆决定偏转方向"
-	if simulation != null:
+	if sim_ref != null:
 		var spin_ratio: float = (
-			simulation.player.spin
-			/ maxf(simulation.player.build.max_spin_speed, 0.001)
+			sim_ref.player.spin
+			/ maxf(sim_ref.player.build.max_spin_speed, 0.001)
 		)
-		if simulation.phase == &"running" and spin_ratio < 0.18:
+		if sim_ref.phase == &"running" and spin_ratio < 0.18:
 			state_text = "低转速：推力和移动距离显著衰减"
-		elif simulation.player.imbalance > 0.55:
+		elif sim_ref.player.imbalance > 0.55:
 			state_text = "失衡：控制力已被削弱"
 		elif control.length_squared() > 0.01:
 			state_text = "箭头方向即当前施力方向"
