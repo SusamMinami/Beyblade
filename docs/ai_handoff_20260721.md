@@ -9,6 +9,8 @@ Web 原型与 Godot 两端已完成核心功能对齐，冻结模拟版本为 `2
 
 下一个阶段是**网络 PVP 第一里程碑**，目标是把 `BattleSimulation` 改造为可接收双方输入、可快照恢复、可回放验算的确定性战斗内核，为接入 Nakama 做准备。
 
+**已完成混合架构设计与代码框架**：新增三层解耦架构（BattleSession / SyncProvider / Transport），同时支持帧同步（FrameSync，Cloudflare免费层可跑）、状态同步（StateSync，Godot headless）、异步验算（AsyncVerify）三种模式，并已生成 Godot/Web/Cloudflare Worker 三端代码骨架。详见 [hybrid_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/hybrid_pvp_architecture.md)。
+
 ## 本轮（2026-07-21）已完成工作
 
 ### 1. Web → Godot 功能全量同步
@@ -68,67 +70,63 @@ Web 端测试：
 - **首发中国地区**
 - 游客限制：禁止进入排位赛；可参加积分赛体验，但**不获得/保存积分**
 
-### 部署方案结论
-- **Cloudflare 免费层不适合**：Workers 10ms CPU 限制、无法运行 Godot headless、中国网络需 Enterprise
-- **MVP 推荐**：中国大陆 2C4G 云主机单节点部署 Nakama + CockroachDB + Godot headless
-- Cloudflare 可用于静态资源/CDN/边缘入口，但不承担权威战斗
+### 部署方案结论（更新：混合架构可利用Cloudflare免费层）
+
+- **Cloudflare免费层现已可用于帧同步+异步验算**：Durable Objects做WS中继不运行物理，Workers做匹配/票据，R2存回放
+- **同步排位赛最终版**：仍需Godot headless权威反作弊，可在Cloudflare验证玩法后再升级
+- **MVP部署路径**：Cloudflare免费层 → 技术封测/海外玩家完全零成本；国内玩家可用香港节点（帧同步延迟可接受）
+- **正式上线**：Cloudflare做全球入口/静态/异步，大陆云主机跑权威同步房间
+- 详见 [hybrid_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/hybrid_pvp_architecture.md) 第3节
 
 ## 第一里程碑任务清单（按顺序执行）
 
-依据 [network_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/network_pvp_architecture.md) 第 9 节，验收标准为：
+依据 [hybrid_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/hybrid_pvp_architecture.md) 三层架构，代码骨架已生成：
 
-### 阶段 1：协议数据结构与输入源抽象
+### 已完成（代码框架生成）
 
-1. 创建 `scripts/battle/battle_manifest.gd` - 版本与调参清单
-2. 创建 `scripts/battle/battle_protocol.gd` - 协议对象定义（LaunchCommand、InputFrame 等）
-3. 创建 `scripts/battle/battle_input_source.gd` - 输入源接口
-4. 创建 `scripts/battle/local_input_source.gd` - 本地玩家输入源
-5. 创建 `scripts/battle/strategy_input_source.gd` - AI/兜底策略输入源（现有内置 AI 重构到此类）
-6. 修改 `BattleSimulation.launch()` - 双方 LaunchCommand 完全显式传入
-7. 修改 `BattleSimulation.step()` - 显式接收双方 InputFrame，不再内部生成 AI
+| 文件 | 状态 | 说明 |
+|------|------|------|
+| [battle_protocol.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_protocol.gd) | ✅ | 协议常量、量化/反量化、信封构造、输入校验 |
+| [battle_state_codec.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_state_codec.gd) | ✅ | 快照规范化编解码，消除Vector2/StringName运行时类型 |
+| [battle_state_hasher.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_state_hasher.gd) | ✅ | SHA-256状态哈希、回放哈希、清单哈希 |
+| [battle_input_source.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_input_source.gd) | ✅ | 输入源抽象接口 |
+| [local_input_source.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/local_input_source.gd) | ✅ | 本地玩家输入源（支持输入缓存） |
+| [strategy_input_source.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/strategy_input_source.gd) | ✅ | AI/幽灵策略（从BattleSimulation剥离） |
+| [battle_transport.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/network/battle_transport.gd) | ✅ | 传输层抽象接口 |
+| [local_transport.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/network/local_transport.gd) | ✅ | 本地内存传输（双客户端测试） |
+| [websocket_transport.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/network/websocket_transport.gd) | ✅ | WebSocket传输（可连Nakama/CF Worker） |
+| [frame_sync_provider.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/network/frame_sync_provider.gd) | ✅ | 帧同步模式提供者 |
+| [async_verify_provider.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/network/async_verify_provider.gd) | ✅ | 异步验算模式提供者 |
+| [battle_session.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_session.gd) | ✅ | 统一战斗会话入口（静态工厂方法） |
+| [cloudflare_client.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/network/cloudflare_client.gd) | ✅ | Cloudflare API封装（匹配/建房/提交回放） |
+| `battle_simulation.gd` 改造 | ✅ | 新增frame计数、launch_explicit、step双输入、restore_from_snapshot |
+| Web协议层 | ✅ | [protocol.js](file:///c:/Users/Admin/Downloads/战斗陀螺/web-prototype/src/network/protocol.js), [websocket_transport.js](file:///c:/Users/Admin/Downloads/战斗陀螺/web-prototype/src/network/websocket_transport.js), [frame_sync_provider.js](file:///c:/Users/Admin/Downloads/战斗陀螺/web-prototype/src/network/frame_sync_provider.js), [async_verify_provider.js](file:///c:/Users/Admin/Downloads/战斗陀螺/web-prototype/src/network/async_verify_provider.js), [battle_session.js](file:///c:/Users/Admin/Downloads/战斗陀螺/web-prototype/src/network/battle_session.js) |
+| Cloudflare Worker | ✅ | [battle_room.ts](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/server/cf_worker/src/battle_room.ts) 帧同步DO中继, [matchmaker.ts](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/server/cf_worker/src/matchmaker.ts) 匹配器, [worker.ts](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/server/cf_worker/src/worker.ts) 入口 |
 
-**验收**：现有本地 AI 对战完全通过旧测试，行为不变。
+### 待完成（下一阶段）
 
-### 阶段 2：快照、编码、哈希与回放
+1. **BattleSession集成到battle_screen.gd**：让战斗界面消费BattleSession而非直接创建simulation
+2. **回放记录器/播放器**：创建replay_recorder.gd和replay_player.gd，序列化/反序列化ReplayEnvelope
+3. **本地双客户端测试场景**：使用LocalTransport验证FrameSync双客户端一致性
+4. **Godot headless验算器**：创建headless_battle_host.gd和命令行验算入口
+5. **自动化测试**：协议、哈希一致性、快照恢复、回放、非法输入边界测试
+6. **Cloudflare Worker部署测试**：wrangler dev本地联调Godot/Web双端
+7. **battle_manifest.gd**：版本化调参清单（冻结正式比赛参数）
 
-8. 创建 `scripts/battle/battle_state_codec.gd` - 快照规范化编码（无 Vector2/StringName 运行时类型）
-9. 创建 `scripts/battle/battle_state_hasher.gd` - 状态哈希计算
-10. 修改 `BattleSimulation` - 支持从任意检查点快照恢复
-11. 创建 `scripts/battle/battle_replay_recorder.gd` - 输入与快照记录器
-12. 创建 `scripts/battle/battle_replay_player.gd` - 回放播放器
+### 验收标准
 
-**验收**：
-- 同一票据和输入流连续重放 100 次，最终哈希完全一致
-- 任意检查点导出并恢复后继续运行，结果与从第 0 帧运行一致
-- 回放序列化落盘再加载，结果与内存回放一致
+1. BattleSimulation 显式双方 LaunchCommand + InputFrame，AI剥离到StrategyInputSource
+2. 同一票据和输入流连续重放100次最终哈希一致
+3. 任意检查点导出/恢复后继续运行结果一致
+4. 回放序列化落盘再加载结果一致
+5. Godot headless命令行可验算回合并给出退出码
+6. LocalTransport + FrameSyncProvider双客户端同帧运行无分歧
+7. Cloudflare Worker部署后Godot/Web客户端可连入同一房间对战
+8. AsyncVerify模式可提交回放至R2
 
-### 阶段 3：Headless 验算器
+### 阶段 3 之后：StateSync + Nakama（第二里程碑）
 
-13. 创建 `scripts/server/headless_battle_host.gd` - headless 战斗宿主
-14. 创建 `scripts/server/async_replay_verifier.gd` - 命令行回放验算入口
-15. 编写命令行脚本可通过退出码表示：通过/非法/结果不一致
-
-**验收**：Godot headless 可验算回放文件并给出正确退出码。
-
-### 阶段 4：非法输入与边界测试
-
-16. 新增自动化测试覆盖：
-    - 非法零件 ID
-    - 越界输入值
-    - 错误 simulation_version
-    - 重复 nonce
-    - 篡改哈希
-    - 双方输入来源切换
-
-**验收**：所有非法情况有确定性错误处理，不崩溃。
-
-### 阶段 5：双客户端观看（无真实网络）
-
-17. 创建 `scripts/battle/network_input_source.gd` - 模拟网络输入源
-18. 修改 `battle_screen.gd` - 消费 BattleSession 而非直接创建模拟
-19. 创建两个本地客户端可通过模拟网络输入源观看同一权威状态
-
-**验收**：双客户端表现一致，为后续接 Nakama 留接口。
+在第一里程碑完成验证后，再新增state_sync_provider.gd（权威状态同步）并接入Nakama。
 
 ## 关键代码边界（必须遵守）
 
@@ -162,19 +160,33 @@ git config user.email "ruisheng.lu@hotmail.com"
 
 ## 建议先阅读的文件
 
-1. [network_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/network_pvp_architecture.md) - PVP 架构完整方案（最优先）
-2. [deterministic_battle_sync.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/deterministic_battle_sync.md) - 跨端同步契约
-3. [battle_simulation.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_simulation.gd) - 当前权威战斗内核
-4. [game_state.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/core/game_state.gd) - 存档 v2 结构
-5. [assembly_calculator.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/assembly/assembly_calculator.gd) - DIY 派生计算
-6. `web-prototype/src/core/battle-simulation.js` - Web 权威参考实现
+1. [hybrid_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/hybrid_pvp_architecture.md) - **混合PVP架构（三层解耦+Cloudflare方案，最优先）**
+2. [network_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/network_pvp_architecture.md) - 产品规则与Nakama权威架构
+3. [deterministic_battle_sync.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/deterministic_battle_sync.md) - 跨端同步契约
+4. [battle_session.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_session.gd) - 统一战斗会话入口
+5. [battle_simulation.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_simulation.gd) - 权威战斗内核（已支持显式双输入/快照恢复）
+6. `scripts/network/` - 传输层、帧同步、异步验算、Cloudflare客户端
+7. `scripts/server/cf_worker/` - Cloudflare Worker服务器代码
+8. `web-prototype/src/network/` - Web端网络层（与GDScript共用协议）
+9. [game_state.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/core/game_state.gd) - 存档v2结构
+10. [assembly_calculator.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/assembly/assembly_calculator.gd) - DIY派生计算
+11. `web-prototype/src/core/battle-simulation.js` - Web权威参考实现
 
 ## 已知非阻塞项
 
-- `battle_screen_test` 退出时有 ObjectDB/resources leak 警告，但测试通过，不影响功能
-- Web 中的部分纯视觉动画（烟花、彩带、复杂镜头、槽位滚入）未逐帧复刻到 Godot
-- Nakama SDK 集成、真实网络、匹配 UI 尚未开始（属于里程碑之后）
+- `battle_screen.gd` 尚未集成BattleSession（仍直接创建simulation），需改造为消费BattleSession
+- 回放记录器/播放器（replay_recorder.gd/replay_player.gd）尚未实现
+- Godot headless验算器尚未创建
+- StateSyncProvider（权威状态同步）留作第二里程碑，需要Godot headless时才实现
+- `battle_screen_test` 退出时有ObjectDB/resources leak警告，但测试通过，不影响功能
+- Web中的部分纯视觉动画（烟花、彩带、复杂镜头、槽位滚入）未逐帧复刻到Godot
+- Nakama SDK集成、完整匹配UI、段位系统UI尚未开始
 
 ---
 
-**下一步行动**：从第一里程碑阶段 1 开始，创建协议数据结构文件。
+**下一步行动**：代码框架已完成，接下来需要：
+1. 运行现有Godot测试确保BattleSimulation改造向后兼容
+2. 实现replay_recorder/replay_player
+3. 创建本地双客户端测试验证FrameSync一致性
+4. 将battle_screen.gd重构为消费BattleSession
+5. 部署Cloudflare Worker进行端到端联调

@@ -5,3 +5,8 @@
 # Local Tone.js audio workbench
 /tools/audio-lab/node_modules/
 /tools/audio-lab/dist/
+
+# Cloudflare Worker
+/scripts/server/cf_worker/node_modules/
+/scripts/server/cf_worker/.wrangler/
+/scripts/server/cf_worker/.dev.vars

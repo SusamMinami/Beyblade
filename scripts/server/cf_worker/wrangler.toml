@@ -1,0 +1,24 @@
+name = "beyblade-battle-server"
+main = "src/worker.ts"
+compatibility_date = "2024-06-20"
+
+[[durable_objects.bindings]]
+name = "BATTLE_ROOM"
+class_name = "BattleRoom"
+
+[[durable_objects.bindings]]
+name = "MATCHMAKER"
+class_name = "Matchmaker"
+
+[[migrations]]
+tag = "v1"
+new_sqlite_classes = ["BattleRoom", "Matchmaker"]
+
+[vars]
+ENVIRONMENT = "development"
+PROTOCOL_VERSION = 1
+SIMULATION_VERSION = "2026.07.21-web-v2"
+
+[[r2_buckets]]
+binding = "REPLAYS"
+bucket_name = "beyblade-replays"

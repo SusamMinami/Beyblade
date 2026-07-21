@@ -1,6 +1,7 @@
 class_name BattleSimulation
 extends RefCounted
 
+const BattleProtocolRef := preload("res://scripts/battle/battle_protocol.gd")
 const SIMULATION_VERSION := "2026.07.21-web-v2"
 const RESULT_SPIN_OUT := &"spin_out"
 const RESULT_RING_OUT := &"ring_out"
@@ -51,6 +52,7 @@ var logger: Callable
 
 var phase := &"ready"
 var time := 0.0
+var frame := 0
 var result: Dictionary = {}
 var events: Array[Dictionary] = []
 var collision_log: Array[Dictionary] = []
@@ -87,6 +89,7 @@ func _init(
 func reset() -> void:
 	phase = &"ready"
 	time = 0.0
+	frame = 0
 	result.clear()
 	events.clear()
 	collision_log.clear()
@@ -150,24 +153,116 @@ func launch(
 	})
 
 
-func step(delta: float, player_control: Vector2 = Vector2.ZERO) -> void:
+func step(delta: float, player_control: Vector2 = Vector2.ZERO, enemy_control: Vector2 = Vector2.INF) -> void:
 	events.clear()
 	if phase != &"running":
 		return
 
 	var dt := clampf(delta, 0.0, 1.0 / 30.0)
 	time += dt
+	frame += 1
 	collision_cooldown = maxf(collision_cooldown - dt, 0.0)
 
-	var enemy_control := _get_enemy_control()
+	var ec: Vector2
+	if enemy_control == Vector2.INF:
+		ec = _get_enemy_control()
+	else:
+		ec = enemy_control
 	integrate_top(player, player_control, dt, false)
-	integrate_top(enemy, enemy_control, dt, true)
+	integrate_top(enemy, ec, dt, true)
 	_resolve_collision()
 	_update_tilt(player, dt)
 	_update_tilt(enemy, dt)
 	_update_risk_states(player, &"player")
 	_update_risk_states(enemy, &"enemy")
 	_check_result()
+
+
+func launch_explicit(player_cmd: Dictionary, enemy_cmd: Dictionary) -> void:
+	reset()
+	phase = &"running"
+	var speed_scale := _tuning_value("speed_scale")
+	_apply_launch_to_top(player, player_cmd, speed_scale, false)
+	_apply_launch_to_top(enemy, enemy_cmd, speed_scale, true)
+	events.append({
+		"type": &"launch",
+		"power": BattleProtocolRef.dequantize_power(player_cmd.power_q),
+		"height": BattleProtocolRef.dequantize_height(player_cmd.height_q)
+	})
+
+
+func _apply_launch_to_top(top: TopState, cmd: Dictionary, speed_scale: float, is_enemy: bool) -> void:
+	var power := BattleProtocolRef.dequantize_power(int(cmd.power_q))
+	var height := BattleProtocolRef.dequantize_height(int(cmd.height_q))
+	var direction := BattleProtocolRef.dequantize_direction(int(cmd.direction_q))
+	var angle := BattleProtocolRef.dequantize_angle(int(cmd.angle_q))
+	var launch_power := clampf(power, 0.35, 1.0)
+	var launch_height := clampf(height, 0.0, 1.0)
+	var launch_angle := clampf(angle, -1.0, 1.0)
+	var speed := (
+		3.4 + top.build.launch_forward_impulse * launch_power
+	) * (0.94 + launch_height * 0.12) * speed_scale
+	var dir_mult := 1.0 if not is_enemy else -1.0
+	top.velocity = Vector2(
+		sin(direction) * speed + launch_angle * 0.72,
+		-cos(direction) * speed * dir_mult
+	)
+	top.spin = (
+		top.build.max_spin_speed
+		* launch_power
+		* (1.0 - absf(launch_angle) * 0.08)
+		* (1.0 - launch_height * 0.035)
+	)
+	top.tilt = (
+		absf(launch_angle) * 0.18
+		+ maxf(launch_height - 0.55, 0.0) * 0.08
+	)
+	if is_enemy:
+		top.tilt += 0.0
+
+
+func restore_from_snapshot(snap: Dictionary) -> void:
+	phase = snap.get("phase", &"running")
+	time = float(snap.get("time", 0.0))
+	frame = int(snap.get("frame", 0))
+	if snap.has("result") and snap.result is Dictionary:
+		result = snap.result.duplicate()
+	else:
+		result.clear()
+	events.clear()
+	if snap.has("player"):
+		_restore_top(player, snap.player)
+	if snap.has("enemy"):
+		_restore_top(enemy, snap.enemy)
+
+
+func _restore_top(top: TopState, d: Dictionary) -> void:
+	var pos: Variant = d.get("position", Vector2.ZERO)
+	var vel: Variant = d.get("velocity", Vector2.ZERO)
+	if pos is Vector2:
+		top.position = pos
+	elif pos is Dictionary:
+		top.position = Vector2(float(pos.get("x", 0.0)), float(pos.get("y", 0.0)))
+	if vel is Vector2:
+		top.velocity = vel
+	elif vel is Dictionary:
+		top.velocity = Vector2(float(vel.get("x", 0.0)), float(vel.get("y", 0.0)))
+	top.spin = float(d.get("spin", top.spin))
+	top.durability = float(d.get("durability", top.durability))
+	top.tilt = float(d.get("tilt", top.tilt))
+	top.imbalance = float(d.get("imbalance", top.imbalance))
+	top.spin_loss_rate = float(d.get("spin_loss_rate", top.spin_loss_rate))
+	top.ring_out_risk = float(d.get("ring_out_risk", top.ring_out_risk))
+	top.stability_state = d.get("stability_state", top.stability_state)
+	top.ring_risk_state = d.get("ring_risk_state", top.ring_risk_state)
+	top.spin_risk_state = d.get("spin_risk_state", top.spin_risk_state)
+	top.control_influence = float(d.get("control_influence", top.control_influence))
+	if d.has("surface_name"):
+		top.surface_name = String(d.surface_name)
+
+
+func get_frame() -> int:
+	return frame
 
 
 func integrate_top(
@@ -711,6 +806,7 @@ func _finish(winner: StringName, reason: StringName) -> void:
 func snapshot() -> Dictionary:
 	return {
 		"phase": phase,
+		"frame": frame,
 		"time": _rounded(time),
 		"result": (
 			{}
