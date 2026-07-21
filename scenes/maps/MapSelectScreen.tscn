@@ -68,6 +68,29 @@ layout_mode = 2
 text = "已选择陀螺"
 autowrap_mode = 3
 
+[node name="MapCarousel" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+layout_mode = 2
+theme_override_constants/separation = 12
+
+[node name="PreviousMapButton" type="Button" parent="MarginContainer/VBoxContainer/MapCarousel"]
+custom_minimum_size = Vector2(72, 120)
+layout_mode = 2
+text = "<"
+
+[node name="SelectedMapLabel" type="Label" parent="MarginContainer/VBoxContainer/MapCarousel"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "01 / 03\n标准碗形竞技场"
+horizontal_alignment = 1
+vertical_alignment = 1
+theme_override_font_sizes/font_size = 22
+
+[node name="NextMapButton" type="Button" parent="MarginContainer/VBoxContainer/MapCarousel"]
+custom_minimum_size = Vector2(72, 120)
+layout_mode = 2
+text = ">"
+
 [node name="MapOptions" type="OptionButton" parent="MarginContainer/VBoxContainer"]
 unique_name_in_owner = true
 layout_mode = 2
@@ -97,5 +120,7 @@ size_flags_horizontal = 3
 text = "开始战斗"
 
 [connection signal="item_selected" from="MarginContainer/VBoxContainer/MapOptions" to="." method="_on_map_options_item_selected"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/MapCarousel/PreviousMapButton" to="." method="_on_previous_map_pressed"]
+[connection signal="pressed" from="MarginContainer/VBoxContainer/MapCarousel/NextMapButton" to="." method="_on_next_map_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonRow/BackButton" to="." method="_on_back_button_pressed"]
 [connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonRow/StartButton" to="." method="_on_start_button_pressed"]

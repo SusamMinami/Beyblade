@@ -1,6 +1,14 @@
-[gd_scene load_steps=2 format=3]
+[gd_scene load_steps=4 format=3]
 
 [ext_resource type="Script" path="res://scripts/assembly/part_customize_screen.gd" id="1"]
+[ext_resource type="PackedScene" path="res://scenes/assembly/FivePartTopModel.tscn" id="2"]
+
+[sub_resource type="Environment" id="Environment_diy"]
+background_mode = 1
+background_color = Color(0.969, 0.953, 0.914, 1)
+ambient_light_source = 2
+ambient_light_color = Color(0.86, 0.91, 0.98, 1)
+ambient_light_energy = 0.9
 
 [node name="PartCustomizeScreen" type="Control"]
 layout_mode = 3
@@ -20,90 +28,241 @@ grow_horizontal = 2
 grow_vertical = 2
 color = Color(0.969, 0.953, 0.914, 1)
 
-[node name="BlueSlash" type="ColorRect" parent="."]
-layout_mode = 0
-offset_left = -40.0
-offset_top = 176.0
-offset_right = 280.0
-offset_bottom = 202.0
-rotation = -0.14
-mouse_filter = 2
-color = Color(0.137, 0.549, 1, 0.8)
-
-[node name="MarginContainer" type="MarginContainer" parent="."]
+[node name="PreviewPanel" type="SubViewportContainer" parent="."]
 layout_mode = 1
 anchors_preset = 15
 anchor_right = 1.0
 anchor_bottom = 1.0
-offset_left = 48.0
-offset_top = 48.0
-offset_right = -48.0
-offset_bottom = -48.0
+offset_top = 130.0
+offset_bottom = -350.0
 grow_horizontal = 2
 grow_vertical = 2
+mouse_filter = 2
+stretch = true
 
-[node name="VBoxContainer" type="VBoxContainer" parent="MarginContainer"]
-layout_mode = 2
-theme_override_constants/separation = 18
+[node name="PreviewViewport" type="SubViewport" parent="PreviewPanel"]
+size = Vector2i(720, 800)
+render_target_update_mode = 4
 
-[node name="TitleLabel" type="Label" parent="MarginContainer/VBoxContainer"]
+[node name="PreviewRoot" type="Node3D" parent="PreviewPanel/PreviewViewport"]
+
+[node name="WorldEnvironment" type="WorldEnvironment" parent="PreviewPanel/PreviewViewport/PreviewRoot"]
+environment = SubResource("Environment_diy")
+
+[node name="PreviewCamera" type="Camera3D" parent="PreviewPanel/PreviewViewport/PreviewRoot"]
+unique_name_in_owner = true
+position = Vector3(0, 0.8, 5)
+current = true
+fov = 30.0
+
+[node name="KeyLight" type="DirectionalLight3D" parent="PreviewPanel/PreviewViewport/PreviewRoot"]
+rotation_degrees = Vector3(-42, -28, 0)
+light_energy = 2.4
+shadow_enabled = true
+
+[node name="RimLight" type="OmniLight3D" parent="PreviewPanel/PreviewViewport/PreviewRoot"]
+position = Vector3(-2.4, 1.2, 2)
+light_color = Color(0.18, 0.62, 1, 1)
+light_energy = 3.0
+omni_range = 6.0
+
+[node name="TopModel" parent="PreviewPanel/PreviewViewport/PreviewRoot" instance=ExtResource("2")]
+unique_name_in_owner = true
+
+[node name="TopBar" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 10
+anchor_right = 1.0
+offset_left = 20.0
+offset_top = 20.0
+offset_right = -20.0
+offset_bottom = 112.0
+grow_horizontal = 2
+
+[node name="TopRow" type="HBoxContainer" parent="TopBar"]
 layout_mode = 2
-text = "零件定制"
+theme_override_constants/separation = 12
+
+[node name="PartTitle" type="Label" parent="TopBar/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+size_flags_horizontal = 3
+text = "01 攻击环 · 深度 DIY"
+theme_override_font_sizes/font_size = 24
+
+[node name="MetricsLabel" type="Label" parent="TopBar/TopRow"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "质量 / 惯量"
+horizontal_alignment = 2
+
+[node name="ViewOptions" type="OptionButton" parent="TopBar/TopRow"]
+unique_name_in_owner = true
+custom_minimum_size = Vector2(112, 0)
+layout_mode = 2
+
+[node name="HandleLayer" type="Control" parent="."]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_top = 130.0
+offset_bottom = -350.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 1
+
+[node name="SizeHandle" type="ColorRect" parent="HandleLayer"]
+unique_name_in_owner = true
+layout_mode = 0
+offset_left = 116.0
+offset_top = 318.0
+offset_right = 174.0
+offset_bottom = 376.0
+mouse_default_cursor_shape = 13
+color = Color(0.137, 0.549, 1, 0.92)
+
+[node name="Label" type="Label" parent="HandleLayer/SizeHandle"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+text = "尺寸"
 horizontal_alignment = 1
-theme_override_font_sizes/font_size = 34
+vertical_alignment = 1
 
-[node name="HintLabel" type="Label" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "MVP 阶段先支持颜色和样式保存。后续可以扩展为外圈轮廓、凸起数量、材质贴图和配重位置编辑。"
-autowrap_mode = 3
-
-[node name="RingColorLabel" type="Label" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "外圈颜色"
-
-[node name="RingColorPicker" type="ColorPickerButton" parent="MarginContainer/VBoxContainer"]
+[node name="HeightHandle" type="ColorRect" parent="HandleLayer"]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_left = 330.0
+offset_top = 112.0
+offset_right = 390.0
+offset_bottom = 172.0
+mouse_default_cursor_shape = 13
+color = Color(0.957, 0.357, 0.165, 0.92)
 
-[node name="CoreColorLabel" type="Label" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "核心颜色"
+[node name="Label" type="Label" parent="HandleLayer/HeightHandle"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+text = "高度"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="CoreColorPicker" type="ColorPickerButton" parent="MarginContainer/VBoxContainer"]
+[node name="ShapeHandle" type="ColorRect" parent="HandleLayer"]
 unique_name_in_owner = true
-layout_mode = 2
+layout_mode = 0
+offset_left = 548.0
+offset_top = 318.0
+offset_right = 608.0
+offset_bottom = 376.0
+mouse_default_cursor_shape = 13
+color = Color(0.9, 0.12, 0.12, 0.92)
 
-[node name="StyleLabel" type="Label" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-text = "零件样式"
+[node name="Label" type="Label" parent="HandleLayer/ShapeHandle"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+mouse_filter = 2
+text = "轮廓"
+horizontal_alignment = 1
+vertical_alignment = 1
 
-[node name="StyleOptions" type="OptionButton" parent="MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
+[node name="BottomDock" type="PanelContainer" parent="."]
+layout_mode = 1
+anchors_preset = 12
+anchor_top = 1.0
+anchor_right = 1.0
+anchor_bottom = 1.0
+offset_left = 20.0
+offset_top = -338.0
+offset_right = -20.0
+offset_bottom = -20.0
+grow_horizontal = 2
+grow_vertical = 0
 
-[node name="StatusLabel" type="Label" parent="MarginContainer/VBoxContainer"]
-unique_name_in_owner = true
-layout_mode = 2
-text = "状态"
-autowrap_mode = 3
-
-[node name="Spacer" type="Control" parent="MarginContainer/VBoxContainer"]
-layout_mode = 2
-size_flags_vertical = 3
-
-[node name="ButtonRow" type="HBoxContainer" parent="MarginContainer/VBoxContainer"]
+[node name="Column" type="VBoxContainer" parent="BottomDock"]
 layout_mode = 2
 theme_override_constants/separation = 10
 
-[node name="BackButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
+[node name="StatusLabel" type="Label" parent="BottomDock/Column"]
+unique_name_in_owner = true
+layout_mode = 2
+text = "直接拖动模型周围的三个彩色手柄"
+horizontal_alignment = 1
+autowrap_mode = 3
+
+[node name="OptionsGrid" type="GridContainer" parent="BottomDock/Column"]
+layout_mode = 2
+columns = 2
+theme_override_constants/h_separation = 12
+theme_override_constants/v_separation = 8
+
+[node name="MaterialLabel" type="Label" parent="BottomDock/Column/OptionsGrid"]
+layout_mode = 2
+text = "材料"
+
+[node name="MaterialOptions" type="OptionButton" parent="BottomDock/Column/OptionsGrid"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-text = "返回"
 
-[node name="ApplyButton" type="Button" parent="MarginContainer/VBoxContainer/ButtonRow"]
+[node name="SymmetryLabel" type="Label" parent="BottomDock/Column/OptionsGrid"]
+layout_mode = 2
+text = "对称延展"
+
+[node name="SymmetryOptions" type="OptionButton" parent="BottomDock/Column/OptionsGrid"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-text = "保存定制"
 
-[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonRow/BackButton" to="." method="_on_back_button_pressed"]
-[connection signal="pressed" from="MarginContainer/VBoxContainer/ButtonRow/ApplyButton" to="." method="_on_apply_button_pressed"]
+[node name="RingColorLabel" type="Label" parent="BottomDock/Column/OptionsGrid"]
+layout_mode = 2
+text = "外圈颜色"
+
+[node name="RingColorPicker" type="ColorPickerButton" parent="BottomDock/Column/OptionsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="CoreColorLabel" type="Label" parent="BottomDock/Column/OptionsGrid"]
+layout_mode = 2
+text = "核心颜色"
+
+[node name="CoreColorPicker" type="ColorPickerButton" parent="BottomDock/Column/OptionsGrid"]
+unique_name_in_owner = true
+layout_mode = 2
+
+[node name="ButtonRow" type="HBoxContainer" parent="BottomDock/Column"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="BackButton" type="Button" parent="BottomDock/Column/ButtonRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "取消"
+
+[node name="ApplyButton" type="Button" parent="BottomDock/Column/ButtonRow"]
+layout_mode = 2
+size_flags_horizontal = 3
+text = "保存 DIY"
+
+[connection signal="item_selected" from="TopBar/TopRow/ViewOptions" to="." method="_on_view_options_item_selected"]
+[connection signal="gui_input" from="HandleLayer/SizeHandle" to="." method="_on_size_handle_gui_input"]
+[connection signal="gui_input" from="HandleLayer/HeightHandle" to="." method="_on_height_handle_gui_input"]
+[connection signal="gui_input" from="HandleLayer/ShapeHandle" to="." method="_on_shape_handle_gui_input"]
+[connection signal="item_selected" from="BottomDock/Column/OptionsGrid/MaterialOptions" to="." method="_on_material_options_item_selected"]
+[connection signal="item_selected" from="BottomDock/Column/OptionsGrid/SymmetryOptions" to="." method="_on_symmetry_options_item_selected"]
+[connection signal="color_changed" from="BottomDock/Column/OptionsGrid/RingColorPicker" to="." method="_on_color_changed"]
+[connection signal="color_changed" from="BottomDock/Column/OptionsGrid/CoreColorPicker" to="." method="_on_color_changed"]
+[connection signal="pressed" from="BottomDock/Column/ButtonRow/BackButton" to="." method="_on_back_button_pressed"]
+[connection signal="pressed" from="BottomDock/Column/ButtonRow/ApplyButton" to="." method="_on_apply_button_pressed"]

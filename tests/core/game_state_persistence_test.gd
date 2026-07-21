@@ -55,6 +55,32 @@ func _run() -> void:
 	source.set_battle_tuning("spin_scale", 0.8)
 	source.set_battle_tuning("control_scale", 1.2)
 	source.set_battle_tuning("speed_scale", 1.1)
+	source.set_active_loadout_index(1)
+	source.set_active_loadout_build(
+		&"attack_ring.stamina_arc",
+		&"core_lock.low_center",
+		&"weight_disc.heavy_outer",
+		&"driver_shaft.low_stable",
+		&"tip.metal_stamina"
+	)
+	source.set_active_loadout_customization(
+		&"attack_ring.stamina_arc",
+		{
+			"shape": 72.0,
+			"size": 1.18,
+			"height": 1.22,
+			"material": "alloy",
+			"symmetry": 3
+		}
+	)
+	_expect(
+		source.purchase_part(&"attack_ring.stamina_arc"),
+		"余额足够时必须能够购买未拥有零件"
+	)
+	_expect(
+		source.purchase_material(&"polymer"),
+		"余额足够时必须能够购买未拥有材料"
+	)
 	var save_error: Error = source.save_state()
 	_expect(
 		save_error == OK,
@@ -69,19 +95,26 @@ func _run() -> void:
 		"状态必须能够从 ConfigFile 恢复，错误码：%d" % load_error
 	)
 	_expect(
-		restored.selected_attack_ring_id == &"attack_ring.smash_three",
-		"必须恢复攻击环"
+		restored.selected_attack_ring_id == &"attack_ring.stamina_arc",
+		"必须恢复当前槽位攻击环"
 	)
 	_expect(
-		restored.selected_tip_id == &"tip.flat_attack",
-		"必须恢复轴尖"
+		restored.selected_tip_id == &"tip.metal_stamina",
+		"必须恢复当前槽位轴尖"
 	)
 	_expect(restored.selected_map == "复合材质竞技场", "必须恢复地图")
-	_expect(restored.coins == 360, "必须恢复赏金")
+	_expect(restored.coins == 80, "必须恢复购买后的赏金余额")
 	_expect(restored.custom_part_style == "突击型", "必须恢复样式")
 	_expect(
-		restored.custom_ring_color.is_equal_approx(Color(0.12, 0.34, 0.56)),
-		"必须恢复攻击环颜色"
+		restored.loadouts[0].colors.ring.is_equal_approx(
+			Color(0.12, 0.34, 0.56)
+		),
+		"必须在第一槽恢复旧攻击环颜色"
+	)
+	_expect(
+		restored.loadouts[0].build.attack_ring_id
+		== "attack_ring.smash_three",
+		"必须在第一槽恢复旧攻击环配置"
 	)
 	_expect(not restored.sound_enabled, "必须恢复静音状态")
 	var tuning: Dictionary = restored.get_battle_tuning()
@@ -89,6 +122,29 @@ func _run() -> void:
 	_expect(is_equal_approx(tuning.spin_scale, 0.8), "必须恢复衰减倍率")
 	_expect(is_equal_approx(tuning.control_scale, 1.2), "必须恢复操控倍率")
 	_expect(is_equal_approx(tuning.speed_scale, 1.1), "必须恢复速度倍率")
+	_expect(restored.loadouts.size() == 3, "必须恢复三个出战槽")
+	_expect(restored.active_loadout_index == 1, "必须恢复当前出战槽")
+	_expect(
+		restored.selected_attack_ring_id == &"attack_ring.stamina_arc",
+		"旧版当前配置字段必须同步到当前槽位"
+	)
+	_expect(
+		restored.owned_part_ids.has(&"attack_ring.stamina_arc"),
+		"必须恢复零件所有权"
+	)
+	_expect(
+		restored.owned_material_ids.has(&"polymer"),
+		"必须恢复材料所有权"
+	)
+	var customization: Dictionary = restored.get_active_loadout_customizations().get(
+		"attack_ring.stamina_arc",
+		{}
+	)
+	_expect(
+		is_equal_approx(float(customization.get("shape", 0.0)), 72.0),
+		"必须恢复 DIY 轮廓参数"
+	)
+	_expect(customization.get("material", "") == "alloy", "必须恢复 DIY 材料")
 
 	var absolute_path := ProjectSettings.globalize_path(test_save_path)
 	if FileAccess.file_exists(test_save_path):

@@ -1,6 +1,9 @@
 class_name FivePartTopModel
 extends Node3D
 
+const PART_CUSTOMIZATION := preload(
+	"res://scripts/assembly/part_customization.gd"
+)
 enum PartSlot {
 	ATTACK_RING,
 	CORE_LOCK,
@@ -53,6 +56,7 @@ var tip_id := &"tip.rubber_balance"
 var ring_color := Color(0.04, 0.72, 0.62, 1.0)
 var core_color := Color(0.92, 0.76, 0.22, 1.0)
 var active_part_index := PartSlot.ATTACK_RING
+var customizations: Dictionary = {}
 
 var polymer_material: StandardMaterial3D
 var polymer_accent_material: StandardMaterial3D
@@ -79,7 +83,8 @@ func configure(
 	new_driver_shaft_id: StringName,
 	new_tip_id: StringName,
 	new_ring_color: Color,
-	new_core_color: Color
+	new_core_color: Color,
+	new_customizations: Dictionary = {}
 ) -> void:
 	attack_ring_id = new_attack_ring_id
 	core_lock_id = new_core_lock_id
@@ -88,6 +93,7 @@ func configure(
 	tip_id = new_tip_id
 	ring_color = new_ring_color
 	core_color = new_core_color
+	customizations = PART_CUSTOMIZATION.normalize_map(new_customizations)
 	if is_node_ready():
 		_rebuild_model()
 
@@ -159,6 +165,7 @@ func _rebuild_model() -> void:
 	_build_weight_disc()
 	_build_driver_shaft()
 	_build_tip()
+	_apply_customization_materials()
 	_apply_part_transforms()
 
 
@@ -441,9 +448,15 @@ func _apply_part_transforms() -> void:
 		var part_node := part_nodes[index]
 		part_node.position = PART_BASE_POSITIONS[index]
 		part_node.rotation_degrees = Vector3.ZERO
-		part_node.scale = Vector3.ONE
+		var customization := _customization_for_slot(index)
+		part_node.scale = Vector3(
+			float(customization.size),
+			float(customization.height),
+			float(customization.size)
+		)
+		part_node.position.y += (float(customization.height) - 1.0) * 0.08
 		if index == active_part_index:
-			part_node.scale = Vector3.ONE * 1.035
+			part_node.scale *= 1.035
 		var damage_amount := 1.0 - part_integrities[index]
 		if broken_parts[index]:
 			part_node.position += BROKEN_PART_OFFSETS[index]
@@ -462,6 +475,42 @@ func _apply_part_transforms() -> void:
 			)
 			part_node.scale *= 1.0 - damage_amount * 0.04
 		_apply_part_damage_overlay(part_node, part_integrities[index], broken_parts[index])
+
+
+func _apply_customization_materials() -> void:
+	for part_index in range(get_customizable_part_count()):
+		var customization := _customization_for_slot(part_index)
+		var material_id := str(customization.material)
+		if material_id == "stock":
+			continue
+		var material := _create_customization_material(material_id, part_index)
+		_override_mesh_materials(get_part_nodes()[part_index], material)
+
+
+func _create_customization_material(
+	material_id: String,
+	part_index: int
+) -> StandardMaterial3D:
+	match material_id:
+		"polymer":
+			var color := ring_color if part_index == PartSlot.ATTACK_RING else core_color
+			return _create_material(color.lightened(0.12), 0.04, 0.34, true)
+		"alloy":
+			return _create_material(Color(0.58, 0.64, 0.7), 0.96, 0.16)
+		"carbon":
+			return _create_material(Color(0.055, 0.08, 0.1), 0.42, 0.28, true)
+		"rubber":
+			return _create_material(Color(0.035, 0.045, 0.05), 0.01, 0.86)
+		_:
+			return polymer_material
+
+
+func _override_mesh_materials(node: Node, material: Material) -> void:
+	for child in node.get_children():
+		if child is MeshInstance3D:
+			child.material_override = material
+		if child.get_child_count() > 0:
+			_override_mesh_materials(child, material)
 
 
 func _apply_part_damage_overlay(
@@ -576,22 +625,53 @@ func _append_annular_section(
 
 
 func _outer_radius(angle: float, part_slot: PartSlot, variant_id: StringName) -> float:
+	var base_radius := 0.0
 	if part_slot == PartSlot.ATTACK_RING:
 		if variant_id == ATTACK_RING_SMASH:
 			var attack_pulse := pow(maxf(0.0, cos(angle * 3.0 - 0.28)), 4.0)
-			return 0.91 + attack_pulse * 0.3
-		if variant_id == ATTACK_RING_STAMINA:
-			return 1.01 + cos(angle * 8.0) * 0.022
-		var balance_pulse := pow(0.5 + 0.5 * cos(angle * 6.0), 2.0)
-		return 0.94 + balance_pulse * 0.12
-
-	if variant_id == WEIGHT_DISC_HEAVY:
-		return 0.82 + cos(angle * 8.0) * 0.018
-	if variant_id == WEIGHT_DISC_ECCENTRIC:
-		return 0.74 + cos(angle) * 0.075 + cos(angle * 5.0) * 0.018
-	if variant_id == INTERNAL_BEZEL:
+			base_radius = 0.91 + attack_pulse * 0.3
+		elif variant_id == ATTACK_RING_STAMINA:
+			base_radius = 1.01 + cos(angle * 8.0) * 0.022
+		else:
+			var balance_pulse := pow(0.5 + 0.5 * cos(angle * 6.0), 2.0)
+			base_radius = 0.94 + balance_pulse * 0.12
+	elif variant_id == WEIGHT_DISC_HEAVY:
+		base_radius = 0.82 + cos(angle * 8.0) * 0.018
+	elif variant_id == WEIGHT_DISC_ECCENTRIC:
+		base_radius = 0.74 + cos(angle) * 0.075 + cos(angle * 5.0) * 0.018
+	elif variant_id == INTERNAL_BEZEL:
 		return 0.72
-	return 0.74 + cos(angle * 6.0) * 0.012
+	else:
+		base_radius = 0.74 + cos(angle * 6.0) * 0.012
+	return _apply_customized_profile(base_radius, angle, part_slot)
+
+
+func _apply_customized_profile(
+	base_radius: float,
+	angle: float,
+	part_slot: int
+) -> float:
+	var customization := _customization_for_slot(part_slot)
+	var shape_strength: float = float(customization.shape) / 100.0
+	if shape_strength <= 0.0:
+		return base_radius
+	var symmetry := int(customization.symmetry)
+	var pulse := 0.5 + 0.5 * cos(angle * float(symmetry))
+	return base_radius * (1.0 + shape_strength * 0.1 * pulse)
+
+
+func _customization_for_slot(part_slot: int) -> Dictionary:
+	var part_ids := [
+		attack_ring_id,
+		core_lock_id,
+		weight_disc_id,
+		driver_shaft_id,
+		tip_id
+	]
+	if part_slot < 0 or part_slot >= part_ids.size():
+		return PART_CUSTOMIZATION.DEFAULT.duplicate(true)
+	var part_id := String(part_ids[part_slot])
+	return PART_CUSTOMIZATION.normalize(customizations.get(part_id, {}))
 
 
 func _attack_lobe_count(variant_id: StringName) -> int:

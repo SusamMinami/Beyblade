@@ -25,6 +25,7 @@ func _initialize() -> void:
 func _run() -> void:
 	_test_web_golden_snapshot()
 	_test_collision_and_rim_response()
+	_test_imbalance_and_launch_height()
 	_test_low_spin_mobility()
 	_test_battle_results()
 	_test_composite_surface_sampling()
@@ -50,24 +51,29 @@ func _test_web_golden_snapshot() -> void:
 	_expect_close(snapshot.time, 1.233333, "金标结束时间")
 	_expect_vector_close(
 		snapshot.player.position,
-		Vector2(6.264632, -3.800843),
+		Vector2(6.230855, -3.707901),
 		"金标玩家位置"
 	)
 	_expect_vector_close(
 		snapshot.player.velocity,
-		Vector2(6.731033, -6.756025),
+		Vector2(6.8538, -6.614687),
 		"金标玩家速度"
 	)
-	_expect_close(snapshot.player.spin, 44.501299, "金标玩家转速")
-	_expect_close(snapshot.player.durability, 94.327635, "金标玩家耐久")
-	_expect_close(snapshot.player.tilt, 0.283675, "金标玩家倾角")
-	_expect_close(snapshot.player.control_influence, 0.657576, "金标玩家操控")
+	_expect_close(snapshot.player.spin, 43.674775, "金标玩家转速")
+	_expect_close(snapshot.player.durability, 94.208807, "金标玩家耐久")
+	_expect_close(snapshot.player.tilt, 0.415654, "金标玩家倾角")
+	_expect_close(snapshot.player.imbalance, 0.194366, "金标玩家失衡")
+	_expect_close(snapshot.player.spin_loss_rate, 4.41236, "金标玩家转速损耗")
+	_expect_close(snapshot.player.ring_out_risk, 0.852019, "金标玩家撞飞风险")
+	_expect(snapshot.player.stability_state == &"wobble", "金标玩家必须处于摇晃状态")
+	_expect_close(snapshot.player.control_influence, 0.598964, "金标玩家操控")
 	_expect_vector_close(
 		snapshot.enemy.position,
-		Vector2(-3.557449, 5.158733),
+		Vector2(-3.763804, 4.94961),
 		"金标 AI 位置"
 	)
-	_expect_close(snapshot.enemy.spin, 54.050553, "金标 AI 转速")
+	_expect_close(snapshot.enemy.spin, 54.029925, "金标 AI 转速")
+	_expect_close(snapshot.enemy.imbalance, 0.143148, "金标 AI 失衡")
 
 
 func _test_collision_and_rim_response() -> void:
@@ -99,6 +105,57 @@ func _test_collision_and_rim_response() -> void:
 	)
 	_expect(battle.player.velocity.x < 0.0, "护圈必须反弹向外速度")
 	_expect(battle.result.is_empty(), "护圈反弹不能立即判定 Ring Out")
+
+
+func _test_imbalance_and_launch_height() -> void:
+	var arena := ARENA_MAP_CATALOG.get_by_name("标准碗形竞技场")
+	var low_launch = _create_battle(arena, 21)
+	var high_launch = _create_battle(arena, 21)
+	low_launch.launch(0.86, 0.0, 0.25, 0.1)
+	high_launch.launch(0.86, 0.0, 0.25, 0.9)
+	_expect(
+		high_launch.player.velocity.length() > low_launch.player.velocity.length(),
+		"较高发射位置必须略微提高平移速度"
+	)
+	_expect(
+		high_launch.player.tilt > low_launch.player.tilt,
+		"较高发射位置必须带来更高初始倾斜"
+	)
+
+	var battle = _create_battle(arena, 17)
+	battle.launch(1.0, 0.0, 0.0)
+	battle.player.position = Vector2(-0.45, 0.0)
+	battle.enemy.position = Vector2(0.45, 0.0)
+	battle.player.velocity = Vector2(7.0, 0.0)
+	battle.enemy.velocity = Vector2(-7.0, 0.0)
+	battle.player.tilt = 0.12
+	battle.enemy.tilt = 0.08
+	battle.step(1.0 / 60.0, Vector2.ZERO)
+	_expect(battle.player.imbalance > 0.0, "有效碰撞必须增加玩家失衡")
+	_expect(battle.enemy.imbalance > 0.0, "有效碰撞必须增加 AI 失衡")
+	_expect(not battle.collision_log.is_empty(), "有效碰撞必须记录诊断遥测")
+
+	battle = _create_battle(arena)
+	battle.launch(1.0, 0.0, 0.0)
+	battle.player.position = Vector2.ZERO
+	battle.player.velocity = Vector2(2.0, 0.0)
+	battle.player.imbalance = 0.8
+	battle.player.tilt = 0.55
+	var initial_imbalance: float = battle.player.imbalance
+	battle.integrate_top(
+		battle.player,
+		Vector2.RIGHT,
+		1.0 / 60.0,
+		false
+	)
+	var impaired_influence: float = battle.player.control_influence
+	for _frame in range(240):
+		battle._update_tilt(battle.player, 1.0 / 60.0)
+	_expect(impaired_influence < 0.75, "失衡必须削弱控制影响")
+	_expect(
+		battle.player.imbalance < initial_imbalance * 0.25,
+		"失衡必须随稳定性逐步恢复"
+	)
 
 
 func _test_low_spin_mobility() -> void:

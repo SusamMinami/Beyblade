@@ -4,6 +4,7 @@ const UI_THEME_FACTORY := preload("res://scripts/ui/ui_theme_factory.gd")
 const ARENA_MAP_CATALOG := preload("res://scripts/maps/arena_map_catalog.gd")
 
 @onready var map_options: OptionButton = %MapOptions
+@onready var selected_map_label: Label = %SelectedMapLabel
 @onready var build_label: Label = %BuildLabel
 @onready var map_description_label: Label = %MapDescriptionLabel
 
@@ -33,9 +34,32 @@ func _on_map_options_item_selected(_index: int) -> void:
 	_update_map_description()
 
 
+func _on_previous_map_pressed() -> void:
+	map_options.select(wrapi(
+		map_options.selected - 1,
+		0,
+		map_options.item_count
+	))
+	_update_map_description()
+
+
+func _on_next_map_pressed() -> void:
+	map_options.select(wrapi(
+		map_options.selected + 1,
+		0,
+		map_options.item_count
+	))
+	_update_map_description()
+
+
 func _update_map_description() -> void:
 	var arena_map: ArenaMapResource = ARENA_MAP_CATALOG.get_all()[map_options.selected]
 	var terrain_mode := "复合地形" if arena_map.supports_composite_terrain else "单一地形"
+	selected_map_label.text = "%02d / %02d\n%s" % [
+		map_options.selected + 1,
+		map_options.item_count,
+		arena_map.map_name
+	]
 	map_description_label.text = "%s\n%s\n默认地形：%s\n类型：%s\n最大倾角：约 %.1f°" % [
 		arena_map.map_name,
 		arena_map.description,

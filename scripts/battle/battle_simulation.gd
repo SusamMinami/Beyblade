@@ -1,6 +1,7 @@
 class_name BattleSimulation
 extends RefCounted
 
+const SIMULATION_VERSION := "2026.07.21-web-v2"
 const RESULT_SPIN_OUT := &"spin_out"
 const RESULT_RING_OUT := &"ring_out"
 const RESULT_BREAK := &"break"
@@ -11,6 +12,10 @@ const MIN_ACTIVE_SPIN := 2.0
 const MIN_DAMAGE_IMPULSE := 0.35
 const DAMAGE_PER_IMPULSE := 1.1
 const MAX_BATTLE_TIME := 75.0
+const TILT_WARNING := 0.38
+const TILT_CRITICAL := 0.62
+const MAX_TILT := 0.9
+const MAX_COLLISION_LOGS := 200
 
 
 class TopState:
@@ -23,6 +28,12 @@ class TopState:
 	var surface_name := ""
 	var control_input := Vector2.ZERO
 	var control_influence := 0.0
+	var imbalance := 0.0
+	var spin_loss_rate := 0.0
+	var ring_out_risk := 0.0
+	var stability_state := &"stable"
+	var ring_risk_state := &"safe"
+	var spin_risk_state := &"safe"
 
 	func _init(build_data: TopBuildData, start_position: Vector2) -> void:
 		build = build_data
@@ -35,11 +46,14 @@ var enemy_build: TopBuildData
 var arena: ArenaMapResource
 var seed: int
 var tuning: Dictionary
+var diagnostics := false
+var logger: Callable
 
 var phase := &"ready"
 var time := 0.0
 var result: Dictionary = {}
 var events: Array[Dictionary] = []
+var collision_log: Array[Dictionary] = []
 var collision_cooldown := 0.0
 var player: TopState
 var enemy: TopState
@@ -50,12 +64,16 @@ func _init(
 	new_enemy_build: TopBuildData,
 	new_arena: ArenaMapResource,
 	new_seed: int = 20260718,
-	initial_tuning: Dictionary = {}
+	initial_tuning: Dictionary = {},
+	enable_diagnostics := false,
+	diagnostic_logger: Callable = Callable()
 ) -> void:
 	player_build = new_player_build
 	enemy_build = new_enemy_build
 	arena = new_arena
 	seed = _uint32(new_seed)
+	diagnostics = enable_diagnostics
+	logger = diagnostic_logger
 	tuning = {
 		"damage_scale": 1.0,
 		"spin_scale": 1.0,
@@ -71,6 +89,7 @@ func reset() -> void:
 	time = 0.0
 	result.clear()
 	events.clear()
+	collision_log.clear()
 	collision_cooldown = 0.0
 	player = TopState.new(player_build, Vector2(0.0, 4.45))
 	enemy = TopState.new(enemy_build, Vector2(0.0, -4.45))
@@ -86,16 +105,18 @@ func set_tuning(next_tuning: Dictionary) -> void:
 func launch(
 	power: float = 0.86,
 	direction: float = 0.0,
-	angle: float = 0.0
+	angle: float = 0.0,
+	height: float = 0.45
 ) -> void:
 	reset()
 	phase = &"running"
 	var launch_power := clampf(power, 0.35, 1.0)
+	var launch_height := clampf(height, 0.0, 1.0)
 	var launch_angle := clampf(angle, -1.0, 1.0)
 	var speed_scale := _tuning_value("speed_scale")
 	var player_speed := (
 		3.4 + player_build.launch_forward_impulse * launch_power
-	) * speed_scale
+	) * (0.94 + launch_height * 0.12) * speed_scale
 	var enemy_power := 0.78 + _seed_unit(3) * 0.16
 	var enemy_speed := (
 		3.4 + enemy_build.launch_forward_impulse * enemy_power
@@ -114,11 +135,19 @@ func launch(
 		player_build.max_spin_speed
 		* launch_power
 		* (1.0 - absf(launch_angle) * 0.08)
+		* (1.0 - launch_height * 0.035)
 	)
 	enemy.spin = enemy_build.max_spin_speed * enemy_power
-	player.tilt = absf(launch_angle) * 0.18
+	player.tilt = (
+		absf(launch_angle) * 0.18
+		+ maxf(launch_height - 0.55, 0.0) * 0.08
+	)
 	enemy.tilt = _seed_unit(7) * 0.08
-	events.append({"type": &"launch", "power": launch_power})
+	events.append({
+		"type": &"launch",
+		"power": launch_power,
+		"height": launch_height
+	})
 
 
 func step(delta: float, player_control: Vector2 = Vector2.ZERO) -> void:
@@ -136,6 +165,8 @@ func step(delta: float, player_control: Vector2 = Vector2.ZERO) -> void:
 	_resolve_collision()
 	_update_tilt(player, dt)
 	_update_tilt(enemy, dt)
+	_update_risk_states(player, &"player")
+	_update_risk_states(enemy, &"enemy")
 	_check_result()
 
 
@@ -150,6 +181,7 @@ func integrate_top(
 	if current_surface == null:
 		return
 	top.surface_name = current_surface.surface_name
+	var spin_before := top.spin
 
 	top.spin = maxf(
 		top.spin
@@ -172,12 +204,19 @@ func integrate_top(
 	var control_magnitude := clampf(raw_control.length(), 0.0, 1.0)
 	var control := raw_control.normalized() if raw_control.length() > 0.00001 else Vector2.ZERO
 	var mobility := _smoothstep(0.02, 0.55, spin_ratio)
+	var scrape_ratio := _smoothstep(0.48, 0.82, top.tilt)
+	var balance_control := clampf(
+		1.0 - top.imbalance * 0.45 - scrape_ratio * 0.35,
+		0.35,
+		1.0
+	)
 	var control_acceleration := (
 		top.build.control_force
 		/ top.build.total_mass
 		* current_surface.control_modifier
 		* _tuning_value("control_scale")
 		* mobility
+		* balance_control
 	)
 	top.velocity += control * control_acceleration * delta
 	top.control_input = control * control_magnitude
@@ -185,7 +224,8 @@ func integrate_top(
 		control_magnitude
 		* mobility
 		* current_surface.control_modifier
-		* top.build.control_response,
+		* top.build.control_response
+		* balance_control,
 		0.0,
 		1.0
 	)
@@ -220,6 +260,25 @@ func integrate_top(
 		top.velocity.x += noise * delta
 		top.velocity.y -= noise * 0.7 * delta
 
+	if scrape_ratio > 0.0:
+		var scrape_spin_loss := (
+			1.25
+			+ top.build.friction * current_surface.surface_friction * 1.8
+		) * scrape_ratio * delta
+		top.spin = maxf(top.spin - scrape_spin_loss, 0.0)
+		var scrape_phase := (
+			time * 12.7
+			+ float(seed) * 0.0007
+			+ (1.9 if is_enemy else 0.2)
+		)
+		var scrape_drift := (
+			scrape_ratio * (0.3 + top.imbalance * 0.9) * delta
+		)
+		top.velocity += Vector2(
+			cos(scrape_phase),
+			sin(scrape_phase)
+		) * scrape_drift
+
 	var drag := (
 		0.17
 		* top.build.friction
@@ -237,6 +296,10 @@ func integrate_top(
 		top.velocity = top.velocity.normalized() * max_speed
 	top.position += top.velocity * delta
 	_resolve_arena_rim(top, current_surface)
+	top.spin_loss_rate = maxf(
+		(spin_before - top.spin) / maxf(delta, 0.000001),
+		0.0
+	)
 
 
 func _resolve_arena_rim(
@@ -316,6 +379,10 @@ func _resolve_collision() -> void:
 	enemy.velocity += normal * impulse * inverse_enemy_mass
 
 	if collision_cooldown <= 0.0 and impulse > MIN_DAMAGE_IMPULSE:
+		var collision_before := {
+			"player": _collision_top_state(player),
+			"enemy": _collision_top_state(enemy)
+		}
 		var base_damage := (
 			(impulse - MIN_DAMAGE_IMPULSE)
 			* DAMAGE_PER_IMPULSE
@@ -341,13 +408,133 @@ func _resolve_collision() -> void:
 		)
 		player.spin = maxf(player.spin - impulse * 0.19, 0.0)
 		enemy.spin = maxf(enemy.spin - impulse * 0.19, 0.0)
+		_apply_collision_imbalance(
+			player,
+			enemy.build.attack_power,
+			player_surface,
+			impulse
+		)
+		_apply_collision_imbalance(
+			enemy,
+			player.build.attack_power,
+			enemy_surface,
+			impulse
+		)
 		collision_cooldown = 0.12
+		var telemetry := _create_collision_telemetry(
+			impulse,
+			collision_before,
+			{
+				"player": _collision_top_state(player),
+				"enemy": _collision_top_state(enemy)
+			},
+			damage_to_player,
+			damage_to_enemy
+		)
+		collision_log.append(telemetry)
+		if collision_log.size() > MAX_COLLISION_LOGS:
+			collision_log.pop_front()
+		if diagnostics and logger.is_valid():
+			logger.call("[BattleSimulation] collision", telemetry)
 		events.append({
 			"type": &"collision",
 			"impulse": impulse,
 			"intensity": clampf(impulse / 7.0, 0.0, 1.0),
-			"position": (player.position + enemy.position) * 0.5
+			"position": (player.position + enemy.position) * 0.5,
+			"telemetry": telemetry
 		})
+
+
+func _apply_collision_imbalance(
+	top: TopState,
+	incoming_attack: float,
+	surface: TerrainSurfaceResource,
+	impulse: float
+) -> void:
+	var spin_ratio := clampf(
+		top.spin / maxf(top.build.max_spin_speed, 0.001),
+		0.0,
+		1.0
+	)
+	var effective_stability := maxf(
+		top.build.stability * surface.stability_modifier,
+		0.2
+	)
+	var low_spin_vulnerability := 0.72 + (1.0 - spin_ratio) * 0.55
+	var gain := clampf(
+		(
+			(impulse - MIN_DAMAGE_IMPULSE)
+			/ 7.0
+			* incoming_attack
+			/ effective_stability
+			* low_spin_vulnerability
+			* 0.48
+		),
+		0.0,
+		0.5
+	)
+	top.imbalance = clampf(top.imbalance + gain, 0.0, 1.0)
+	top.tilt = clampf(top.tilt + gain * 0.28, 0.0, MAX_TILT)
+
+
+func _collision_top_state(top: TopState) -> Dictionary:
+	return {
+		"tilt": _rounded(top.tilt),
+		"spin": _rounded(top.spin),
+		"imbalance": _rounded(top.imbalance),
+		"durability": _rounded(top.durability)
+	}
+
+
+func _create_collision_telemetry(
+	impulse: float,
+	before: Dictionary,
+	after: Dictionary,
+	damage_to_player: float,
+	damage_to_enemy: float
+) -> Dictionary:
+	return {
+		"time": _rounded(time),
+		"impulse": _rounded(impulse),
+		"intensity": _rounded(clampf(impulse / 7.0, 0.0, 1.0)),
+		"position": Vector2(
+			_rounded((player.position.x + enemy.position.x) * 0.5),
+			_rounded((player.position.y + enemy.position.y) * 0.5)
+		),
+		"player": _collision_top_delta(
+			before.player,
+			after.player,
+			damage_to_player
+		),
+		"enemy": _collision_top_delta(
+			before.enemy,
+			after.enemy,
+			damage_to_enemy
+		)
+	}
+
+
+func _collision_top_delta(
+	previous: Dictionary,
+	next: Dictionary,
+	damage: float
+) -> Dictionary:
+	return {
+		"tilt_before": previous.tilt,
+		"tilt_after": next.tilt,
+		"tilt_delta": _rounded(float(next.tilt) - float(previous.tilt)),
+		"spin_before": previous.spin,
+		"spin_after": next.spin,
+		"spin_delta": _rounded(float(next.spin) - float(previous.spin)),
+		"imbalance_before": previous.imbalance,
+		"imbalance_after": next.imbalance,
+		"imbalance_delta": _rounded(
+			float(next.imbalance) - float(previous.imbalance)
+		),
+		"durability_before": previous.durability,
+		"durability_after": next.durability,
+		"damage": _rounded(damage)
+	}
 
 
 func _update_tilt(top: TopState, delta: float) -> void:
@@ -357,13 +544,117 @@ func _update_tilt(top: TopState, delta: float) -> void:
 		0.0,
 		1.0
 	)
-	var instability := clampf(1.15 - top.build.stability, 0.0, 0.8)
-	var target_tilt := clampf(
-		instability * 0.5 + speed * 0.012 + (1.0 - spin_ratio) * 0.32,
+	var surface := arena.get_surface_at_radius(top.position.length())
+	if surface == null:
+		return
+	var effective_stability := (
+		top.build.stability * surface.stability_modifier
+	)
+	var instability := clampf(
+		1.15 - effective_stability + top.imbalance * 0.72,
 		0.0,
-		0.62
+		1.25
+	)
+	var target_tilt := clampf(
+		instability * 0.48
+		+ speed * 0.012
+		+ (1.0 - spin_ratio) * 0.32
+		+ top.imbalance * 0.2,
+		0.0,
+		MAX_TILT
 	)
 	top.tilt += (target_tilt - top.tilt) * minf(delta * 4.0, 1.0)
+	var recovery := (
+		0.1 + effective_stability * 0.16
+	) * (
+		0.55 + spin_ratio * 0.45
+	)
+	top.imbalance = maxf(top.imbalance - recovery * delta, 0.0)
+	top.ring_out_risk = _calculate_ring_out_risk(top)
+
+
+func _calculate_ring_out_risk(top: TopState) -> float:
+	var radius := top.position.length()
+	var edge_risk := _smoothstep(
+		arena.wall_radius * 0.7,
+		arena.ring_out_radius,
+		radius
+	)
+	var outward := 0.0
+	if radius > 0.001:
+		outward = maxf(top.velocity.dot(top.position / radius), 0.0)
+	var momentum_risk := _smoothstep(1.5, 9.2, outward)
+	var tilt_risk := _smoothstep(TILT_WARNING, MAX_TILT, top.tilt)
+	return clampf(
+		edge_risk * 0.58 + momentum_risk * 0.27 + tilt_risk * 0.15,
+		0.0,
+		1.0
+	)
+
+
+func _update_risk_states(top: TopState, actor: StringName) -> void:
+	var next_stability_state := (
+		&"critical"
+		if top.tilt >= TILT_CRITICAL
+		else &"wobble" if top.tilt >= TILT_WARNING else &"stable"
+	)
+	var next_ring_risk_state := (
+		&"critical"
+		if top.ring_out_risk >= 0.78
+		else &"warning" if top.ring_out_risk >= 0.5 else &"safe"
+	)
+	var spin_ratio := clampf(
+		top.spin / maxf(top.build.max_spin_speed, 0.001),
+		0.0,
+		1.0
+	)
+	var next_spin_risk_state := (
+		&"critical"
+		if spin_ratio <= 0.16
+		else &"warning" if spin_ratio <= 0.32 else &"safe"
+	)
+	_emit_risk_transition(
+		top,
+		actor,
+		&"stability_state",
+		next_stability_state,
+		&"stability"
+	)
+	_emit_risk_transition(
+		top,
+		actor,
+		&"ring_risk_state",
+		next_ring_risk_state,
+		&"ring_out_risk"
+	)
+	_emit_risk_transition(
+		top,
+		actor,
+		&"spin_risk_state",
+		next_spin_risk_state,
+		&"spin_risk"
+	)
+
+
+func _emit_risk_transition(
+	top: TopState,
+	actor: StringName,
+	property: StringName,
+	next_state: StringName,
+	event_type: StringName
+) -> void:
+	if top.get(property) == next_state:
+		return
+	top.set(property, next_state)
+	events.append({
+		"type": event_type,
+		"actor": actor,
+		"state": next_state,
+		"tilt": _rounded(top.tilt),
+		"spin": _rounded(top.spin),
+		"imbalance": _rounded(top.imbalance),
+		"ring_out_risk": _rounded(top.ring_out_risk)
+	})
 
 
 func _check_result() -> void:
@@ -448,6 +739,15 @@ func _top_snapshot(top: TopState) -> Dictionary:
 		"spin": _rounded(top.spin),
 		"durability": _rounded(top.durability),
 		"tilt": _rounded(top.tilt),
+		"imbalance": _rounded(top.imbalance),
+		"spin_loss_rate": _rounded(top.spin_loss_rate),
+		"spin_ratio": _rounded(clampf(
+			top.spin / maxf(top.build.max_spin_speed, 0.001),
+			0.0,
+			1.0
+		)),
+		"ring_out_risk": _rounded(top.ring_out_risk),
+		"stability_state": top.stability_state,
 		"surface_name": top.surface_name,
 		"control_influence": _rounded(top.control_influence)
 	}

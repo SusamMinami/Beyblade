@@ -18,6 +18,7 @@ func _initialize() -> void:
 func _run() -> void:
 	_test_database()
 	_test_derived_attributes()
+	_test_part_customization()
 	await _test_body_integration()
 	_finish()
 
@@ -83,6 +84,67 @@ func _test_derived_attributes() -> void:
 	_expect(eccentric.stability < standard.stability, "偏心配重必须降低稳定性")
 
 
+func _test_part_customization() -> void:
+	var standard := _calculate(DEFAULT_IDS)
+	var customized := _calculate(
+		DEFAULT_IDS,
+		{
+			"attack_ring.balance_six": {
+				"shape": 70.0,
+				"size": 1.2,
+				"height": 1.25,
+				"material": "alloy",
+				"symmetry": 3
+			}
+		}
+	)
+	_expect(customized.total_mass > standard.total_mass, "合金放大 DIY 必须提高总质量")
+	_expect(
+		customized.moment_of_inertia > standard.moment_of_inertia,
+		"合金放大 DIY 必须提高转动惯量"
+	)
+	_expect(
+		customized.center_of_mass.y > standard.center_of_mass.y,
+		"加高攻击环必须抬高组合质心"
+	)
+	_expect(customized.attack_power > standard.attack_power, "轮廓 DIY 必须提高攻击力")
+
+	var default_customized := _calculate(
+		DEFAULT_IDS,
+		{
+			"attack_ring.balance_six": {
+				"shape": 0.0,
+				"size": 1.0,
+				"height": 1.0,
+				"material": "stock",
+				"symmetry": 2
+			}
+		}
+	)
+	_expect(
+		is_equal_approx(default_customized.total_mass, standard.total_mass),
+		"默认 DIY 参数不能改变基准质量"
+	)
+	_expect(
+		is_equal_approx(
+			default_customized.moment_of_inertia,
+			standard.moment_of_inertia
+		),
+		"默认 DIY 参数不能改变基准惯量"
+	)
+
+	var eccentric_ids := DEFAULT_IDS.duplicate()
+	eccentric_ids[2] = "weight_disc.eccentric"
+	var eccentric := _calculate(eccentric_ids)
+	var raw_part_inertia := 0.0
+	for part in eccentric.get_parts():
+		raw_part_inertia += part.moment_of_inertia
+	_expect(
+		eccentric.moment_of_inertia > raw_part_inertia,
+		"偏心零件必须通过平行轴定理增加组合惯量"
+	)
+
+
 func _test_body_integration() -> void:
 	var body_scene := load("res://scenes/battle/BeybladeBody.tscn") as PackedScene
 	_expect(body_scene != null, "战斗陀螺场景必须可加载")
@@ -128,13 +190,14 @@ func _test_body_integration() -> void:
 	await process_frame
 
 
-func _calculate(ids: Array) -> TopBuildData:
+func _calculate(ids: Array, customizations: Dictionary = {}) -> TopBuildData:
 	return AssemblyCalculator.calculate_by_ids(
 		ids[0],
 		ids[1],
 		ids[2],
 		ids[3],
-		ids[4]
+		ids[4],
+		customizations
 	)
 
 

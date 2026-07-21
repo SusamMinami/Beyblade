@@ -1,3 +1,5 @@
+export const SIMULATION_VERSION = "2026.07.21-web-v2";
+
 export const BATTLE_RESULT = Object.freeze({
   SPIN_OUT: "spin_out",
   RING_OUT: "ring_out",

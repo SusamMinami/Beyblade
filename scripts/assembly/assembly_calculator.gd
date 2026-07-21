@@ -1,6 +1,9 @@
 class_name AssemblyCalculator
 extends RefCounted
 
+const PART_CUSTOMIZATION := preload(
+	"res://scripts/assembly/part_customization.gd"
+)
 const REFERENCE_MASS := 1.22
 const REFERENCE_INERTIA := 0.89
 const BASE_SPIN_DECAY := 3.8
@@ -14,14 +17,16 @@ static func calculate_by_ids(
 	core_lock_id: StringName,
 	weight_disc_id: StringName,
 	driver_shaft_id: StringName,
-	tip_id: StringName
+	tip_id: StringName,
+	customizations: Dictionary = {}
 ) -> TopBuildData:
 	return calculate(
 		PartDatabase.get_part(attack_ring_id),
 		PartDatabase.get_part(core_lock_id),
 		PartDatabase.get_part(weight_disc_id),
 		PartDatabase.get_part(driver_shaft_id),
-		PartDatabase.get_part(tip_id)
+		PartDatabase.get_part(tip_id),
+		customizations
 	)
 
 
@@ -30,8 +35,14 @@ static func calculate(
 	core_lock: TopPartResource,
 	weight_disc: TopPartResource,
 	driver_shaft: TopPartResource,
-	tip: TopPartResource
+	tip: TopPartResource,
+	customizations: Dictionary = {}
 ) -> TopBuildData:
+	attack_ring = _customized_part(attack_ring, customizations)
+	core_lock = _customized_part(core_lock, customizations)
+	weight_disc = _customized_part(weight_disc, customizations)
+	driver_shaft = _customized_part(driver_shaft, customizations)
+	tip = _customized_part(tip, customizations)
 	var result := TopBuildData.new()
 	result.attack_ring = _accept_type(attack_ring, TopPartResource.PartType.ATTACK_RING)
 	result.core_lock = _accept_type(core_lock, TopPartResource.PartType.CORE_LOCK)
@@ -46,7 +57,7 @@ static func calculate(
 
 	result.total_mass = _sum_mass(parts)
 	result.center_of_mass = _calculate_center_of_mass(parts, result.total_mass)
-	result.moment_of_inertia = _sum_inertia(parts)
+	result.moment_of_inertia = _sum_inertia(parts, result.center_of_mass)
 	result.contact_area = _sum_contact_area(parts)
 
 	result.friction = clampf(
@@ -118,6 +129,21 @@ static func calculate(
 	return result
 
 
+static func _customized_part(
+	part: TopPartResource,
+	customizations: Dictionary
+) -> TopPartResource:
+	if part == null:
+		return null
+	var value = customizations.get(
+		String(part.part_id),
+		customizations.get(part.part_id, {})
+	)
+	if not value is Dictionary:
+		return part
+	return PART_CUSTOMIZATION.apply_to_part(part, value)
+
+
 static func _accept_type(
 	part: TopPartResource,
 	expected_type: TopPartResource.PartType
@@ -134,10 +160,17 @@ static func _sum_mass(parts: Array[TopPartResource]) -> float:
 	return total
 
 
-static func _sum_inertia(parts: Array[TopPartResource]) -> float:
+static func _sum_inertia(
+	parts: Array[TopPartResource],
+	center_of_mass: Vector3
+) -> float:
 	var total := 0.0
 	for part in parts:
-		total += part.moment_of_inertia
+		var offset := part.center_of_mass_offset - center_of_mass
+		total += (
+			part.moment_of_inertia
+			+ part.mass * (offset.x * offset.x + offset.z * offset.z)
+		)
 	return total
 
 

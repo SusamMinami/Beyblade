@@ -2,6 +2,12 @@
 
 ## 权威边界
 
+当前冻结模拟版本：
+
+```text
+2026.07.21-web-v2
+```
+
 `BattleSimulation` 是战斗规则的唯一权威。它负责：
 
 - 固定 `1/60s` 步长推进。
@@ -34,8 +40,10 @@ Web 与 Godot 共享：
 - 三张地图的 `wall_radius`、`ring_out_radius` 和 `bowl_force`。
 - 复合地图 `3.1 / 5.9` 两个材质分区半径。
 - AI、碰撞、移动衰减、胜负和计时公式。
+- 发射高度、失衡、擦地损耗、风险状态和碰撞遥测。
+- DIY 尺寸、高度、轮廓、对称、材料倍率和平行轴惯量。
 
-`tests/battle/battle_simulation_test.gd` 使用 Web 生成的固定种子快照作为金标。
+`tests/battle/battle_simulation_test.gd` 使用最新 Web 规则生成的固定种子快照作为金标。
 跨 JavaScript 与 GDScript 允许 `1e-4` 浮点误差，不允许结果、事件或胜负原因漂移。
 
 ## 后续异步 PVP

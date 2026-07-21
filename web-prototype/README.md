@@ -113,6 +113,6 @@ new BattleSimulation({
 碰撞前后的 `tilt`、`spin`、`imbalance`、`durability` 及对应变化量，方便导出后
 分析平衡性。日志最多保留最近 200 次碰撞。
 
-当前失衡与 DIY 规则优先在 Web 原型验证，尚未同步到 Godot
-`BattleSimulation`。跨运行时快照对齐前，不应把这版 Web 对局作为异步 PVP
-正式结算依据。
+失衡、风险状态、发射高度、DIY 材料和组合惯量规则已同步到 Godot
+`BattleSimulation` 与 Godot v2 存档。两端当前冻结模拟版本为
+`2026.07.21-web-v2`，继续使用固定种子金标防止规则漂移。

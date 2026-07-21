@@ -16,6 +16,9 @@ func _run() -> void:
 	var game_state = root.get_node("/root/GameState")
 	var original_save_path: String = game_state.save_path
 	var original_coins: int = game_state.coins
+	var original_tutorial: Dictionary = game_state.tutorial.duplicate(true)
+	var original_tuning: Dictionary = game_state.battle_tuning.duplicate(true)
+	var original_sound: bool = game_state.sound_enabled
 	game_state.save_path = TEST_SAVE_PATH
 
 	var screen := BATTLE_SCREEN_SCENE.instantiate()
@@ -33,6 +36,10 @@ func _run() -> void:
 	_expect(
 		screen.get_node_or_null("%LaunchDirectionSlider") != null,
 		"战斗场景必须提供发射方向"
+	)
+	_expect(
+		screen.get_node_or_null("%LaunchHeightSlider") != null,
+		"战斗场景必须提供发射高度"
 	)
 	_expect(
 		screen.get_node_or_null("%LaunchAngleSlider") != null,
@@ -83,6 +90,9 @@ func _run() -> void:
 	screen.free()
 	await process_frame
 	game_state.coins = original_coins
+	game_state.tutorial = original_tutorial
+	game_state.battle_tuning = original_tuning
+	game_state.sound_enabled = original_sound
 	game_state.save_path = original_save_path
 	if FileAccess.file_exists(TEST_SAVE_PATH):
 		DirAccess.remove_absolute(

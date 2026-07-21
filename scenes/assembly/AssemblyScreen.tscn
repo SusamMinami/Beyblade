@@ -213,7 +213,7 @@ grow_vertical = 0
 
 [node name="HintLabel" type="Label" parent="Overlay/HintPill"]
 layout_mode = 2
-text = "拖动旋转 · 点击模型层选中 · 再次点击切换款式"
+text = "拖动旋转 · 点击部件展开 · 再次点击进入深度 DIY · 横扫切换出战槽"
 horizontal_alignment = 1
 vertical_alignment = 1
 theme_override_font_sizes/font_size = 13
@@ -280,6 +280,7 @@ size_flags_horizontal = 3
 text = "05 轴尖"
 
 [node name="PartEditor" type="PanelContainer" parent="Overlay/BottomDock/BottomColumn"]
+unique_name_in_owner = true
 layout_mode = 2
 
 [node name="EditorColumn" type="VBoxContainer" parent="Overlay/BottomDock/BottomColumn/PartEditor"]
@@ -328,10 +329,10 @@ layout_mode = 2
 theme_override_constants/separation = 10
 
 [node name="ConfigButton" type="Button" parent="Overlay/BottomDock/BottomColumn/FooterRow"]
+unique_name_in_owner = true
 layout_mode = 2
 size_flags_horizontal = 3
-disabled = true
-text = "配方槽 · 即将开放"
+text = "切换出战槽 · 01/03"
 
 [node name="NextButton" type="Button" parent="Overlay/BottomDock/BottomColumn/FooterRow"]
 layout_mode = 2
@@ -349,4 +350,5 @@ text = "确认组装 / 选择地图"
 [connection signal="item_selected" from="Overlay/BottomDock/BottomColumn/PartEditor/EditorColumn/VariantRow/PartOptions" to="." method="_on_part_options_item_selected"]
 [connection signal="pressed" from="Overlay/BottomDock/BottomColumn/PartEditor/EditorColumn/VariantRow/PreviousVariantButton" to="." method="_on_previous_variant_pressed"]
 [connection signal="pressed" from="Overlay/BottomDock/BottomColumn/PartEditor/EditorColumn/VariantRow/NextVariantButton" to="." method="_on_next_variant_pressed"]
+[connection signal="pressed" from="Overlay/BottomDock/BottomColumn/FooterRow/ConfigButton" to="." method="_on_config_button_pressed"]
 [connection signal="pressed" from="Overlay/BottomDock/BottomColumn/FooterRow/NextButton" to="." method="_on_next_button_pressed"]
