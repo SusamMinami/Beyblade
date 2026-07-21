@@ -41,9 +41,19 @@ func send_message(msg: Dictionary) -> void:
 	if not is_connected():
 		return
 	_seq += 1
-	msg["seq"] = _seq
-	var json_str := JSON.stringify(msg)
-	_ws.send_text(json_str)
+	if msg.has("_binary") and msg["_binary"] is PackedByteArray:
+		_ws.send(msg["_binary"], WebSocketPeer.WRITE_MODE_BINARY)
+	elif msg.has("_text"):
+		_ws.send_text(str(msg["_text"]))
+	else:
+		var payload: PackedByteArray = msg.get("payload", PackedByteArray())
+		_ws.send(payload, WebSocketPeer.WRITE_MODE_BINARY)
+
+
+func send_binary(data: PackedByteArray) -> void:
+	if is_connected():
+		_seq += 1
+		_ws.send(data, WebSocketPeer.WRITE_MODE_BINARY)
 
 
 func poll(delta: float = -1.0) -> void:
@@ -63,7 +73,7 @@ func poll(delta: float = -1.0) -> void:
 			_heartbeat_timer += dt
 			if _heartbeat_timer >= _heartbeat_interval:
 				_heartbeat_timer = 0.0
-				send_message(BattleProtocol.make_envelope(BattleProtocol.MSG_PING))
+				send_binary(BattleStateCodec.encode_binary_ping())
 			_drain_messages()
 		WebSocketPeer.STATE_CONNECTING:
 			pass
@@ -74,10 +84,19 @@ func poll(delta: float = -1.0) -> void:
 func _drain_messages() -> void:
 	while _ws.get_available_packet_count() > 0:
 		var packet := _ws.get_packet()
-		var packet_str := packet.get_string_from_utf8()
-		var parsed: Variant = JSON.parse_string(packet_str)
-		if parsed is Dictionary:
-			var msg: Dictionary = parsed as Dictionary
-			if msg.get("type", "") == BattleProtocol.MSG_PONG:
-				continue
-			emit_signal("message_received", msg)
+		if packet.size() < 1:
+			continue
+		var first_byte := packet[0]
+		var msg: Dictionary = {}
+		if first_byte == ord('{') or first_byte == ord('['):
+			var parsed: Variant = JSON.parse_string(packet.get_string_from_utf8())
+			if parsed is Dictionary:
+				msg = parsed as Dictionary
+		else:
+			msg = BattleStateCodec.decode_binary_message(packet)
+		if msg.is_empty():
+			continue
+		var type_val: Variant = msg.get("type", "")
+		if type_val == BattleProtocol.MSG_PONG or (type_val is String and type_val == "pong"):
+			continue
+		emit_signal("message_received", msg)

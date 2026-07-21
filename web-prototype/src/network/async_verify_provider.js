@@ -7,14 +7,23 @@ import {
   dequantizeHeight,
   dequantizeDirection,
   dequantizeAngle,
-  dequantizeVector2,
-  encodeInputFrame,
-  encodeLaunchCommand,
+  dequantizeControl,
   quantizePower,
   quantizeHeight,
   quantizeDirection,
   quantizeAngle,
+  quantizeControl,
 } from "./protocol.js";
+
+const dequantizeVector2 = (d) => ({ x: dequantizeControl(d.x | 0), y: dequantizeControl(d.y | 0) });
+
+function _encInputFrame({ frame, slot, cx, cy, flags }) {
+  return { f: frame, s: slot, cx: cx | 0, cy: cy | 0, fl: (flags || 0) & 0x3f };
+}
+function _encLaunchCommand(cmd) {
+  if (!cmd) return null;
+  return { power_q: cmd.power_q ?? cmd.p, height_q: cmd.height_q ?? cmd.h, direction_q: cmd.direction_q ?? cmd.d, angle_q: cmd.angle_q ?? cmd.a, slot: cmd.slot };
+}
 
 export async function sha256Hex(str) {
   const buf = new TextEncoder().encode(str);
@@ -183,8 +192,8 @@ export class AsyncVerifyProvider {
     const eCtrl = dequantizeVector2({ x: eRaw.cx, y: eRaw.cy });
     this._recorder.push({
       f: currentFrame,
-      p: encodeInputFrame({ frame: currentFrame, slot: SLOT.PLAYER, cx: pRaw.cx, cy: pRaw.cy, flags: 0 }),
-      e: encodeInputFrame({ frame: currentFrame, slot: SLOT.ENEMY, cx: eRaw.cx, cy: eRaw.cy, flags: 0 }),
+      p: _encInputFrame({ frame: currentFrame, slot: SLOT.PLAYER, cx: pRaw.cx, cy: pRaw.cy, flags: 0 }),
+      e: _encInputFrame({ frame: currentFrame, slot: SLOT.ENEMY, cx: eRaw.cx, cy: eRaw.cy, flags: 0 }),
     });
     this.sim.step(FIXED_DT, pCtrl, eCtrl);
     this._recordFrame(currentFrame, false);
@@ -214,8 +223,8 @@ export class AsyncVerifyProvider {
       seed: this.sim.seed,
       arena_id: this.sim.arena?.id || "standard",
       launches: {
-        player: encodeLaunchCommand(this._playerLaunch),
-        enemy: encodeLaunchCommand(this._enemyLaunch),
+        player: _encLaunchCommand(this._playerLaunch),
+        enemy: _encLaunchCommand(this._enemyLaunch),
       },
       inputs: this._recorder,
       checkpoints: this._checkpoints,

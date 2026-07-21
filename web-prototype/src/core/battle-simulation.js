@@ -86,12 +86,25 @@ export class BattleSimulation {
   reset() {
     this.phase = "ready";
     this.time = 0;
+    this.frame = 0;
     this.result = null;
     this.events = [];
     this.collisionCooldown = 0;
     this.collisionLog = [];
     this.player = createTop(this.playerBuild, { x: 0, y: 4.45 });
     this.enemy = createTop(this.enemyBuild, { x: 0, y: -4.45 });
+  }
+
+  getSnapshot() {
+    return {
+      phase: this.phase,
+      frame: this.frame | 0,
+      time: this.time,
+      result: this.result,
+      player: this.player,
+      enemy: this.enemy,
+      events: this.events,
+    };
   }
 
   setTuning(nextTuning) {
@@ -138,17 +151,48 @@ export class BattleSimulation {
     });
   }
 
-  step(delta, playerControl = { x: 0, y: 0 }) {
+  _applyLaunchToTop(top, build, power, height, direction, angle) {
+    const launchPower = clamp(0.35 + (power / 255) * 0.65, 0.35, 1);
+    const launchHeight = clamp(height / 255, 0, 1);
+    const launchDir = direction / 10;
+    const launchAngle = clamp(angle / 127, -1, 1);
+    const speed =
+      (3.4 + build.launchForwardImpulse * launchPower) *
+      (0.94 + launchHeight * 0.12) *
+      this.tuning.speedScale;
+    top.velocity = {
+      x: Math.sin(launchDir) * speed + launchAngle * 0.72,
+      y: -Math.cos(launchDir) * speed,
+    };
+    top.spin =
+      build.maxSpinSpeed *
+      launchPower *
+      (1 - Math.abs(launchAngle) * 0.08) *
+      (1 - launchHeight * 0.035);
+    top.tilt = Math.abs(launchAngle) * 0.18 + Math.max(launchHeight - 0.55, 0) * 0.08;
+  }
+
+  launchExplicit(playerCmd, enemyCmd) {
+    this.reset();
+    this.phase = "running";
+    this._applyLaunchToTop(this.player, this.playerBuild, playerCmd.power_q ?? playerCmd.p, playerCmd.height_q ?? playerCmd.h, playerCmd.direction_q ?? playerCmd.d, playerCmd.angle_q ?? playerCmd.a);
+    this._applyLaunchToTop(this.enemy, this.enemyBuild, enemyCmd.power_q ?? enemyCmd.p, enemyCmd.height_q ?? enemyCmd.h, enemyCmd.direction_q ?? enemyCmd.d, enemyCmd.angle_q ?? enemyCmd.a);
+    this.enemy.velocity.y = -this.enemy.velocity.y;
+    this.events.push({ type: "launch", power: 0.86, height: 0.45 });
+  }
+
+  step(delta, playerControl = { x: 0, y: 0 }, enemyControl = null) {
     this.events = [];
     if (this.phase !== "running") return;
 
     const dt = clamp(delta, 0, 1 / 30);
     this.time += dt;
+    this.frame = (this.frame | 0) + 1;
     this.collisionCooldown = Math.max(this.collisionCooldown - dt, 0);
 
-    const enemyControl = this._getEnemyControl();
+    const enemyCtrl = enemyControl !== null ? enemyControl : this._getEnemyControl();
     this._integrateTop(this.player, playerControl, dt, false);
-    this._integrateTop(this.enemy, enemyControl, dt, true);
+    this._integrateTop(this.enemy, enemyCtrl, dt, true);
     this._resolveCollision();
     this._updateTilt(this.player, dt);
     this._updateTilt(this.enemy, dt);

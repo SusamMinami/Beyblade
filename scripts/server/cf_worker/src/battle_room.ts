@@ -1,23 +1,26 @@
-import { MSG, makeEnvelope, validateLaunchCommand, validateInputFrame, errorResponse, PROTOCOL_VERSION, SIMULATION_VERSION } from "./protocol";
+import {
+  MSG, PROTOCOL_VERSION, SIMULATION_VERSION,
+  decodeMessage, validateLaunchCommand, validateInputFrame,
+  encodeWelcome, encodeError, encodeLaunchWindow, encodeLaunchBoth,
+  encodeInputBatch, encodePong, encodeResult, encodeRoomState,
+  encodeReplayAck, encodeHashCheck,
+} from "./protocol";
 
 type Attachment = {
   slot: number;
   name: string;
   ready: boolean;
   launched: boolean;
-  seq: number;
 };
 
 type PersistedBattle = {
   roomId: string;
-  mode: string;
   arenaId: string;
   seed: number;
   created: number;
   started: boolean;
   finished: boolean;
   launchCmds: Record<number, any>;
-  lastFrame: number;
   result: any;
   idleDeadline: number;
 };
@@ -25,6 +28,7 @@ type PersistedBattle = {
 const STORAGE_KEY = "battle";
 const IDLE_TIMEOUT_MS = 60_000;
 const ALARM_BUFFER_MS = 5_000;
+const DEFAULT_ARENA = "standard";
 
 export class BattleRoom {
   state: DurableObjectState;
@@ -44,14 +48,12 @@ export class BattleRoom {
   _defaultBattle(roomId: string): PersistedBattle {
     return {
       roomId,
-      mode: "frame_sync",
-      arenaId: "standard",
+      arenaId: DEFAULT_ARENA,
       seed: Math.floor(Math.random() * 0xffffffff),
       created: Date.now(),
       started: false,
       finished: false,
       launchCmds: {},
-      lastFrame: 0,
       result: null,
       idleDeadline: 0,
     };
@@ -120,24 +122,26 @@ export class BattleRoom {
 
   async _handleWebSocket(request: Request): Promise<Response> {
     const url = new URL(request.url);
-    const slotParam = url.searchParams.get("slot");
 
     const existingAttachments = this.state.getWebSockets()
       .map((ws) => ws.deserializeAttachment() as Attachment | null)
       .filter((a): a is Attachment => a !== null);
 
     const occupied = new Set(existingAttachments.map((a) => a.slot));
+    const slotParam = url.searchParams.get("slot");
     let requestedSlot: number;
     if (slotParam != null) {
       requestedSlot = parseInt(slotParam);
     } else {
       requestedSlot = occupied.has(0) ? (occupied.has(1) ? -1 : 1) : 0;
     }
+
+    const pair = new WebSocketPair();
+    const [client, server] = Object.values(pair) as [WebSocket, WebSocket];
+    this.state.acceptWebSocket(server);
+
     if (requestedSlot < 0 || requestedSlot > 1 || occupied.has(requestedSlot)) {
-      const pair = new WebSocketPair();
-      const [client, server] = Object.values(pair) as [WebSocket, WebSocket];
-      this.state.acceptWebSocket(server);
-      server.send(JSON.stringify(errorResponse(400, "Slot unavailable")));
+      server.send(encodeError(400, "Slot unavailable"));
       server.close(1008, "Slot unavailable");
       return new Response(null, { status: 101, webSocket: client });
     }
@@ -148,27 +152,22 @@ export class BattleRoom {
       name,
       ready: false,
       launched: false,
-      seq: 0,
     };
-
-    const pair = new WebSocketPair();
-    const [client, server] = Object.values(pair) as [WebSocket, WebSocket];
-    this.state.acceptWebSocket(server);
     server.serializeAttachment(attachment);
 
-    server.send(JSON.stringify(makeEnvelope(MSG.WELCOME, {
-      slot: requestedSlot,
-      protocol_version: PROTOCOL_VERSION,
-      simulation_version: SIMULATION_VERSION,
-      seed: this.battle.seed,
-      arena_id: this.battle.arenaId,
-      server_time: Date.now(),
-    })));
+    server.send(encodeWelcome(requestedSlot, this.battle.seed, this.battle.arenaId, Date.now()));
 
     await this._broadcastSystem();
     await this._scheduleIdleAlarm();
 
     return new Response(null, { status: 101, webSocket: client });
+  }
+
+  _forEachSession(fn: (ws: WebSocket, att: Attachment) => void): void {
+    for (const ws of this.state.getWebSockets()) {
+      const att = ws.deserializeAttachment() as Attachment | null;
+      if (att) fn(ws, att);
+    }
   }
 
   _findWsBySlot(slot: number): WebSocket | null {
@@ -179,66 +178,45 @@ export class BattleRoom {
     return null;
   }
 
-  _forEachSession(fn: (ws: WebSocket, att: Attachment) => void): void {
-    for (const ws of this.state.getWebSockets()) {
-      const att = ws.deserializeAttachment() as Attachment | null;
-      if (att) fn(ws, att);
-    }
-  }
-
-  _send(ws: WebSocket, msg: unknown): void {
+  _sendBinary(ws: WebSocket, data: ArrayBuffer): void {
     try {
-      if (ws.readyState === WebSocket.OPEN) {
-        ws.send(JSON.stringify(msg));
-      }
+      if (ws.readyState === WebSocket.OPEN) ws.send(data);
     } catch (e) {
       console.error("Send error", e);
     }
   }
 
-  async _broadcast(msg: unknown): Promise<void> {
-    const raw = JSON.stringify(msg);
-    const all = this.state.getWebSockets();
-    for (const ws of all) {
-      try {
-        if (ws.readyState === WebSocket.OPEN) ws.send(raw);
-      } catch {}
-    }
-  }
-
   async _broadcastSystem(): Promise<void> {
-    const players: Array<{ slot: number; name: string; ready: boolean } | null> = [null, null];
+    const players: Array<{ name: string; ready: boolean } | null> = [null, null];
     this._forEachSession((_ws, att) => {
-      players[att.slot] = { slot: att.slot, name: att.name, ready: att.ready };
+      players[att.slot] = { name: att.name, ready: att.ready };
     });
-    await this._broadcast({
-      type: "room_state",
-      data: {
-        started: this.battle.started,
-        players,
-      },
-    });
+    const msg = encodeRoomState(this.battle.started, this.battle.finished, players);
+    for (const ws of this.state.getWebSockets()) {
+      this._sendBinary(ws, msg);
+    }
   }
 
   async webSocketMessage(ws: WebSocket, message: ArrayBuffer | string): Promise<void> {
     const att = ws.deserializeAttachment() as Attachment | null;
     if (!att) return;
 
-    let msg: any;
-    try {
-      const text = typeof message === "string" ? message : new TextDecoder().decode(message);
-      msg = JSON.parse(text);
-    } catch (e) {
-      console.error("Parse error", e);
-      return;
+    let buf: ArrayBuffer;
+    if (typeof message === "string") {
+      buf = new TextEncoder().encode(message).buffer as ArrayBuffer;
+    } else {
+      buf = message;
     }
 
-    const { type, data } = msg;
+    const decoded = decodeMessage(buf);
+    if (!decoded) return;
+    const { type, data } = decoded;
+
     let stateChanged = false;
 
     switch (type) {
       case MSG.PING:
-        this._send(ws, makeEnvelope(MSG.PONG, {}));
+        this._sendBinary(ws, encodePong());
         break;
 
       case MSG.HELLO:
@@ -263,10 +241,17 @@ export class BattleRoom {
             if (keys.length === 2) {
               const p0 = this.battle.launchCmds[0];
               const p1 = this.battle.launchCmds[1];
-              await this._broadcast(makeEnvelope(MSG.LAUNCH_BOTH, { player: p0, enemy: p1 }));
+              this._forEachSession((w, a) => {
+                const own = a.slot === 0 ? p0 : p1;
+                const opp = a.slot === 0 ? p1 : p0;
+                this._sendBinary(w, encodeLaunchBoth(
+                  { p: own.p, h: own.h, d: own.d, a: own.a },
+                  { p: opp.p, h: opp.h, d: opp.d, a: opp.a },
+                ));
+              });
             }
           } else {
-            this._send(ws, errorResponse(400, "Invalid launch command"));
+            this._sendBinary(ws, encodeError(400, "Invalid launch command"));
           }
         }
         break;
@@ -276,22 +261,20 @@ export class BattleRoom {
           const frames: any[] = Array.isArray(data?.frames) ? data.frames : [];
           const validFrames: any[] = [];
           for (const f of frames) {
-            if (validateInputFrame(f)) {
-              validFrames.push(f);
-            }
+            if (validateInputFrame(f)) validFrames.push(f);
           }
           if (validFrames.length > 0) {
-            await this._relayInputs(att.slot, validFrames);
+            await this._relayInputs(att.slot, validFrames, ws);
           }
         }
         break;
 
       case MSG.HASH_CHECK:
-        await this._relayHashCheck(ws, att.slot, data);
+        await this._relayHashCheck(att.slot, data);
         break;
 
       case MSG.REPLAY_SUBMIT:
-        await this._handleReplaySubmit(ws, data);
+        await this._handleReplaySubmit(ws, att.slot, data);
         break;
     }
 
@@ -306,35 +289,35 @@ export class BattleRoom {
     if (slots[0]?.ready && slots[1]?.ready && !this.battle.started) {
       this.battle.started = true;
       await this._persist();
-      await this._broadcast(makeEnvelope(MSG.LAUNCH_WINDOW, {
-        window_ms: 15000,
-        seed: this.battle.seed,
-        arena_id: this.battle.arenaId,
-      }));
+      const msg = encodeLaunchWindow(15000, this.battle.seed, this.battle.arenaId);
+      for (const ws of this.state.getWebSockets()) this._sendBinary(ws, msg);
     }
   }
 
-  async _relayInputs(_senderSlot: number, frames: any[]): Promise<void> {
-    const envelope = makeEnvelope(MSG.INPUT_BATCH, { frames });
-    await this._broadcast(envelope);
+  async _relayInputs(senderSlot: number, frames: any[], senderWs: WebSocket): Promise<void> {
+    const otherWs = this._findWsBySlot(1 - senderSlot);
+    if (!otherWs) return;
+    const msg = encodeInputBatch(senderSlot, frames);
+    this._sendBinary(otherWs, msg);
   }
 
-  async _relayHashCheck(senderWs: WebSocket, senderSlot: number, data: any): Promise<void> {
+  async _relayHashCheck(senderSlot: number, data: any): Promise<void> {
     const other = this._findWsBySlot(1 - senderSlot);
     if (other) {
-      this._send(other, makeEnvelope(MSG.HASH_CHECK, data));
+      const frame = data?.frame | 0;
+      const hash = String(data?.hash || "");
+      this._sendBinary(other, encodeHashCheck(frame, hash));
     }
   }
 
-  async _handleReplaySubmit(ws: WebSocket, data: any): Promise<void> {
-    const att = ws.deserializeAttachment() as Attachment | null;
-    if (!att) return;
-    const replayId = `${this.battle.roomId}_${att.slot}_${Date.now()}`;
+  async _handleReplaySubmit(ws: WebSocket, slot: number, data: any): Promise<void> {
+    const replayId = `${this.battle.roomId}_${slot}_${Date.now()}`;
     try {
-      await this.env.REPLAYS?.put(`replays/${replayId}.json`, JSON.stringify(data));
-      this._send(ws, makeEnvelope(MSG.REPLAY_ACK, { replay_id: replayId, accepted: true }));
+      const json = typeof data === "string" ? data : JSON.stringify(data || {});
+      await this.env.REPLAYS?.put(`replays/${replayId}.json`, json);
+      this._sendBinary(ws, encodeReplayAck(replayId, true));
     } catch (e) {
-      this._send(ws, makeEnvelope(MSG.REPLAY_ACK, { replay_id: replayId, accepted: false, error: String(e) }));
+      this._sendBinary(ws, encodeReplayAck(replayId, false, String(e)));
     }
   }
 
@@ -342,9 +325,11 @@ export class BattleRoom {
     const att = ws.deserializeAttachment() as Attachment | null;
     if (att && this.battle.started && !this.battle.finished) {
       this.battle.finished = true;
-      this.battle.result = { winner: 1 - att.slot, reason: "disconnect" };
+      const winnerSlot = 1 - att.slot;
+      this.battle.result = { winner: winnerSlot, reason: "disconnect" };
       await this._persist();
-      await this._broadcast(makeEnvelope(MSG.RESULT, this.battle.result));
+      const msg = encodeResult(winnerSlot, "disconnect");
+      for (const w of this.state.getWebSockets()) this._sendBinary(w, msg);
     }
     await this._broadcastSystem();
     await this._scheduleIdleAlarm();
