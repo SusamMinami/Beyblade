@@ -1335,6 +1335,8 @@ class BeybladeApp {
     shell.dataset.screen = screen;
     shell.dataset.arena = this.selectedArena.id;
     if (screen !== "battle") {
+      this.root.querySelector("#launch-controls").classList.add("is-hidden");
+      this.root.querySelector("#battle-controls").classList.add("is-hidden");
       this.root.querySelector("#result-card").classList.add("is-hidden");
       this.root.querySelector("#result-card").classList.remove("is-victory");
       this._showVictoryCelebration(false);
@@ -1667,7 +1669,7 @@ class BeybladeApp {
       this.simulation?.enemy.spin ?? 0,
       this.simulation?.phase === "running" && !this.paused,
     );
-    this.stage.update(delta, this.simulation);
+    this.stage.update(delta, this.simulation, this.paused);
     requestAnimationFrame((nextTime) => this._tick(nextTime));
   }
 

@@ -3,8 +3,14 @@ extends Node
 const PART_CUSTOMIZATION := preload(
 	"res://scripts/assembly/part_customization.gd"
 )
+const COMPETITIVE_PROFILE := preload(
+	"res://scripts/competitive/competitive_profile.gd"
+)
+const REGIONAL_MODELS := preload(
+	"res://scripts/competitive/regional_competition_models.gd"
+)
 const DEFAULT_SAVE_PATH := "user://game_state.cfg"
-const STORAGE_VERSION := 2
+const STORAGE_VERSION := 3
 const LOADOUT_COUNT := 3
 const DEFAULT_ATTACK_RING_ID := &"attack_ring.balance_six"
 const DEFAULT_CORE_LOCK_ID := &"core_lock.standard"
@@ -84,6 +90,11 @@ const VALID_MAPS := [
 	"金属高速竞技场",
 	"复合材质竞技场"
 ]
+const PRACTICE_MAP_IDS_BY_NAME := {
+	"标准碗形竞技场": "standard",
+	"金属高速竞技场": "metal",
+	"复合材质竞技场": "composite"
+}
 const TUNING_LIMITS := {
 	"damage_scale": Vector2(0.5, 1.8),
 	"spin_scale": Vector2(0.6, 1.6),
@@ -119,6 +130,8 @@ var tutorial := {
 	"completed": false,
 	"first_reward_claimed": false
 }
+var competitive_profile: Dictionary = {}
+var regional_cache: Dictionary = {}
 
 
 func _init() -> void:
@@ -330,6 +343,16 @@ func get_battle_reward(won: bool) -> int:
 func apply_battle_result(won: bool) -> int:
 	var reward := get_battle_reward(won)
 	coins += reward
+	var practice_map_id := str(
+		PRACTICE_MAP_IDS_BY_NAME.get(selected_map, "")
+	)
+	if not practice_map_id.is_empty():
+		competitive_profile = COMPETITIVE_PROFILE.record_practice_result(
+			competitive_profile,
+			practice_map_id,
+			won,
+			int(Time.get_unix_time_from_system())
+		)
 	if tutorial.stage == TUTORIAL_FIRST_BATTLE:
 		tutorial.first_reward_claimed = true
 		tutorial.stage = TUTORIAL_BUY_FIRST_PART
@@ -338,6 +361,93 @@ func apply_battle_result(won: bool) -> int:
 		tutorial.completed = true
 	save_state()
 	return reward
+
+
+func record_practice_result(
+	map_id: String,
+	won: bool,
+	completed_at: int = 0
+) -> void:
+	if map_id not in COMPETITIVE_PROFILE.PRACTICE_MAP_IDS:
+		push_warning("忽略未知练习地图：%s" % map_id)
+		return
+	competitive_profile = COMPETITIVE_PROFILE.record_practice_result(
+		competitive_profile,
+		map_id,
+		won,
+		completed_at
+	)
+	save_state()
+
+
+func is_competitive_unlocked() -> bool:
+	return COMPETITIVE_PROFILE.is_competitive_unlocked(competitive_profile)
+
+
+func get_practice_wins(map_id: String) -> int:
+	return COMPETITIVE_PROFILE.get_practice_wins(
+		competitive_profile,
+		map_id
+	)
+
+
+func get_competitive_profile() -> Dictionary:
+	return COMPETITIVE_PROFILE.normalize(competitive_profile)
+
+
+func get_ranked_profile() -> Dictionary:
+	return COMPETITIVE_PROFILE.normalize_ranked_profile(
+		competitive_profile.get("ranked", {})
+	)
+
+
+func get_regional_profile() -> Dictionary:
+	return COMPETITIVE_PROFILE.normalize_regional_profile(
+		competitive_profile.get("regional", {})
+	)
+
+
+func get_regional_cache() -> Dictionary:
+	return REGIONAL_MODELS.normalize_cache(regional_cache)
+
+
+func apply_ranked_server_snapshot(snapshot: Dictionary) -> bool:
+	var current := get_ranked_profile()
+	if not COMPETITIVE_PROFILE.should_accept_server_snapshot(
+		current,
+		snapshot
+	):
+		return false
+	competitive_profile.ranked = (
+		COMPETITIVE_PROFILE.normalize_ranked_profile(snapshot)
+	)
+	save_state()
+	return true
+
+
+func apply_regional_profile_server_snapshot(snapshot: Dictionary) -> bool:
+	var current := get_regional_profile()
+	if not COMPETITIVE_PROFILE.should_accept_server_snapshot(
+		current,
+		snapshot
+	):
+		return false
+	competitive_profile.regional = (
+		COMPETITIVE_PROFILE.normalize_regional_profile(snapshot)
+	)
+	save_state()
+	return true
+
+
+func apply_regional_cache_server_snapshot(snapshot: Dictionary) -> bool:
+	if not COMPETITIVE_PROFILE.should_accept_server_snapshot(
+		regional_cache,
+		snapshot
+	):
+		return false
+	regional_cache = REGIONAL_MODELS.normalize_cache(snapshot)
+	save_state()
+	return true
 
 
 func skip_tutorial() -> void:
@@ -349,6 +459,8 @@ func skip_tutorial() -> void:
 func save_state() -> Error:
 	_ensure_loadouts()
 	_sync_legacy_fields()
+	competitive_profile = COMPETITIVE_PROFILE.normalize(competitive_profile)
+	regional_cache = REGIONAL_MODELS.normalize_cache(regional_cache)
 	var config := ConfigFile.new()
 	config.set_value("meta", "version", STORAGE_VERSION)
 	config.set_value("build", "attack_ring_id", String(selected_attack_ring_id))
@@ -376,6 +488,8 @@ func save_state() -> Error:
 		owned_material_ids
 	)
 	config.set_value("progression", "tutorial", tutorial)
+	config.set_value("competitive", "profile", competitive_profile)
+	config.set_value("competitive", "regional_cache", regional_cache)
 	return config.save(save_path)
 
 
@@ -386,6 +500,7 @@ func load_state() -> Error:
 	var error := config.load(save_path)
 	if error != OK:
 		return error
+	var storage_version := int(config.get_value("meta", "version", 1))
 
 	var legacy_build := _load_legacy_build(config)
 	var legacy_colors := {
@@ -425,7 +540,10 @@ func load_state() -> Error:
 	))
 	_load_tuning(config.get_value("settings", "battle_tuning", {}))
 	_load_progression(config)
+	_load_competitive_state(config)
 	_sync_legacy_fields()
+	if storage_version < STORAGE_VERSION:
+		return save_state()
 	return OK
 
 
@@ -475,6 +593,8 @@ func _reset_progression() -> void:
 		"completed": false,
 		"first_reward_claimed": false
 	}
+	competitive_profile = COMPETITIVE_PROFILE.create_default()
+	regional_cache = REGIONAL_MODELS.create_default_cache()
 	_sync_legacy_fields()
 
 
@@ -646,6 +766,20 @@ func _load_progression(config: ConfigFile) -> void:
 		))
 	if tutorial.completed:
 		tutorial.stage = TUTORIAL_COMPLETE
+
+
+func _load_competitive_state(config: ConfigFile) -> void:
+	var storage_version := int(config.get_value("meta", "version", 1))
+	if storage_version < 3:
+		competitive_profile = COMPETITIVE_PROFILE.create_default()
+		regional_cache = REGIONAL_MODELS.create_default_cache()
+		return
+	competitive_profile = COMPETITIVE_PROFILE.normalize(
+		config.get_value("competitive", "profile", {})
+	)
+	regional_cache = REGIONAL_MODELS.normalize_cache(
+		config.get_value("competitive", "regional_cache", {})
+	)
 
 
 func _add_owned_part(part_id: StringName) -> void:

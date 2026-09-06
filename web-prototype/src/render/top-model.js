@@ -1,5 +1,7 @@
 import * as THREE from "three";
+import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { normalizePartCustomization } from "../core/part-customization.js";
+import { applySurfaceFinish, cloneSurfaceMaterial } from "./surface-finish.js";
 
 const SLOT_Y = Object.freeze({
   attackRing: 0.24,
@@ -52,7 +54,7 @@ function createMaterials(colors, materialType = "stock") {
     };
   }
 
-  for (const item of Object.values(materials)) {
+  for (const [name, item] of Object.entries(materials)) {
     if (materialType === "polymer") {
       item.metalness *= 0.35;
       item.roughness = Math.max(item.roughness, 0.48);
@@ -70,6 +72,11 @@ function createMaterials(colors, materialType = "stock") {
       item.roughness = Math.max(item.roughness, 0.78);
       item.color.multiplyScalar(0.72);
     }
+    const finish = woodFinish ? "wood"
+      : materialType === "carbon" ? "carbon"
+        : materialType === "rubber" || name === "rubber" ? "rubber"
+          : item.metalness > 0.65 ? "machined" : "polymer";
+    applySurfaceFinish(item, finish);
     item.needsUpdate = true;
   }
   return materials;
@@ -112,36 +119,36 @@ function radialRingGeometry(
   customization,
 ) {
   const positions = [];
+  const uvs = [];
+  const indices = [];
   const halfHeight = height * 0.5;
-  const point = (angle, radius, y) => [
-    Math.cos(angle) * radius,
-    y,
-    Math.sin(angle) * radius,
+  const bevel = Math.min(height * 0.22, 0.045);
+  // Closed radial section: inner wall, top chamfers, outer wall, bottom.
+  const profile = [
+    [0, bevel, -halfHeight],
+    [0, 0, -halfHeight + bevel],
+    [0, 0, halfHeight - bevel],
+    [0, bevel, halfHeight],
+    [1, -bevel, halfHeight],
+    [1, 0, halfHeight - bevel],
+    [1, 0, -halfHeight + bevel],
+    [1, -bevel, -halfHeight],
+    [0, bevel, -halfHeight],
   ];
-  const triangle = (a, b, c) => positions.push(...a, ...b, ...c);
-  const quad = (a, b, c, d) => {
-    triangle(a, b, c);
-    triangle(a, c, d);
-  };
-
-  for (let index = 0; index < segments; index += 1) {
-    const angleA = (Math.PI * 2 * index) / segments;
-    const angleB = (Math.PI * 2 * (index + 1)) / segments;
-    const outerA = outerRadius(angleA, slot, id, customization);
-    const outerB = outerRadius(angleB, slot, id, customization);
-    const innerBottomA = point(angleA, innerRadius, -halfHeight);
-    const innerBottomB = point(angleB, innerRadius, -halfHeight);
-    const outerBottomA = point(angleA, outerA, -halfHeight);
-    const outerBottomB = point(angleB, outerB, -halfHeight);
-    const innerTopA = point(angleA, innerRadius, halfHeight);
-    const innerTopB = point(angleB, innerRadius, halfHeight);
-    const outerTopA = point(angleA, outerA, halfHeight);
-    const outerTopB = point(angleB, outerB, halfHeight);
-
-    quad(innerTopA, innerTopB, outerTopB, outerTopA);
-    quad(innerBottomA, outerBottomA, outerBottomB, innerBottomB);
-    quad(outerBottomA, outerTopA, outerTopB, outerBottomB);
-    quad(innerBottomB, innerTopB, innerTopA, innerBottomA);
+  const row = segments + 1;
+  for (let layer = 0; layer < profile.length; layer += 1) {
+    const [outer, inset, y] = profile[layer];
+    for (let index = 0; index <= segments; index += 1) {
+      const angle = (Math.PI * 2 * (index % segments)) / segments;
+      const radius = (outer ? outerRadius(angle, slot, id, customization) : innerRadius) + inset;
+      positions.push(Math.cos(angle) * radius, y, Math.sin(angle) * radius);
+      uvs.push(index / segments, layer / (profile.length - 1));
+      if (layer < profile.length - 1 && index < segments) {
+        const a = layer * row + index;
+        const b = a + row;
+        indices.push(a, a + 1, b, a + 1, b + 1, b);
+      }
+    }
   }
 
   const geometry = new THREE.BufferGeometry();
@@ -149,7 +156,18 @@ function radialRingGeometry(
     "position",
     new THREE.Float32BufferAttribute(positions, 3),
   );
+  geometry.setAttribute("uv", new THREE.Float32BufferAttribute(uvs, 2));
+  geometry.setIndex(indices);
   geometry.computeVertexNormals();
+  const normals = geometry.getAttribute("normal");
+  for (let layer = 0; layer < profile.length; layer += 1) {
+    const a = layer * row;
+    const b = a + segments;
+    const normal = new THREE.Vector3().fromBufferAttribute(normals, a)
+      .add(new THREE.Vector3().fromBufferAttribute(normals, b)).normalize();
+    normals.setXYZ(a, normal.x, normal.y, normal.z);
+    normals.setXYZ(b, normal.x, normal.y, normal.z);
+  }
   geometry.computeBoundingSphere();
   return geometry;
 }
@@ -161,14 +179,73 @@ function mesh(geometry, meshMaterial) {
   return instance;
 }
 
-function cylinder(topRadius, bottomRadius, height, segments = 36) {
-  return new THREE.CylinderGeometry(
-    topRadius,
-    bottomRadius,
-    height,
-    segments,
-    2,
-  );
+function cylinder(topRadius, bottomRadius, height, segments = 64) {
+  const bevel = Math.min(height * 0.15, topRadius * 0.12, bottomRadius * 0.12, 0.025);
+  return new THREE.LatheGeometry([
+    new THREE.Vector2(0, -height / 2),
+    new THREE.Vector2(bottomRadius - bevel, -height / 2),
+    new THREE.Vector2(bottomRadius, -height / 2 + bevel),
+    new THREE.Vector2(topRadius, height / 2 - bevel),
+    new THREE.Vector2(topRadius - bevel, height / 2),
+    new THREE.Vector2(0, height / 2),
+  ], segments);
+}
+
+function addTrim(parent, radius, y, thickness, trimMaterial) {
+  const trim = mesh(new THREE.TorusGeometry(radius, thickness, 10, 96), trimMaterial);
+  trim.rotation.x = Math.PI / 2;
+  trim.position.y = y;
+  parent.add(trim);
+}
+
+function bladeGeometry(length, width, height) {
+  const shape = new THREE.Shape();
+  shape.moveTo(-length * 0.5, -width * 0.4);
+  shape.lineTo(length * 0.28, -width * 0.58);
+  shape.lineTo(length * 0.5, -width * 0.12);
+  shape.lineTo(length * 0.32, width * 0.38);
+  shape.lineTo(-length * 0.34, width * 0.5);
+  shape.closePath();
+  const geometry = new THREE.ExtrudeGeometry(shape, {
+    depth: height - 0.018, steps: 1, bevelEnabled: true,
+    bevelSegments: 3, bevelSize: 0.009, bevelThickness: 0.009,
+    curveSegments: 1,
+  });
+  geometry.rotateX(-Math.PI / 2);
+  geometry.translate(0, -height / 2 + 0.009, 0);
+  return geometry;
+}
+
+function addBolts(parent, count, radius, y, materials) {
+  addRadialDetails(parent, count, radius, y,
+    cylinder(0.036, 0.041, 0.028, 6), materials.metal);
+  addRadialDetails(parent, count, radius, y + 0.015,
+    new THREE.BoxGeometry(0.037, 0.002, 0.009), materials.darkMetal);
+}
+
+// Bake repeated fittings by material without losing the five selectable parts.
+function compactPart(group) {
+  group.updateMatrixWorld(true);
+  const batches = new Map();
+  const originals = new Set();
+  group.traverse((child) => {
+    if (!child.isMesh) return;
+    const geometry = child.geometry.index
+      ? child.geometry.toNonIndexed() : child.geometry.clone();
+    geometry.applyMatrix4(child.matrixWorld);
+    const batch = batches.get(child.material) ?? [];
+    batch.push(geometry);
+    batches.set(child.material, batch);
+    originals.add(child.geometry);
+  });
+  group.clear();
+  for (const [partMaterial, geometries] of batches) {
+    const geometry = mergeGeometries(geometries, false);
+    if (!geometry) throw new Error("Incompatible top detail geometry");
+    group.add(mesh(geometry, partMaterial));
+    geometries.forEach((item) => item.dispose());
+  }
+  originals.forEach((item) => item.dispose());
 }
 
 function addRadialDetails(
@@ -196,7 +273,7 @@ function buildAttackRing(id, materials, customization) {
       radialRingGeometry(
         0.5,
         0.22,
-        96,
+        160,
         "attackRing",
         id,
         customization,
@@ -222,15 +299,21 @@ function buildAttackRing(id, materials, customization) {
     lobeCount,
     id === "attack_ring.smash_three" ? 1.02 : 0.94,
     0.08,
-    new THREE.BoxGeometry(...contactSize),
+    bladeGeometry(contactSize[0], contactSize[2], contactSize[1]),
     materials.metal,
     id === "attack_ring.smash_three" ? 0.12 : 0,
   );
+  addRadialDetails(group, lobeCount, 0.79, 0.155,
+    bladeGeometry(0.3, 0.16, 0.075), materials.polymerAccent, 0.12);
+  addRadialDetails(group, lobeCount, 0.84, -0.11,
+    bladeGeometry(0.23, 0.17, 0.07), materials.darkMetal, -0.1);
 
   const bezel = mesh(
-    new THREE.TorusGeometry(0.59, 0.065, 12, 64),
+    new THREE.TorusGeometry(0.59, 0.045, 16, 128),
     materials.darkMetal,
   );
+  addBolts(group, lobeCount, 0.73, 0.203, materials);
+  addTrim(group, 0.515, 0.07, 0.015, materials.metal);
   bezel.rotation.x = Math.PI * 0.5;
   bezel.position.y = 0.12;
   group.add(bezel);
@@ -265,7 +348,7 @@ function buildCoreLock(id, materials, customization) {
   );
   body.position.y = offsetY;
   group.add(body);
-  const cap = mesh(cylinder(0.28, 0.31, 0.085, 20), materials.darkMetal);
+  const cap = mesh(cylinder(0.28, 0.31, 0.085, 48), materials.darkMetal);
   cap.position.y = offsetY + height * 0.52;
   cap.rotation.y = Math.PI / 16;
   group.add(cap);
@@ -275,6 +358,11 @@ function buildCoreLock(id, materials, customization) {
   );
   emblem.position.y = offsetY + height * 0.78;
   group.add(emblem);
+  addTrim(group, 0.185, offsetY + height * 0.78, 0.013, materials.metal);
+  addTrim(group, radius * 0.98, offsetY + height * 0.32, 0.012, materials.polymerAccent);
+  addRadialDetails(group, 3, 0.085, offsetY + height * 0.88,
+    bladeGeometry(0.115, 0.038, 0.023), materials.metal, 0.35);
+  addBolts(group, 3, 0.237, offsetY + height * 0.52 + 0.047, materials);
   addRadialDetails(
     group,
     customization.shape > 0
@@ -297,7 +385,7 @@ function buildWeightDisc(id, materials, customization) {
     radialRingGeometry(
       0.29,
       0.14,
-      80,
+      128,
       "weightDisc",
       id,
       customization,
@@ -309,6 +397,10 @@ function buildWeightDisc(id, materials, customization) {
   const hub = mesh(cylinder(0.34, 0.34, 0.165), materials.darkMetal);
   hub.position.x = offset;
   group.add(hub);
+  for (const radius of [0.38, 0.44, 0.69]) {
+    addTrim(group, radius, 0.073, 0.008, materials.darkMetal);
+  }
+  addTrim(group, 0.335, 0.062, 0.014, materials.metal);
   const insetGroup = new THREE.Group();
   insetGroup.position.x = offset;
   addRadialDetails(
@@ -357,6 +449,11 @@ function buildDriverShaft(id, materials, customization) {
   );
   lower.position.y = offsetY - height * 0.42;
   group.add(lower);
+  for (let index = 0; index < 4; index += 1) {
+    addTrim(group, radius * 1.03, offsetY - height * 0.25 + index * height * 0.14,
+      0.012, index % 2 ? materials.darkMetal : materials.metal);
+  }
+  addTrim(group, 0.255, offsetY + height * 0.38, 0.015, materials.polymerAccent);
   addRadialDetails(
     group,
     customization.shape > 0 ? customization.symmetry : 6,
@@ -414,6 +511,7 @@ function buildTip(id, materials, customization) {
       materials.shadow,
     );
   }
+  addTrim(group, id === "tip.flat_attack" ? 0.197 : 0.16, 0.07, 0.015, materials.metal);
   return group;
 }
 
@@ -440,6 +538,7 @@ export function createTopModel(
     const materials = createMaterials(colors, customization.material);
     top.userData.materials.push(...Object.values(materials));
     const partGroup = builder(partId, materials, customization);
+    compactPart(partGroup);
     partGroup.name = slot;
     partGroup.position.y = SLOT_Y[slot];
     partGroup.userData.baseY = SLOT_Y[slot];
@@ -451,12 +550,14 @@ export function createTopModel(
     partGroup.scale.copy(partGroup.userData.baseScale);
     partGroup.traverse((child) => {
       if (!child.isMesh) return;
-      child.material = child.material.clone();
+      child.material = cloneSurfaceMaterial(child.material);
       top.userData.materials.push(child.material);
     });
     top.userData.partGroups[slot] = partGroup;
     top.add(partGroup);
   });
+  top.updateMatrixWorld(true);
+  top.userData.contactOffset = -new THREE.Box3().setFromObject(top).min.y;
   return top;
 }
 
