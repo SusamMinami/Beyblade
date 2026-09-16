@@ -4229,3 +4229,22 @@ input[type="range"] {
     animation: none;
   }
 }
+
+.arena-asset-status {
+  position: absolute;
+  top: 42%;
+  left: 15%;
+  right: 15%;
+  padding: 16px;
+  color: #e0f4ed;
+  background: #18303a;
+  border: 1px solid #648e95;
+  text-align: center;
+  z-index: 4;
+}
+.arena-asset-status[hidden] { display: none; }
+.game-shell[data-screen="battle"][data-arena="street"] { --accent: #e7b66e; }
+.game-shell[data-screen="battle"][data-arena="ruins"] { --accent: #b194ed; }
+.game-shell[data-screen="battle"] .battle-clock b { color: #ecf6f3; }
+.game-shell[data-screen="battle"]:is([data-arena="metal"],[data-arena="street"],[data-arena="ruins"]) .stage-shell::before,
+.game-shell[data-screen="battle"]:is([data-arena="metal"],[data-arena="street"],[data-arena="ruins"]) .stage-shell::after { display: none; }

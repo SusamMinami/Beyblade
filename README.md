@@ -1,6 +1,13 @@
 # 战斗陀螺
 
-一款面向手机用户的 Godot 3D 物理对战小游戏。玩家可以组装自己的战斗陀螺，通过发射器参数和手机传感器影响战斗过程，在竞技场中通过撞击、失衡、停转或击飞对手取得胜利。
+一款面向手机用户的 3D 战斗陀螺游戏，包含活跃开发的 Web 原型和保留的 Godot 版本。玩家组装陀螺、调节发射并操控对战，通过撞击、停转或击飞对手取胜；手机传感器属于待真机验证的方向。
+
+**当前开发以 `web-prototype/` 为先：功能、界面和场景美术先在 Web 验证，再完善
+Godot。** 这是 2026-09-15 确认的迭代顺序，详见 `AGENTS.md`。
+最新版测试室入口为 Web 的 `/#lab`，双档升降陈列室为 `/#collection`。
+
+**接手入口：[文档导航](docs/README.md)**。这里按任务区分当前指南、设计草案和历史记录，
+无需从旧交接中拼凑当前状态。最近文档核对：2026-09-16。
 
 项目同步仓库：
 
@@ -10,29 +17,31 @@ https://github.com/SusamMinami/Beyblade.git
 
 ## 当前项目状态
 
-- 引擎：Godot 4.x
-- 渲染：移动端优先，当前使用 `gl_compatibility`
-- 物理：当前配置为 `Jolt Physics`
-- 平台目标：Android / iOS 手机端优先
-- 当前阶段：可运行的确定性 1v1 MVP
+- 活跃端：`web-prototype/`，Vite + 原生 JavaScript + Three.js + Tone.js。
+- Web 已有本地 1v1、DIY/经济/成长、双档陈列室、童年/精密实验室与五张地图。
+- Godot：4.x，`gl_compatibility`，保留 Jolt 部件实验与确定性战斗场景。
+- 平台目标：手机端优先；浏览器手机尺寸检查不等于 Android / iOS 真机验收。
+- PVP：存在协议、会话和 Worker 代码，尚不能据此宣称完整公网对战或正式结算已上线。
 
 Godot 战斗规则由 `scripts/battle/battle_simulation.gd` 以固定 `1/60s`
 步长计算，Jolt 刚体保留用于部件物理、碰撞实验和表现验证。胜负、AI、转速、
-耐久、地形和奖励不依赖渲染帧率，可与 Web 原型使用同一组种子和输入做快照对照。
+耐久和地形按规则层计算。跨端快照对照限于相同规则与输入；奖励由本地经济层处理。
 
 ## Web 验证原型
 
 `web-prototype/` 提供独立的 HTML / Three.js / Tone.js 版本，用于快速验证五件式组装、
 地图地形、发射、1v1 AI、操控、碰撞和动态音效。Web 与 Godot 版本共享相同的 15 个
-基准零件参数，并统一采用 `9:16` 竖屏、白色涂鸦准备界面、地图主题战斗界面、
-近景跟随镜头和转速耦合移动规则。两端已有固定种子金标快照测试，允许 `1e-4`
-以内的跨运行时浮点误差。
+基准零件参数，采用 `9:16` 竖屏和转速耦合移动规则。Web 的陈列室、实验室和
+战斗场景各有独立视觉系统。共有旧地图已有固定种子金标快照，跨运行时容差为 `1e-4`；
+这不代表所有新增地图或网络链路已经跨端验证。
 
 Web 的碰撞失衡、风险反馈、发射高度、零件二次 DIY、材料、三出战槽和成长存档已同步
-到 Godot。两端当前冻结模拟版本为 `2026.07.21-web-v2`，最新固定种子金标误差保持在
-`1e-4` 以内。
+到 Godot（2026-07 阶段）。目前 Web 求解器为 `2026.09.16-web-v3`，
+Godot 求解器为 `2026.07.21-web-v2`；网络层独立声明协议 `2`、
+模拟标识 `2026.07.21-bin`。新增遗迹方形边界、障碍碰撞和场景尚未迁入 Godot/网络。
+兼容边界见 [确定性同步](docs/deterministic_battle_sync.md)。
 
-Godot 当前已同步：
+Godot 保留的 7 月核心功能：
 
 - 双陀螺 1v1、地图对应 AI 配置和固定步长规则。
 - 发射力度、高度、方向、入场倾角与实时操控。
@@ -49,6 +58,10 @@ npm run dev
 ```
 
 ## 游戏目标
+
+以下玩法原则与“推荐工程结构 / MVP 范围”保留早期设计背景；
+其中的建议、示例地图和阶段划分不是当前任务清单。已实现状态以
+[Web 指南](web-prototype/README.md) 为准。
 
 本项目追求“物理可信”的战斗陀螺体验，而不是完全等同现实的工程级仿真。核心设计原则是：
 
@@ -325,14 +338,15 @@ git push -u origin main
 git pull origin main --allow-unrelated-histories
 ```
 
-如发生冲突，优先保留 Godot 场景、资源和脚本的人工修改，不要直接覆盖。
+如发生冲突，逐文件核对双方修改；Web、Godot、资源和文档中的人工改动都需要保留。
 
 ### 日常协作流程
 
 ```powershell
-git pull
 git status
-git add .
+git diff
+# 核对后仅暂存本次任务的文件，再提交与推送。
+git add <本次修改的文件>
 git commit -m "feat: describe change"
 git push
 ```
@@ -405,7 +419,8 @@ Godot 本身对版本控制比较友好，场景、资源和脚本大多是文�
 - `Godot MCP`
 - `Godot MCP Pro`
 
-详细安装方式见：[Godot AI / MCP 安装说明](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/godot_ai_mcp_setup.md)。
+候选方案与核实要求见：[Godot AI / MCP 说明](docs/godot_ai_mcp_setup.md)。
+目前没有锁定具体插件及版本，不应直接执行旧示例包名。
 
 这类插件通常会在本机启动一个 MCP 服务，让 AI 客户端通过工具接口访问 Godot 编辑器。它们适合：
 
@@ -433,9 +448,10 @@ Godot 本身对版本控制比较友好，场景、资源和脚本大多是文�
 
 ## 近期任务建议
 
-当前已完成 Web → Godot 全功能对齐，冻结模拟版本 `2026.07.21-web-v2`。
-下一步进入 **PVP 第一里程碑**，将 `BattleSimulation` 改造为可接收双方输入、可快照恢复、可回放验算的确定性内核。
+按当前用户任务继续 Web 功能、手感和场景验证，验收后再安排 Godot 移植。
+本页不把 7 月的 PVP 排期作为新的默认任务。
 
-详细任务清单见：[ai_handoff_20260721.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/ai_handoff_20260721.md)
-
-PVP 架构设计见：[network_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/network_pvp_architecture.md)
+- 开发入口与检查：[文档导航](docs/README.md)。
+- 当前美术资产及碰撞：[场景说明](docs/battle_worlds.md)。
+- 若开始联网任务，先读 [混合架构的实现状态](docs/hybrid_pvp_architecture.md)，
+  再读 [PVP 产品与权威结算设计](docs/network_pvp_architecture.md)。

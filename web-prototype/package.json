@@ -7,13 +7,17 @@
     "dev": "vite --host 127.0.0.1",
     "build": "vite build",
     "preview": "vite preview --host 127.0.0.1",
-    "test": "vitest run"
+    "test": "vitest run",
+    "verify:lab": "node tools/verify-lab.mjs",
+    "verify:showroom": "node tools/verify-showroom.mjs",
+    "verify:worlds": "node tools/verify-worlds.mjs"
   },
   "dependencies": {
     "three": "^0.178.0",
     "tone": "^15.1.22"
   },
   "devDependencies": {
+    "playwright": "^1.63.0",
     "vite": "^7.0.0",
     "vitest": "^3.2.4"
   }

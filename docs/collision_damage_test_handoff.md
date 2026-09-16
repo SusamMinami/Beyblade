@@ -2,6 +2,9 @@
 
 更新时间：2026-07-19
 
+范围核对：2026-09-16。本文是 **Godot / Jolt 局部损伤专题**，核心职责边界继续有效，
+不代表当前 Web 场景或网络的实现状态。当前入口见 [文档导航](README.md)。
+
 ## 当前定位
 
 项目现在有两层战斗逻辑：
@@ -60,7 +63,8 @@ web-prototype/src/core/battle-simulation.js
 web-prototype/tests/battle-simulation.test.js
 ```
 
-修改正式规则时必须同步 Web 与 Godot 两端，并更新金标快照。
+修改正式规则先在 Web 验证，并在 [确定性同步](deterministic_battle_sync.md) 记录
+版本与未迁移范围；Godot 移植及跨端兼容验收时同步规则和金标快照。
 
 ## 手动检查建议
 

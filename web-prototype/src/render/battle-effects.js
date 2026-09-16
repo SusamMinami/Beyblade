@@ -1,7 +1,7 @@
 import * as THREE from "three";
 
-const SPARK_COUNT = 96;
-const TRAIL_COUNT = 32;
+const SPARK_COUNT = 192;
+const TRAIL_COUNT = 48;
 
 export class BattleEffects {
   constructor(scene) {
@@ -26,6 +26,20 @@ export class BattleEffects {
     this.root.add(this.sparkMesh);
     this.flash = new THREE.PointLight(0xffb45e, 0, 5, 2);
     this.root.add(this.flash);
+    this.time=0;
+    this.halos=[0x43edff,0xff9147].map(color=>{
+      const group=new THREE.Group();
+      for (let i=0;i<3;i++) {
+        const arc=new THREE.Mesh(new THREE.TorusGeometry(.65+i*.11,.014+i*.004,5,48,Math.PI*(1.2-i*.18)),
+          new THREE.MeshBasicMaterial({color,transparent:true,opacity:.7-i*.17,blending:THREE.AdditiveBlending,depthWrite:false,toneMapped:false}));
+        arc.rotation.x=Math.PI/2;
+        arc.rotation.z=i*2.1;
+        arc.position.y=i*.035;
+        group.add(arc);
+      }
+      this.root.add(group);
+      return group;
+    });
     this.trails = [0x38dac6, 0xff795c].map((hex) => {
       const geometry = new THREE.BufferGeometry();
       const positions = new Float32Array(TRAIL_COUNT * 6);
@@ -60,6 +74,7 @@ export class BattleEffects {
     this.sparkColors.fill(0);
     this.sparkGeometry.attributes.color.needsUpdate = true;
     this.flash.intensity = 0;
+    this.halos.forEach(halo=>{halo.visible=false;});
     this.trails.forEach((trail) => {
       trail.count = 0;
       trail.ribbon.visible = false;
@@ -70,7 +85,7 @@ export class BattleEffects {
     this.flash.position.copy(position);
     this.flash.intensity = reducedMotion ? 0 : 14 + intensity * 26;
     if (reducedMotion) return;
-    const count = 10 + Math.round(Math.min(intensity, 1) * 18);
+    const count = 16 + Math.round(Math.min(intensity, 1) * 34);
     for (let index = 0; index < count; index += 1) {
       const spark = this.sparks[this.cursor++ % SPARK_COUNT];
       const angle = Math.random() * Math.PI * 2;
@@ -84,6 +99,18 @@ export class BattleEffects {
   }
 
   update(delta, models, running, reducedMotion) {
+    this.time+=delta;
+    this.halos.forEach((halo,i)=>{
+      const model=models[i];
+      halo.visible=Boolean(model && running && !reducedMotion);
+      if (!halo.visible) return;
+      halo.position.copy(model.position);
+      halo.position.y=(model.userData.groundHeight??0)+.16;
+      halo.rotation.y=this.time*(i ? -11 : 12);
+      const spin=model.userData.spinRatio??1;
+      halo.scale.setScalar(.85+spin*.3);
+      halo.children.forEach((arc,j)=>{arc.material.opacity=(.68-j*.16)*spin;});
+    });
     this.flash.intensity *= Math.exp(-delta * 18);
     for (let index = 0; index < SPARK_COUNT; index += 1) {
       const spark = this.sparks[index];
@@ -132,16 +159,16 @@ export class BattleEffects {
         const dz = next.z - point.z;
         const length = Math.max(Math.hypot(dx, dz), 0.001);
         const fade = (1 - i / Math.max(trail.count, 1)) ** 2;
-        const width = 0.045 * fade;
+        const width = 0.16 * fade;
         for (let side = 0; side < 2; side += 1) {
           const offset = i * 6 + side * 3;
           const sign = side === 0 ? -1 : 1;
           trail.positions[offset] = point.x + dz / length * width * sign;
           trail.positions[offset + 1] = point.y;
           trail.positions[offset + 2] = point.z - dx / length * width * sign;
-          trail.colors[offset] = trail.color.r * fade * 0.85;
-          trail.colors[offset + 1] = trail.color.g * fade * 0.85;
-          trail.colors[offset + 2] = trail.color.b * fade * 0.85;
+          trail.colors[offset] = trail.color.r * fade * 1.7;
+          trail.colors[offset + 1] = trail.color.g * fade * 1.7;
+          trail.colors[offset + 2] = trail.color.b * fade * 1.7;
         }
       }
       trail.geometry.setDrawRange(0, Math.max(0, trail.count - 1) * 6);

@@ -1,3 +1,5 @@
+import collisionManifest from "../../../resources/battle_worlds/collision_manifest.json" with { type: "json" };
+
 const surface = (
   name,
   {
@@ -74,9 +76,10 @@ export const ARENAS = Object.freeze({
   }),
   metal: arena({
     id: "metal",
+    scene: "championship",
     number: "02",
-    name: "金属高速竞技场",
-    shortName: "高速金属",
+    name: "冠军科幻竞技场",
+    shortName: "冠军竞技场",
     tag: "高速",
     description: "低摩擦、高回弹、长续航，碰撞后滑移与撞飞风险明显。",
     accent: "#8ed8e7",
@@ -101,6 +104,21 @@ export const ARENAS = Object.freeze({
       if (radius < 5.9) return SURFACES.rubber;
       return SURFACES.brake;
     },
+  }),
+  street: arena({
+    id: "street", scene: "street", number: "04", name: "放学后的街头", shortName: "街头对决",
+    tag: "童年", description: "暖阳、涂鸦与落叶中的玩具盘。沿用标准碗的均衡材料与回中心力。",
+    accent: "#e7b66e", ringOutRadius: 7.2, wallRadius: 6.7, bowlForce: .86,
+    surfaceAt: () => SURFACES.standard,
+  }),
+  ruins: arena({
+    id: "ruins", scene: "floating_ruins", number: "05", name: "浮空古代遗迹", shortName: "浮空遗迹",
+    tag: "障碍", description: "方形石台与四座实体石墩。绕开障碍抢占路线，越过边缘将出界。",
+    accent: "#b194ed", ringOutRadius: collisionManifest.ruins.ringOutExtent,
+    wallRadius: collisionManifest.ruins.halfExtent, bowlForce: 0,
+    boundary: "square", groundHeight: collisionManifest.ruins.groundHeight,
+    blockers: [...collisionManifest.ruins.blockers, ...(collisionManifest.ruins.pillars ?? [])],
+    surfaceAt: () => SURFACES.standard,
   }),
 });
 

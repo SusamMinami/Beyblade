@@ -1,0 +1,53 @@
+{
+  "schemaVersion": 2,
+  "title": "SPIN CORE Web Prototype",
+  "extensions": {
+    "motion": [
+      { "name": "scan", "value": "5.2s", "purpose": "Explicit spin and wind inspection before saving a configuration report" },
+      { "name": "calibration", "value": "1.6s", "purpose": "Presentation self-check; no physics mutation" },
+      { "name": "idle-rotation", "value": "0.18rad/s", "purpose": "Approximate optional lab idle rotation (1.7 RPM target); disabled with reduced motion, independent of explicit test spin" },
+      { "name": "collection-lift", "value": "1.05s", "purpose": "Lower the old specimen, commit selection under the deck, raise the next; 0.22s with reduced motion" },
+      { "name": "collection-idle-rotation", "value": "0.16rad/s", "purpose": "Slow stage presentation; paused during lift, close inspection and reduced motion" },
+      { "name": "collection-spot-sweep", "value": "x = sin(t * 0.42 + phase) * 1.3; z = cos(t * 0.31 + phase) * 0.85", "purpose": "Five phase-offset moving stage spots; reduced motion fixes t at zero, inspection dims the beams" },
+      { "name": "collection-camera", "value": "1 - exp(-delta * 5)", "purpose": "Frame-rate-independent approach to stage or inspection camera; immediate with reduced motion" },
+      { "name": "battle-impact-ring", "value": "0.38s", "purpose": "Collision-driven expanding/fading marker; reduced motion retains fading without expansion; paused battle time freezes age" },
+      { "name": "battle-impact-flash-decay", "value": "exp(-delta * 18)", "purpose": "Brief local collision light; suppressed with reduced motion and frozen by paused battle time" },
+      { "name": "battle-energy-pulse-decay", "value": "exp(-delta * 3.8)", "purpose": "Collision pulse on authored energy/crystal materials; critical state takes warning-color priority; decorative modulation suppressed with reduced motion" }
+    ]
+  },
+  "components": [
+    {
+      "name": "Laboratory action",
+      "kind": "button",
+      "description": "Start a measurement",
+      "html": "<button class=\"ds-lab-action\">开始测试</button>",
+      "css": ".ds-lab-action{background:#cfdf32;color:#202f33;border:1px solid #ecf490;border-radius:7px;padding:12px 26px;font:600 16px sans-serif}.ds-lab-action:hover{background:#dfed54}.ds-lab-action:focus-visible{outline:2px solid #0c897e;outline-offset:2px}.ds-lab-action:active{transform:translateY(1px)}.ds-lab-action:disabled{opacity:.55;cursor:not-allowed}"
+    }
+  ],
+  "narrative": {
+    "northStar": "The user's silver laboratory, sunny childhood desk, cyan/gold collection stages and distinct battle-world references",
+    "overview": "Web is the first implementation and review target. Assembly retains its incumbent visual system; battle retains its portrait controls while expanding its worlds. The precision test lab remains a distinct silver, graphite, cyan, and yellow-green instrument environment based on the user's reference, now available at LV.2. The reference's planned systems are present even when their service is pending. The separate collection route follows the two new user references: a cyan holographic chamber and a gold-lit arena rig. Dark tonal variations, tinted text/borders and opaque instrument overlays are intentional for those stages.\n\nThe beginner lab now opens on a sunny childhood desk: honey oak, a green cutting mat, an ivory toy dish, a blue task lamp, stationery and a paper-colored whiteboard. The metal arena gains a modeled sci-fi stadium; the street toy-bowl alley and square floating ruins extend the existing map selection. These are distinct stylized real-time worlds, not a replacement global skin or photo-identical copies. Godot and external-server collision/protocol integration have not been migrated for these additions.",
+    "rules": [
+      { "name": "Web first", "body": "Validate changes in the Web prototype before porting them to Godot.", "section": "layout" },
+      { "name": "Live specimen", "body": "The lab renders the existing playable build and its customizations.", "section": "components" },
+      { "name": "The Local Palette Rule", "body": "Warm paper labels belong to the childhood room; dark instrument glass belongs to the precision room. Color-detector findings are advisories to inspect in context, not authority to homogenize these worlds. Authored Blender material values and rendered lighting remain the material truth; the CSS/renderer colors above are not claimed as exact final pixel colors.", "section": "colors" }
+    ],
+    "dos": [
+      "Do read configuration and economy from the existing v2 store.",
+      "Do keep all results in game-balance units.",
+      "Do respect reduced motion and offer a lighter rendering mode.",
+      "Do retain warm childhood ink/paper and world-specific material/lighting palettes.",
+      "Do preserve visible ruin paving, square edges and broken pillar silhouettes.",
+      "Do keep inspection on the real configured top and use existing part focus."
+    ],
+    "donts": [
+      "Don't fabricate premium-currency transactions, data history or lab experience.",
+      "Don't change battle physics to match the illustration.",
+      "Don't claim this real-time art pass is a photoreal reproduction.",
+      "Don't treat a locked stage preview as ownership or equipment selection.",
+      "Don't promote scene-level Experience into a global mode for task overlays.",
+      "Don't treat color advisories as defects without inspecting the intended world.",
+      "Don't claim the new worlds or their collision model have shipped in Godot or external multiplayer services."
+    ]
+  }
+}

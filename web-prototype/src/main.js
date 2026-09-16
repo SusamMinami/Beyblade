@@ -29,6 +29,10 @@ import {
   PART_TYPE_META,
 } from "./data/parts.js";
 import { ThreeStage } from "./render/three-stage.js";
+import { LabScreen } from "./ui/lab-screen.js";
+import { normalizeLabState } from "./core/lab-state.js";
+import { ShowroomScreen } from "./ui/showroom-screen.js";
+import { normalizeShowroom } from "./core/showroom-state.js";
 
 const STORAGE_KEY = "spin-core-web-prototype-v2";
 const LEGACY_STORAGE_KEY = "spin-core-web-prototype-v1";
@@ -102,6 +106,8 @@ function loadState() {
       build: activeLoadout.build,
       colors: activeLoadout.colors,
       customizations: activeLoadout.customizations,
+      lab: normalizeLabState(saved?.lab),
+      showroom: normalizeShowroom(saved?.showroom),
       tuning: { ...fallback.tuning, ...saved?.tuning },
     };
   } catch {
@@ -113,6 +119,8 @@ function loadState() {
       build: loadoutState.loadouts[0].build,
       colors: loadoutState.loadouts[0].colors,
       customizations: loadoutState.loadouts[0].customizations,
+      lab: normalizeLabState(),
+      showroom: normalizeShowroom(),
     };
   }
 }
@@ -154,10 +162,16 @@ class BeybladeApp {
     this._renderAssembly();
     this._renderMaps();
     this._renderPersistentState();
-    if (this.state.tutorial.stage === TUTORIAL_STAGE.FIRST_BATTLE) {
+    if (location.hash === "#lab") {
+      this.goTo("lab");
+    } else if (location.hash === "#collection") {
+      this.goTo("collection");
+    } else if (location.hash === "#map") {
+      this.goTo("map");
+    } else if (this.state.tutorial.stage === TUTORIAL_STAGE.FIRST_BATTLE) {
       this.goTo("battle");
     } else {
-      this.goTo("assembly");
+      this.goTo(this.state.tutorial.completed ? "collection" : "assembly");
     }
     requestAnimationFrame((time) => this._tick(time));
   }
@@ -173,6 +187,8 @@ class BeybladeApp {
           <nav class="phase-nav" aria-label="游戏进度">
             <button class="phase is-active" data-go="assembly"><i></i><span>组装</span></button>
             <button class="phase" data-go="map"><i></i><span>场地</span></button>
+            <button class="phase" data-go="lab"><i></i><span>测试室</span></button>
+            <button class="phase" data-go="collection"><i></i><span>陀螺库</span></button>
             <button class="phase" data-phase-only="battle"><i></i><span>对战</span></button>
           </nav>
           <div class="top-actions">
@@ -325,6 +341,7 @@ class BeybladeApp {
               </div>
             </div>
             <div class="action-row">
+              <button class="button ghost open-lab-button" data-go="lab">测试室</button>
               <button class="button primary" id="go-map">选择竞技场 <span>→</span></button>
             </div>
           </div>
@@ -452,6 +469,20 @@ class BeybladeApp {
         this.audio.playUi();
       },
     );
+    this.root.querySelector("#three-stage").addEventListener("arenastatus",event=>{
+      const {state,message}=event.detail;
+      this.root.querySelector("#launch-button").disabled=state!=="ready";
+      this.root.querySelector("#three-stage").dataset.assetState=state;
+      let notice=this.root.querySelector(".arena-asset-status");
+      if (!notice) {
+        notice=document.createElement("div");
+        notice.className="arena-asset-status";
+        notice.setAttribute("role","status");
+        this.root.querySelector("#three-stage").append(notice);
+      }
+      notice.hidden=state==="ready";
+      notice.textContent=message;
+    });
     this.root
       .querySelector("#three-stage")
       .addEventListener("assemblyclear", () => {
@@ -730,7 +761,9 @@ class BeybladeApp {
 
     arenaList.addEventListener("pointerdown", (event) => {
       if (!event.target.closest("[data-arena]")) return;
+      this.arenaCentering = false;
       this.arenaDrag = {
+        card: event.target.closest(".arena-card"),
         pointerId: event.pointerId,
         startX: event.clientX,
         startY: event.clientY,
@@ -766,7 +799,11 @@ class BeybladeApp {
       }
       arenaList.classList.remove("is-dragging");
       this.arenaDrag = null;
-      if (!drag.moved) return;
+      if (event.type === "pointercancel") return;
+      if (!drag.moved) {
+        settleOnCard(drag.card);
+        return;
+      }
 
       this.suppressArenaClickUntil = performance.now() + 280;
       const cards = getCards();
@@ -793,12 +830,10 @@ class BeybladeApp {
       }
       settleOnCard(event.target.closest("[data-arena]"));
     });
-    arenaList.addEventListener("scroll", () => {
-      if (this.arenaDrag) return;
-      window.cancelAnimationFrame(this.arenaScrollFrame);
-      this.arenaScrollFrame = window.requestAnimationFrame(() => {
-        this._selectArena(getClosestCard()?.dataset.arena);
-      });
+    arenaList.addEventListener("scrollend", () => {
+      if (this.arenaCentering) { this.arenaCentering = false; return; }
+      if (this.arenaDrag || this.screen !== "map") return;
+      this._selectArena(getClosestCard()?.dataset.arena);
     });
   }
 
@@ -807,6 +842,7 @@ class BeybladeApp {
     const arenaList = this.root.querySelector("#arena-list");
     const left =
       card.offsetLeft - (arenaList.clientWidth - card.offsetWidth) * 0.5;
+    this.arenaCentering = Math.abs(arenaList.scrollLeft - left) > 1;
     arenaList.scrollTo({ left, behavior });
   }
 
@@ -1167,6 +1203,7 @@ class BeybladeApp {
   }
 
   _canNavigateTo(screen) {
+    if (screen === "lab" || screen === "collection") return true;
     if (this.state.tutorial.completed) return true;
     if (this.state.tutorial.stage === TUTORIAL_STAGE.FIRST_BATTLE) {
       return screen === "battle";
@@ -1254,6 +1291,7 @@ class BeybladeApp {
   }
 
   _selectArena(arenaId) {
+    if (this.screen !== "map") return;
     if (!arenaId || arenaId === this.selectedArena.id) return;
     this.selectedArena = getArena(arenaId);
     this.state.arenaId = this.selectedArena.id;
@@ -1307,13 +1345,19 @@ class BeybladeApp {
   }
 
   goTo(screen) {
-    if (screen === "map") {
+    if (this.screen === "lab" && screen !== "lab") this.labScreen?.leave();
+    if (this.screen === "collection" && screen !== "collection") this.showroomScreen?.leave();
+    if (screen === "lab" || screen === "collection") {
+      this.simulation = null;
+      this.labScreen ??= new LabScreen(this);
+      if (screen === "collection") this.showroomScreen ??= new ShowroomScreen(this);
+    } else if (screen === "map") {
       this._renderMaps();
       this.stage.showArena(this.selectedArena);
       requestAnimationFrame(() => {
         this._centerArenaCard(
           this.root.querySelector(
-            `[data-arena="${this.selectedArena.id}"]`,
+            `.arena-card[data-arena="${this.selectedArena.id}"]`,
           ),
           "auto",
         );
@@ -1333,6 +1377,9 @@ class BeybladeApp {
     this.screen = screen;
     const shell = this.root.querySelector(".game-shell");
     shell.dataset.screen = screen;
+    if (screen === "lab") this.labScreen.enter();
+    if (screen === "collection") this.showroomScreen.enter();
+    if (location.hash !== `#${screen}`) history.replaceState(null, "", `#${screen}`);
     shell.dataset.arena = this.selectedArena.id;
     if (screen !== "battle") {
       this.root.querySelector("#launch-controls").classList.add("is-hidden");
@@ -1369,6 +1416,8 @@ class BeybladeApp {
       assembly: ["ASSEMBLY / 01", "五层结构实验"],
       map: ["ARENA / 02", this.selectedArena.shortName],
       battle: ["BATTLE / 03", this.selectedArena.shortName],
+      lab: ["TOP TEST LAB", "陀螺测试实验室"],
+      collection: ["TOP COLLECTION", "陀螺陈列室"],
     }[screen];
     this.root.querySelector("#stage-kicker").textContent = caption[0];
     this.root.querySelector("#stage-title").textContent = caption[1];
@@ -1393,7 +1442,7 @@ class BeybladeApp {
     );
     const enemySelection = firstBattle
       ? DEFAULT_BUILD
-      : ENEMY_BUILDS[this.selectedArena.id];
+      : ENEMY_BUILDS[this.selectedArena.id] ?? ENEMY_BUILDS.standard;
     const enemyBuild = calculateBuild(enemySelection);
     this.simulation = new BattleSimulation({
       playerBuild: battlePlayerBuild,
@@ -1430,7 +1479,9 @@ class BeybladeApp {
   }
 
   async _launch() {
+    if (!this.stage.arenaReady || this.simulation?.phase !== "ready") return;
     await this.audio.init();
+    if (!this.stage.arenaReady || this.simulation?.phase !== "ready" || this.screen !== "battle") return;
     this.audio.setEnabled(this.state.sound);
     const { power, height, direction, angle } = this.launchParams;
     this.simulation.launch({ power, height, direction, angle });
@@ -1478,13 +1529,13 @@ class BeybladeApp {
 
   _processEvents() {
     for (const event of this.simulation.events) {
-      if (event.type === "collision") {
+      if (event.type === "collision" || event.type === "obstacle") {
         this.stage.spawnImpact(event.position, event.intensity);
         this.audio.playCollision(event.intensity);
         this.root.querySelector("#battle-message-kicker").textContent =
           event.intensity > 0.58 ? "HEAVY IMPACT" : "CONTACT";
         this.root.querySelector("#battle-message").textContent =
-          `碰撞冲量 ${event.impulse.toFixed(2)}`;
+          `${event.type === "obstacle" ? "石墩碰撞" : "碰撞冲量"} ${event.impulse.toFixed(2)}`;
       }
       if (
         event.actor === "player" &&
@@ -1669,7 +1720,9 @@ class BeybladeApp {
       this.simulation?.enemy.spin ?? 0,
       this.simulation?.phase === "running" && !this.paused,
     );
-    this.stage.update(delta, this.simulation, this.paused);
+    if (this.screen === "lab") this.labScreen.update(delta);
+    else if (this.screen === "collection") this.showroomScreen.update(delta);
+    else this.stage.update(delta, this.simulation, this.paused);
     requestAnimationFrame((nextTime) => this._tick(nextTime));
   }
 

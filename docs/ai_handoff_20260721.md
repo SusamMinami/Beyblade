@@ -1,5 +1,11 @@
 # AI 接手说明：Web → Godot 全功能对齐完成，进入 PVP 第一里程碑
 
+> 历史归档（2026-09-16 标记）：保留原阶段判断、排期和验收记录，不作为当前工作指令。
+> 已知过时项：Godot 战斗页已接入 BattleSession；协议已转为二进制 v2；
+> Web 求解器已到 `2026.09.16-web-v3`，新增场景与碰撞尚未迁入 Godot/网络。
+> 下文“全部对齐”“待接入”、云免费额度与 Git 身份示例均不可直接沿用。
+> 当前接手见 [文档导航](README.md)，PVP 状态见 [混合架构](hybrid_pvp_architecture.md)。
+
 更新时间：2026-07-21
 
 ## 当前状态快照
@@ -9,7 +15,7 @@ Web 原型与 Godot 两端已完成核心功能对齐，冻结模拟版本为 `2
 
 下一个阶段是**网络 PVP 第一里程碑**，目标是把 `BattleSimulation` 改造为可接收双方输入、可快照恢复、可回放验算的确定性战斗内核，为接入 Nakama 做准备。
 
-**已完成混合架构设计与代码框架**：新增三层解耦架构（BattleSession / SyncProvider / Transport），同时支持帧同步（FrameSync，Cloudflare免费层可跑）、状态同步（StateSync，Godot headless）、异步验算（AsyncVerify）三种模式，并已生成 Godot/Web/Cloudflare Worker 三端代码骨架。详见 [hybrid_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/hybrid_pvp_architecture.md)。
+**已完成混合架构设计与代码框架**：新增三层解耦架构（BattleSession / SyncProvider / Transport），同时支持帧同步（FrameSync，Cloudflare免费层可跑）、状态同步（StateSync，Godot headless）、异步验算（AsyncVerify）三种模式，并已生成 Godot/Web/Cloudflare Worker 三端代码骨架。详见 [hybrid_pvp_architecture.md](hybrid_pvp_architecture.md)。
 
 ## 本轮（2026-07-21）已完成工作
 
@@ -19,15 +25,15 @@ Godot 端新增/升级功能：
 
 | 模块 | 关键文件 | 完成内容 |
 | --- | --- | --- |
-| DIY 零件定制 | [part_customization.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/assembly/part_customization.gd) | 材料倍率、尺寸、高度、轮廓、对称、归一化规则 |
-| 组装计算器 | [assembly_calculator.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/assembly/assembly_calculator.gd) | 平行轴惯量、DIY 参数应用、六参数计算 |
-| 五件模型 | [five_part_top_model.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/assembly/five_part_top_model.gd) | DIY 视觉表现、材料颜色/金属度、零件缩放、轮廓变体、高亮与损伤 |
-| 组装界面 | [assembly_screen.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/assembly/assembly_screen.gd) | 三出战槽、零件/材料购买所有权、点击部件进 DIY、教程引导、购买即装备 |
-| DIY 界面 | [part_customize_screen.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/assembly/part_customize_screen.gd) | 三视图、蓝/橙/红三色手柄、实时属性、对称切换、材料购买、保存/取消 |
-| 存档系统 | [game_state.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/core/game_state.gd) | v2 存档：3 loadouts、所有权、教程阶段、胜负奖励、旧存档兼容迁移 |
-| 战斗模拟 | [battle_simulation.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_simulation.gd) | 发射高度、imbalance、ring_out_risk、擦地损耗、风险状态、碰撞遥测、地形稳定性 |
-| 战斗界面 | [battle_screen.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_screen.gd) | 直接拖拽发射向量、高度滑杆、地图特征、教程跳过、DIY 模型传入、奖励落盘 |
-| 地图选择 | [map_select_screen.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/maps/map_select_screen.gd) | 前后卡片按钮、循环切换、OptionButton 兼容 |
+| DIY 零件定制 | [part_customization.gd](../scripts/assembly/part_customization.gd) | 材料倍率、尺寸、高度、轮廓、对称、归一化规则 |
+| 组装计算器 | [assembly_calculator.gd](../scripts/assembly/assembly_calculator.gd) | 平行轴惯量、DIY 参数应用、六参数计算 |
+| 五件模型 | [five_part_top_model.gd](../scripts/assembly/five_part_top_model.gd) | DIY 视觉表现、材料颜色/金属度、零件缩放、轮廓变体、高亮与损伤 |
+| 组装界面 | [assembly_screen.gd](../scripts/assembly/assembly_screen.gd) | 三出战槽、零件/材料购买所有权、点击部件进 DIY、教程引导、购买即装备 |
+| DIY 界面 | [part_customize_screen.gd](../scripts/assembly/part_customize_screen.gd) | 三视图、蓝/橙/红三色手柄、实时属性、对称切换、材料购买、保存/取消 |
+| 存档系统 | [game_state.gd](../scripts/core/game_state.gd) | v2 存档：3 loadouts、所有权、教程阶段、胜负奖励、旧存档兼容迁移 |
+| 战斗模拟 | [battle_simulation.gd](../scripts/battle/battle_simulation.gd) | 发射高度、imbalance、ring_out_risk、擦地损耗、风险状态、碰撞遥测、地形稳定性 |
+| 战斗界面 | [battle_screen.gd](../scripts/battle/battle_screen.gd) | 直接拖拽发射向量、高度滑杆、地图特征、教程跳过、DIY 模型传入、奖励落盘 |
+| 地图选择 | [map_select_screen.gd](../scripts/maps/map_select_screen.gd) | 前后卡片按钮、循环切换、OptionButton 兼容 |
 
 ### 2. 测试全量通过
 
@@ -48,16 +54,16 @@ Web 端测试：
 
 ### 3. 文档更新
 
-- [deterministic_battle_sync.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/deterministic_battle_sync.md) - 更新跨端契约为 v2
-- [network_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/network_pvp_architecture.md) - PVP 架构完整方案已输出
-- [README.md](file:///c:/Users/Admin/Downloads/战斗陀螺/README.md) - 项目状态更新
+- [deterministic_battle_sync.md](deterministic_battle_sync.md) - 更新跨端契约为 v2
+- [network_pvp_architecture.md](network_pvp_architecture.md) - PVP 架构完整方案已输出
+- [README.md](../README.md) - 项目状态更新
 
 ### 4. 场景更新
 
-- [AssemblyScreen.tscn](file:///c:/Users/Admin/Downloads/战斗陀螺/scenes/assembly/AssemblyScreen.tscn)
-- [PartCustomizeScreen.tscn](file:///c:/Users/Admin/Downloads/战斗陀螺/scenes/assembly/PartCustomizeScreen.tscn)
-- [BattleScreen.tscn](file:///c:/Users/Admin/Downloads/战斗陀螺/scenes/battle/BattleScreen.tscn)
-- [MapSelectScreen.tscn](file:///c:/Users/Admin/Downloads/战斗陀螺/scenes/maps/MapSelectScreen.tscn)
+- [AssemblyScreen.tscn](../scenes/assembly/AssemblyScreen.tscn)
+- [PartCustomizeScreen.tscn](../scenes/assembly/PartCustomizeScreen.tscn)
+- [BattleScreen.tscn](../scenes/battle/BattleScreen.tscn)
+- [MapSelectScreen.tscn](../scenes/maps/MapSelectScreen.tscn)
 
 ## 已确认的产品规则（冻结）
 
@@ -76,32 +82,32 @@ Web 端测试：
 - **同步排位赛最终版**：仍需Godot headless权威反作弊，可在Cloudflare验证玩法后再升级
 - **MVP部署路径**：Cloudflare免费层 → 技术封测/海外玩家完全零成本；国内玩家可用香港节点（帧同步延迟可接受）
 - **正式上线**：Cloudflare做全球入口/静态/异步，大陆云主机跑权威同步房间
-- 详见 [hybrid_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/hybrid_pvp_architecture.md) 第3节
+- 详见 [hybrid_pvp_architecture.md](hybrid_pvp_architecture.md) 第3节
 
 ## 第一里程碑任务清单（按顺序执行）
 
-依据 [hybrid_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/hybrid_pvp_architecture.md) 三层架构，代码骨架已生成：
+依据 [hybrid_pvp_architecture.md](hybrid_pvp_architecture.md) 三层架构，代码骨架已生成：
 
 ### 已完成（代码框架生成）
 
 | 文件 | 状态 | 说明 |
 |------|------|------|
-| [battle_protocol.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_protocol.gd) | ✅ | 协议常量、量化/反量化、信封构造、输入校验 |
-| [battle_state_codec.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_state_codec.gd) | ✅ | 快照规范化编解码，消除Vector2/StringName运行时类型 |
-| [battle_state_hasher.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_state_hasher.gd) | ✅ | SHA-256状态哈希、回放哈希、清单哈希 |
-| [battle_input_source.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_input_source.gd) | ✅ | 输入源抽象接口 |
-| [local_input_source.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/local_input_source.gd) | ✅ | 本地玩家输入源（支持输入缓存） |
-| [strategy_input_source.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/strategy_input_source.gd) | ✅ | AI/幽灵策略（从BattleSimulation剥离） |
-| [battle_transport.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/network/battle_transport.gd) | ✅ | 传输层抽象接口 |
-| [local_transport.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/network/local_transport.gd) | ✅ | 本地内存传输（双客户端测试） |
-| [websocket_transport.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/network/websocket_transport.gd) | ✅ | WebSocket传输（可连Nakama/CF Worker） |
-| [frame_sync_provider.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/network/frame_sync_provider.gd) | ✅ | 帧同步模式提供者 |
-| [async_verify_provider.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/network/async_verify_provider.gd) | ✅ | 异步验算模式提供者 |
-| [battle_session.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_session.gd) | ✅ | 统一战斗会话入口（静态工厂方法） |
-| [cloudflare_client.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/network/cloudflare_client.gd) | ✅ | Cloudflare API封装（匹配/建房/提交回放） |
+| [battle_protocol.gd](../scripts/battle/battle_protocol.gd) | ✅ | 协议常量、量化/反量化、信封构造、输入校验 |
+| [battle_state_codec.gd](../scripts/battle/battle_state_codec.gd) | ✅ | 快照规范化编解码，消除Vector2/StringName运行时类型 |
+| [battle_state_hasher.gd](../scripts/battle/battle_state_hasher.gd) | ✅ | SHA-256状态哈希、回放哈希、清单哈希 |
+| [battle_input_source.gd](../scripts/battle/battle_input_source.gd) | ✅ | 输入源抽象接口 |
+| [local_input_source.gd](../scripts/battle/local_input_source.gd) | ✅ | 本地玩家输入源（支持输入缓存） |
+| [strategy_input_source.gd](../scripts/battle/strategy_input_source.gd) | ✅ | AI/幽灵策略（从BattleSimulation剥离） |
+| [battle_transport.gd](../scripts/network/battle_transport.gd) | ✅ | 传输层抽象接口 |
+| [local_transport.gd](../scripts/network/local_transport.gd) | ✅ | 本地内存传输（双客户端测试） |
+| [websocket_transport.gd](../scripts/network/websocket_transport.gd) | ✅ | WebSocket传输（可连Nakama/CF Worker） |
+| [frame_sync_provider.gd](../scripts/network/frame_sync_provider.gd) | ✅ | 帧同步模式提供者 |
+| [async_verify_provider.gd](../scripts/network/async_verify_provider.gd) | ✅ | 异步验算模式提供者 |
+| [battle_session.gd](../scripts/battle/battle_session.gd) | ✅ | 统一战斗会话入口（静态工厂方法） |
+| [cloudflare_client.gd](../scripts/network/cloudflare_client.gd) | ✅ | Cloudflare API封装（匹配/建房/提交回放） |
 | `battle_simulation.gd` 改造 | ✅ | 新增frame计数、launch_explicit、step双输入、restore_from_snapshot |
-| Web协议层 | ✅ | [protocol.js](file:///c:/Users/Admin/Downloads/战斗陀螺/web-prototype/src/network/protocol.js), [websocket_transport.js](file:///c:/Users/Admin/Downloads/战斗陀螺/web-prototype/src/network/websocket_transport.js), [frame_sync_provider.js](file:///c:/Users/Admin/Downloads/战斗陀螺/web-prototype/src/network/frame_sync_provider.js), [async_verify_provider.js](file:///c:/Users/Admin/Downloads/战斗陀螺/web-prototype/src/network/async_verify_provider.js), [battle_session.js](file:///c:/Users/Admin/Downloads/战斗陀螺/web-prototype/src/network/battle_session.js) |
-| Cloudflare Worker | ✅ | [battle_room.ts](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/server/cf_worker/src/battle_room.ts) 帧同步DO中继, [matchmaker.ts](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/server/cf_worker/src/matchmaker.ts) 匹配器, [worker.ts](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/server/cf_worker/src/worker.ts) 入口 |
+| Web协议层 | ✅ | [protocol.js](../web-prototype/src/network/protocol.js), [websocket_transport.js](../web-prototype/src/network/websocket_transport.js), [frame_sync_provider.js](../web-prototype/src/network/frame_sync_provider.js), [async_verify_provider.js](../web-prototype/src/network/async_verify_provider.js), [battle_session.js](../web-prototype/src/network/battle_session.js) |
+| Cloudflare Worker | ✅ | [battle_room.ts](../scripts/server/cf_worker/src/battle_room.ts) 帧同步DO中继, [matchmaker.ts](../scripts/server/cf_worker/src/matchmaker.ts) 匹配器, [worker.ts](../scripts/server/cf_worker/src/worker.ts) 入口 |
 
 ### 待完成（下一阶段）
 
@@ -160,16 +166,16 @@ git config user.email "ruisheng.lu@hotmail.com"
 
 ## 建议先阅读的文件
 
-1. [hybrid_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/hybrid_pvp_architecture.md) - **混合PVP架构（三层解耦+Cloudflare方案，最优先）**
-2. [network_pvp_architecture.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/network_pvp_architecture.md) - 产品规则与Nakama权威架构
-3. [deterministic_battle_sync.md](file:///c:/Users/Admin/Downloads/战斗陀螺/docs/deterministic_battle_sync.md) - 跨端同步契约
-4. [battle_session.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_session.gd) - 统一战斗会话入口
-5. [battle_simulation.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/battle/battle_simulation.gd) - 权威战斗内核（已支持显式双输入/快照恢复）
+1. [hybrid_pvp_architecture.md](hybrid_pvp_architecture.md) - **混合PVP架构（三层解耦+Cloudflare方案，最优先）**
+2. [network_pvp_architecture.md](network_pvp_architecture.md) - 产品规则与Nakama权威架构
+3. [deterministic_battle_sync.md](deterministic_battle_sync.md) - 跨端同步契约
+4. [battle_session.gd](../scripts/battle/battle_session.gd) - 统一战斗会话入口
+5. [battle_simulation.gd](../scripts/battle/battle_simulation.gd) - 权威战斗内核（已支持显式双输入/快照恢复）
 6. `scripts/network/` - 传输层、帧同步、异步验算、Cloudflare客户端
 7. `scripts/server/cf_worker/` - Cloudflare Worker服务器代码
 8. `web-prototype/src/network/` - Web端网络层（与GDScript共用协议）
-9. [game_state.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/core/game_state.gd) - 存档v2结构
-10. [assembly_calculator.gd](file:///c:/Users/Admin/Downloads/战斗陀螺/scripts/assembly/assembly_calculator.gd) - DIY派生计算
+9. [game_state.gd](../scripts/core/game_state.gd) - 存档v2结构
+10. [assembly_calculator.gd](../scripts/assembly/assembly_calculator.gd) - DIY派生计算
 11. `web-prototype/src/core/battle-simulation.js` - Web权威参考实现
 
 ## 已知非阻塞项

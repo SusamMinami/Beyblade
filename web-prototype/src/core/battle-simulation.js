@@ -1,4 +1,4 @@
-export const SIMULATION_VERSION = "2026.07.21-web-v2";
+export const SIMULATION_VERSION = "2026.09.16-web-v3";
 
 export const BATTLE_RESULT = Object.freeze({
   SPIN_OUT: "spin_out",
@@ -194,6 +194,10 @@ export class BattleSimulation {
     this._integrateTop(this.player, playerControl, dt, false);
     this._integrateTop(this.enemy, enemyCtrl, dt, true);
     this._resolveCollision();
+    if (this.arena.blockers) {
+      this._resolveObstacles(this.player);
+      this._resolveObstacles(this.enemy);
+    }
     this._updateTilt(this.player, dt);
     this._updateTilt(this.enemy, dt);
     this._updateRiskStates(this.player, "player");
@@ -312,10 +316,26 @@ export class BattleSimulation {
     top.position.x += top.velocity.x * dt;
     top.position.y += top.velocity.y * dt;
     this._resolveArenaRim(top, currentSurface);
+    this._resolveObstacles(top);
     top.spinLossRate = Math.max((spinBefore - top.spin) / Math.max(dt, 1e-6), 0);
   }
 
   _resolveArenaRim(top, surface) {
+    if (this.arena.boundary === "square") {
+      for (const axis of ["x", "y"]) {
+        const value = top.position[axis];
+        if (Math.abs(value) <= this.arena.wallRadius || Math.abs(value) >= this.arena.ringOutRadius) continue;
+        const sign = Math.sign(value);
+        const outward = top.velocity[axis] * sign;
+        if (outward >= 9.2) continue;
+        top.position[axis] = sign * (this.arena.wallRadius - .03);
+        if (outward > 0) {
+          top.velocity[axis] -= sign * outward * (1 + surface.bounce * .52);
+          top.spin = Math.max(0, top.spin - outward * .24);
+        }
+      }
+      return;
+    }
     const radius = length(top.position);
     if (
       radius <= this.arena.wallRadius ||
@@ -334,6 +354,40 @@ export class BattleSimulation {
       top.velocity.x -= normal.x * rebound;
       top.velocity.y -= normal.y * rebound;
       top.spin = Math.max(top.spin - outwardSpeed * 0.24, 0);
+    }
+  }
+
+  _boundaryDistance(position) {
+    return this.arena.boundary === "square"
+      ? Math.max(Math.abs(position.x), Math.abs(position.y)) : length(position);
+  }
+
+  _resolveObstacles(top) {
+    for (const obstacle of this.arena.blockers ?? []) {
+      const px=top.position.x, py=top.position.y;
+      const nearestX=clamp(px,obstacle.x-obstacle.hx,obstacle.x+obstacle.hx);
+      const nearestY=clamp(py,obstacle.z-obstacle.hz,obstacle.z+obstacle.hz);
+      let dx=px-nearestX, dy=py-nearestY, distance=Math.hypot(dx,dy);
+      if (distance>=TOP_RADIUS) continue;
+      let depth=TOP_RADIUS-distance;
+      if (distance<1e-8) {
+        const gapX=obstacle.hx-Math.abs(px-obstacle.x);
+        const gapY=obstacle.hz-Math.abs(py-obstacle.z);
+        dx=gapX<gapY ? (Math.sign(px-obstacle.x)||1) : 0;
+        dy=gapX<gapY ? 0 : (Math.sign(py-obstacle.z)||1);
+        depth=TOP_RADIUS+Math.min(gapX,gapY);
+        distance=1;
+      }
+      const nx=dx/distance, ny=dy/distance;
+      top.position.x+=nx*(depth+.001);
+      top.position.y+=ny*(depth+.001);
+      const approach=top.velocity.x*nx+top.velocity.y*ny;
+      if (approach>=0) continue;
+      top.velocity.x-=nx*approach*1.52;
+      top.velocity.y-=ny*approach*1.52;
+      top.spin=Math.max(0,top.spin+approach*.24);
+      if (approach<-.4) this.events.push({type:"obstacle",
+        position:{x:nearestX,y:nearestY}, intensity:clamp(-approach/10,.1,1), impulse:-approach});
     }
   }
 
@@ -559,14 +613,16 @@ export class BattleSimulation {
   }
 
   _calculateRingOutRisk(top) {
-    const radius = length(top.position);
+    const radius = this._boundaryDistance(top.position);
     const edgeRisk = smoothstep(
       this.arena.wallRadius * 0.7,
       this.arena.ringOutRadius,
       radius,
     );
-    const outward =
-      radius > 0.001
+    const edgeAxis = Math.abs(top.position.x) >= Math.abs(top.position.y) ? "x" : "y";
+    const outward = this.arena.boundary === "square"
+      ? Math.max(0, top.velocity[edgeAxis] * Math.sign(top.position[edgeAxis]))
+      : radius > 0.001
         ? Math.max(dot(top.velocity, scale(top.position, 1 / radius)), 0)
         : 0;
     const momentumRisk = smoothstep(1.5, 9.2, outward);
@@ -646,7 +702,7 @@ export class BattleSimulation {
         this._finish(winnerId, BATTLE_RESULT.BREAK);
         return;
       }
-      if (length(loser.position) > this.arena.ringOutRadius) {
+      if (this._boundaryDistance(loser.position) > this.arena.ringOutRadius) {
         this._finish(winnerId, BATTLE_RESULT.RING_OUT);
         return;
       }

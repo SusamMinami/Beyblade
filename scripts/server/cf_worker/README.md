@@ -1,6 +1,9 @@
 # Beyblade Battle Server (Cloudflare Worker)
 
-基于 Cloudflare Workers + Durable Objects 的零成本帧同步中继与异步回放服务器，支持 Godot 客户端与 Web 客户端共享同一后端。
+基于 Cloudflare Workers + Durable Objects 的帧同步中继与 R2 回放上传原型。
+文档与源码静态核对：2026-09-16；本次没有部署或公网联调。
+Web / Godot / Worker 的协议声明相同，但求解器版本已有差异，不能据此宣称跨端对战已兼容。
+见 [版本边界](../../../docs/deterministic_battle_sync.md)。
 
 ## 架构概览
 
@@ -13,12 +16,15 @@ Web Client ───┘                          └─ Web Client
                       └── Matchmaker DO (匹配队列)
 ```
 
-**帧同步模式**：Durable Object 仅转发输入批次，双方客户端各自运行确定性物理，每 60 帧哈希校验防作弊。服务器不运行物理，可在免费层承载大量对局。
+**帧同步模式**：Durable Object 中继输入、哈希及房间状态，不运行权威物理。
+哈希交换用于发现状态分歧，不能独立证明结果合法或保证防作弊。
 
 ## 前置要求
 
-- **Node.js**：推荐 20.x（兼容 wrangler@3）。Node 22+ 可使用 wrangler@4，但目前脚本固定 wrangler@3 以保证兼容性。
-- **Cloudflare 账号**：免费注册，无需绑卡即可使用 Workers/Durable Objects/R2。
+- **Node.js/npm**：版本需符合安装锁文件中的工具要求；当前声明 `wrangler: ^3.60.0`。
+  `^` 是版本范围，不是精确固定版本。
+- **Cloudflare 账号**：实际计划、DO 存储类型、R2 开通条件及费用需在部署前核实，
+  本指南不承诺无需绑卡或全栈免费。
 - **Git**（可选）
 
 ## 快速部署（Windows）
@@ -47,15 +53,21 @@ Setup 完成后，执行正式部署：
 成功后会输出类似：
 ```
 === Deployment successful! ===
-Health check: GET https://beyblade-battle-server.<你的子域名>.workers.dev/health
+Health check: GET https://beyblade-battle-server.<你的子域名>.workers.dev/api/health
 ```
+
+脚本自己的成功提示仍打印旧 `/health`；源码当前只实现 `/api/health`。
+Setup 中 R2 创建错误被重定向，不能仅凭其“ready”提示断言桶已创建，需核对实际结果。
 
 ### 本地开发调试
 
 ```powershell
 .\deploy.ps1 -Dev          # 启动本地 dev server (默认 http://localhost:8787)
-.\deploy.ps1 -Dev -Tail    # 启动并实时查看日志
+npm run typecheck          # 在另一个终端检查类型
 ```
+
+部署后查看线上日志使用 `npx wrangler tail`。
+现有 `-Dev -Tail` 分支调用 `wrangler dev --tail`，本次未验证该组合，不作为推荐命令。
 
 ## 手动部署（跨平台）
 
@@ -74,37 +86,36 @@ npx wrangler deploy               # 部署
 
 | Method | Path | 说明 |
 |--------|------|------|
-| GET | `/health` | 健康检查 |
+| GET | `/api/health` | 健康检查；`/health` 当前返回 404 |
 | GET | `/` | 服务信息页 |
 | POST | `/api/create-room` | 创建私有房间，返回 `room_id` 和 `ws_url` |
 | POST | `/api/match/enqueue` | 加入公共匹配队列 |
 | POST | `/api/match/cancel` | 离开队列 |
 | GET | `/room/:id/ws` | WebSocket 帧同步端点（客户端用 `wss://` 连接）|
-| POST | `/api/submit-replay` | 提交异步回放（JSON），存入 R2 |
+| POST | `/api/submit-replay` | 提交 JSON 并存入 R2；accepted 仅表示存储成功，不是验算通过 |
 | GET | `/room/:id/status` | 查询房间状态 |
 
 ## WebSocket 协议
 
-所有消息均为 JSON 信封格式：
+HTTP API 使用 JSON；WebSocket 主协议是 **二进制 v2**，模拟标识
+`2026.07.21-bin`。字符串/JSON 兼容分支不能替代主协议。
+编码和解码使用现有实现：
 
-```json
-{ "type": "<消息类型>", "data": { ... }, "seq": <序列号> }
-```
+- [Worker protocol.ts](src/protocol.ts)
+- [Godot battle_protocol.gd](../../battle/battle_protocol.gd)
+- [Web protocol.js](../../../web-prototype/src/network/protocol.js)
 
-消息类型（详见 [src/protocol.ts](src/protocol.ts) 和 Godot 端 [battle_protocol.gd](../../../scripts/battle/battle_protocol.gd)）：
-- `ready`：玩家准备就绪
-- `launch`：发射指令（量化后的 power/height/direction/angle）
-- `input_batch`：帧输入批次（每 3 帧一批，20Hz 发送）
-- `state_hash`：状态哈希校验（每 60 帧一次）
-- `opponent_disconnect`：对手断线
-- `error`：错误消息
+主要编号包含 `HELLO`、`WELCOME`、`READY`、`LAUNCH`、`LAUNCH_BOTH`、
+`INPUT`、`INPUT_BATCH`、`HASH_CHECK`、`ERROR`。
+当前协议常量 `INPUT_BATCH_SIZE = 6`、`HASH_CHECK_INTERVAL = 60`；
+不要继续沿用旧 JSON 文档中的每 3 帧/20 Hz 或方向 int16 说明。
 
 ## wrangler.toml 配置说明
 
 ```toml
 name = "beyblade-battle-server"           # Worker 名称，决定子域名前缀
 main = "src/worker.ts"                    # 入口文件
-compatibility_date = "2025-01-29"         # 兼容性日期，需 >= 2024-06 以支持 DO + WebSocket
+compatibility_date = "2026-06-01"         # 当前仓库配置
 compatibility_flags = ["nodejs_compat"]   # Node.js 兼容（未来可能使用 Buffer/crypto）
 
 [[durable_objects.bindings]]              # 战斗房间 Durable Object
@@ -121,6 +132,8 @@ new_classes = ["BattleRoom", "Matchmaker"]
 
 [vars]                                    # 环境变量（可在 dashboard 中覆盖）
 ENVIRONMENT = "production"
+PROTOCOL_VERSION = 2
+SIMULATION_VERSION = "2026.07.21-bin"
 ROOM_IDLE_TIMEOUT_SEC = 60                # 房间空闲 60s 自动清理
 BATCH_FRAMES = 3                          # 每 3 帧一批输入
 DESYNC_CHECK_INTERVAL = 60                # 每 60 帧校验一次哈希
@@ -130,21 +143,27 @@ binding = "REPLAYS"
 bucket_name = "beyblade-replays"
 ```
 
-### 免费层限制（Cloudflare Free）
+上述 `[vars]` 是配置内容，不能当成已被代码消费的运行时开关。
+例如 `BATCH_FRAMES = 3` 与协议常量 `INPUT_BATCH_SIZE = 6` 不同；
+实际编码和发送应核对源码。完整配置以 [wrangler.toml](wrangler.toml) 为准。
 
-| 资源 | 免费额度 | 本项目预估 |
-|------|---------|-----------|
-| Workers 请求 | 100,000 次/天 | 每局约 600-2000 请求，足够数百局/天 |
-| Durable Objects | 无显式请求上限；单次 CPU 限 50ms（DO 的 fetch 上下文）| 每次转发约 1-3ms，远低于限制 |
-| R2 存储 | 10 GB | 每局回放约 5-20KB，可存数十万局 |
-| R2 Class A 操作 | 1,000,000 次/月 | 每局 1 次写入，可支撑数万局/月 |
-| R2 Class B 操作 | 10,000,000 次/月 | 读取回放时使用 |
-| WebSocket | 通过 DO 原生支持，无额外费用 | 帧同步中继使用 |
+### 套餐与容量（待核实）
+
+旧版免费配额与每日局数估算已移除：没有实际账号计划和消息/存储压测支撑。
+部署前核实以下官方资料；本次整理未联网确认其最新数字：
+
+- [Workers 定价](https://developers.cloudflare.com/workers/platform/pricing/)
+- [Durable Objects 定价](https://developers.cloudflare.com/durable-objects/platform/pricing/)
+- [Durable Objects 迁移](https://developers.cloudflare.com/durable-objects/reference/durable-objects-migrations/)
+- [R2 定价](https://developers.cloudflare.com/r2/pricing/)
+
+当前迁移使用 `new_classes`，不能据此假定已经采用免费计划所需的 DO 类型。
+已有远端迁移需要按实际部署历史处理，不直接改旧 tag。
 
 ### 注意事项
 
-1. **中国大陆访问**：免费层走 Cloudflare 全球网络。同步排位赛对延迟敏感（<100ms 体验最佳），大陆玩家可能需要香港/亚太线路或国内服务器。异步积分赛对延迟不敏感，免费层完全可用。
-2. **wrangler 版本**：本项目固定 `wrangler@^3.60.0`（兼容 Node 18/20）。如需使用 wrangler@4，请先升级到 Node 22+。
+1. **中国大陆访问**：公网线路、DNS、域名和移动网络质量需实测；不能以“异步”推导服务必然可达。
+2. **wrangler 版本**：依赖范围见 package.json，实际安装版本见 package-lock.json；升级需单独验证。
 3. **API Token 权限**：如果不想用 OAuth 登录，可以在 Cloudflare Dashboard 创建 API Token，权限需要：
    - Workers Routes:Edit
    - Workers Scripts:Edit
@@ -158,36 +177,45 @@ bucket_name = "beyblade-replays"
 ### Godot 端
 
 ```gdscript
+const BattleSession = preload("res://scripts/battle/battle_session.gd")
 var ws_transport := WebSocketTransport.new()
 var session := BattleSession.create_frame_sync_battle(
     player_build,
+    enemy_build,
     arena_map,
     20260718,
-    ws_transport
+    ws_transport,
+    0
 )
 # battle_screen 通过 set_battle_session(session) 注入
 battle_screen.set_battle_session(session)
-ws_transport.connect_to_url("wss://beyblade-battle-server.<你的子域名>.workers.dev/room/room_xxx/ws")
+session.connect_to_room("wss://beyblade-battle-server.<你的子域名>.workers.dev/room/room_xxx/ws")
 ```
 
-### Web 端
+### Web 端（API 形状示例，不是完整联调脚本）
 
 ```javascript
 import { BattleSession } from './network/battle_session.js';
 import { WebSocketTransport } from './network/websocket_transport.js';
 
-const transport = new WebSocketTransport();
-const session = BattleSession.createFrameSyncBattle(playerBuild, arenaMap, 20260718, transport);
-session.connect('battle_finished', (result) => { /* 显示结算 */ });
-transport.connect('wss://beyblade-battle-server.<你的子域名>.workers.dev/room/room_xxx/ws');
+// sim 是已按同一版本、双方配置、地图和 seed 创建的 BattleSimulation。
+const transport = new WebSocketTransport(roomWsUrl);
+const session = BattleSession.createFrameSyncBattle(sim, transport, 0);
+session.on('finish', (result) => { /* 显示结算 */ });
+transport.connect();
 ```
+
+Godot 的会话脚本没有 `class_name BattleSession`，调用方需先 preload 该脚本。
+两端示例只说明当前签名；还需要处理握手、slot、ready、发射、轮询与断开。
+当前 Web 求解器、Godot 求解器和网络标识未统一，不把此示例视为跨端验收结果。
 
 ## 反作弊说明
 
-帧同步中继模式为了适配免费层，不在服务器运行物理，但通过以下手段保证公平：
+帧同步中继不运行服务器物理，现有输入和哈希机制有以下边界：
 1. **输入量化**：所有输入使用 int8/int16 量化传输，不存在浮点歧义
 2. **确定性物理**：固定 1/60s 步长，种子化随机数
-3. **哈希校验**：每 60 帧双方交换状态 SHA-256 哈希，不一致即检测到 desync/作弊
-4. **回放审计**：对局完成后完整回放可提交到 R2，服务端可用 Godot headless 批量审计高段位对局（需付费 Worker 或自建服务器）
+3. **哈希交换**：用于报告分歧，分歧不等同于作弊；本次未验证两端哈希算法一致性。
+4. **回放审计**：当前 R2 上传不执行重演，headless 审计属于待实现方案。
 
-后续如需更强反作弊（排位赛），可切换到 StateSync 模式（服务端权威物理），但需要付费 Cloudflare Workers Unbound 或自建服务器。
+正式排位的目标是 StateSync 与服务端权威物理。普通付费 Worker 不会因此获得
+运行 Godot 进程的能力，需要另行选择支持该运行时的宿主。

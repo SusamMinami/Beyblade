@@ -10,3 +10,9 @@
 /scripts/server/cf_worker/node_modules/
 /scripts/server/cf_worker/.wrangler/
 /scripts/server/cf_worker/.dev.vars
+
+# Local editor, Python, and review logs
+/.vscode/
+**/__pycache__/
+*.py[cod]
+/.impeccable/**/*.log

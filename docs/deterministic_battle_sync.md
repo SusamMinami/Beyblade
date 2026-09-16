@@ -1,12 +1,20 @@
 # Web / Godot 确定性战斗同步
 
+最后核对：2026-09-16。本文维护共有规则与版本差异，不宣称全端实时一致。
+
+## 版本与兼容范围
+
+| 范围 | 当前声明 | 来源 |
+| --- | --- | --- |
+| Web 战斗求解器 | `2026.09.16-web-v3` | [battle-simulation.js](../web-prototype/src/core/battle-simulation.js) |
+| Godot 战斗求解器 | `2026.07.21-web-v2` | [battle_simulation.gd](../scripts/battle/battle_simulation.gd) |
+| Web / Godot / Worker 网络层 | 协议 `2`，模拟标识 `2026.07.21-bin` | [JS](../web-prototype/src/network/protocol.js)、[GDScript](../scripts/battle/battle_protocol.gd)、[TS](../scripts/server/cf_worker/src/protocol.ts) |
+
+Web v3 增加遗迹方形边界与障碍碰撞，Godot 和网络层尚未迁移该扩展。
+网络层标识相同不代表双方求解器相同；不得仅改版本字符串就允许新增地图联网。
+旧金标只覆盖其既有场景，不证明新地图、回放恢复或二进制联机兼容。
+
 ## 权威边界
-
-当前冻结模拟版本：
-
-```text
-2026.07.21-web-v2
-```
 
 `BattleSimulation` 是战斗规则的唯一权威。它负责：
 
@@ -33,7 +41,7 @@ Godot `world.y` 由 `ArenaMapResource.get_height_at()` 加陀螺离地高度得�
 
 ## 跨端契约
 
-Web 与 Godot 共享：
+以下为两端共有的旧规则基线，新增场景不在此范围：
 
 - 15 个正式 `part_id` 及其参数。
 - `AssemblyCalculator` 派生公式。
@@ -43,8 +51,20 @@ Web 与 Godot 共享：
 - 发射高度、失衡、擦地损耗、风险状态和碰撞遥测。
 - DIY 尺寸、高度、轮廓、对称、材料倍率和平行轴惯量。
 
-`tests/battle/battle_simulation_test.gd` 使用最新 Web 规则生成的固定种子快照作为金标。
+`tests/battle/battle_simulation_test.gd` 使用已有共有规则的固定种子快照作为金标。
 跨 JavaScript 与 GDScript 允许 `1e-4` 浮点误差，不允许结果、事件或胜负原因漂移。
+
+## 输入与恢复的实现状态
+
+- 两端求解器已有显式双方发射、双方输入与帧计数；旧 AI 入口仍保留。
+- Godot 已有 `restore_from_snapshot()` 及独立规范化编码/哈希模块。
+- Web 求解器已有 `getSnapshot()`，尚未提供对应的快照恢复方法。
+- Godot 战斗页已使用 `BattleSession`；Web 主游戏仍直接使用 `BattleSimulation`。
+- 网络层存在异步回放数据组装，但独立播放器、命令行验算和跨端恢复一致性
+  不应标为已验收。详见 [混合 PVP 架构](hybrid_pvp_architecture.md)。
+
+规则改动先在 Web 实现并验证，记录版本和未迁移范围。移植 Godot 或启用跨端联机前，
+同步参数、规则、地图数据与金标，重新验证相同输入及快照恢复。
 
 ## 后续异步 PVP
 

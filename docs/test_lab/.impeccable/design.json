@@ -1,0 +1,38 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-09-15T15:20:00+08:00",
+  "title": "Battle Beyblade Test Lab",
+  "extensions": {
+    "motion": [
+      {
+        "name": "specimen-idle",
+        "value": "0.18 rad/s",
+        "purpose": "Inspect the full existing specimen without moving the apparatus."
+      },
+      {
+        "name": "measurement",
+        "value": "2.4s",
+        "purpose": "Visual scan duration; does not change physics or simulate a real measurement."
+      }
+    ],
+    "breakpoints": [],
+    "shadows": []
+  },
+  "components": [],
+  "narrative": {
+    "northStar": "The user's silver and cyan laboratory reference",
+    "overview": "A native Godot scene, not an HTML component library. This contract is scoped to the test lab only.",
+    "keyCharacteristics": [
+      "Real 3D equipment",
+      "Live in-world measurements",
+      "Compact portrait controls"
+    ],
+    "rules": [],
+    "dos": [
+      "Preserve the existing five-part specimen and game units."
+    ],
+    "donts": [
+      "Do not invent functionality or propagate this palette to unrelated screens."
+    ]
+  }
+}

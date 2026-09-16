@@ -1,0 +1,107 @@
+import { chromium } from "playwright";
+import assert from "node:assert/strict";
+import { mkdir } from "node:fs/promises";
+import { resolve } from "node:path";
+import { normalizeShowroom, equipDisplayStage } from "../src/core/showroom-state.js";
+import { windParameters } from "../src/core/lab-state.js";
+const out = resolve("../.impeccable/review/showroom");
+await mkdir(out, { recursive: true });
+const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? "C:/Program Files/Google/Chrome/Application/chrome.exe", headless: true });
+const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: "no-preference" });
+const key = "spin-core-web-prototype-v2";
+await context.addInitScript((key) => {
+  if (!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify({
+    version: 2, tutorial: { completed: true, stage: "complete" },
+    lab: { settings: { autoRotate: false, windSpeed: 8, windDirection: 90 } },
+  }));
+}, key);
+const page = await context.newPage();
+const errors = [];
+page.on("pageerror", (e) => errors.push(e.message));
+let checks = 0;
+const check = (ok, label) => { assert.ok(ok, label); checks++; };
+const saved = () => page.evaluate((key) => JSON.parse(localStorage.getItem(key)), key);
+const capture = async (name, viewport = null) => {
+  if (viewport) await page.setViewportSize(viewport);
+  await page.waitForTimeout(350);
+  await page.screenshot({ path: `${out}/${name}.png` });
+};
+const readyLab = () => page.waitForFunction(() => !document.querySelector(".lab-start")?.disabled);
+const readyLift = () => page.waitForFunction(() => document.querySelector(".collection-view")?.dataset.lift === "idle" && !document.querySelector("[data-show-loadout]")?.disabled);
+try {
+  await page.goto(`${process.env.LAB_TEST_URL ?? "http://127.0.0.1:5173"}/#lab`);
+  await readyLab();
+  check(Number(await page.locator("#lab-rpm").textContent()) === 0, "Idle rotation can stay off");
+  await capture("lab-close-desktop");
+  await page.locator('[data-view="top"]').click();
+  await page.waitForTimeout(600);
+  await page.locator('[data-lab="test"]').click();
+  await page.waitForFunction(() => Number(document.querySelector("#lab-rpm").textContent) > 100);
+  check(Number(await page.locator("#lab-lean").textContent()) > 0, "Wind drives measured visual tilt");
+  check(Number(await page.locator("#lab-drift").textContent()) > 0, "Wind drives downstream visual displacement");
+  await capture("lab-top-running", { width: 390, height: 844 });
+  check(await page.locator(".lab-overhead-values").isVisible(), "Readout remains available overhead");
+  await page.waitForFunction(() => document.querySelector(".lab-start b").textContent === "再次测试");
+  const report = (await saved()).lab.records[0];
+  check(report.windSpeed === 8 && report.windDirection === 90, "Wind speed/direction persisted in report");
+  await page.locator('[data-lab="wind"]').click();
+  await page.locator('[data-setting="windSpeed"]').fill("0");
+  await page.locator('[data-setting="windSpeed"]').dispatchEvent("change");
+  check((await saved()).lab.settings.windSpeed === 0, "Manual wind-speed control saved");
+  await page.locator('[data-lab="wind"]').click();
+  await page.locator('[data-lab="collection"]').click();
+  await readyLift();
+  check(await page.locator(".collection-scene canvas").count() === 1, "Collection uses the shared live renderer");
+  await capture("holo-mobile");
+  await capture("holo-desktop", { width: 1440, height: 1000 });
+  await page.locator(".game-shell").screenshot({ path: `${out}/holo-portrait.png` });
+  await page.locator('[data-show-loadout="1"]').click();
+  check(await page.locator("[data-show-loadout='2']").isDisabled(), "Repeated selection blocked while lift moves");
+  check(await page.locator(".collection-view").getAttribute("data-lift") === "lowering", "Old specimen lowers before selection changes");
+  check((await saved()).activeLoadoutIndex === 0 || (await saved()).activeLoadoutIndex === undefined, "Saved selection does not jump ahead of descent");
+  await page.waitForFunction(() => document.querySelector(".collection-view").dataset.lift === "rising");
+  check((await saved()).activeLoadoutIndex === 1, "Selection commits only under deck");
+  await page.screenshot({ path: `${out}/lift-rising.png` });
+  await readyLift();
+  check((await page.locator(".collection-description h2").textContent()).includes("突击"), "Description and active specimen agree");
+  await page.locator('[data-collection="stages"]').click();
+  check(await page.locator('[data-equip-stage="arena"]').isDisabled(), "Advanced stage locked at LV1");
+  await page.locator('[data-preview-stage="arena"]').click();
+  check((await saved()).showroom?.equipped !== "arena", "Preview never equips locked stage");
+  await capture("arena-desktop");
+  await page.locator(".game-shell").screenshot({ path: `${out}/arena-portrait.png` });
+  await capture("arena-mobile", { width: 390, height: 844 });
+  await page.locator('[data-collection="lab"]').click();
+  await readyLab();
+  check(await page.locator(".lab-scene canvas").count() === 1, "Renderer returns to lab");
+  await page.locator('[data-lab="collection"]').click();
+  await readyLift();
+  check(await page.locator(".collection-view").getAttribute("data-stage") === "holo", "Leaving preview restores equipped stage");
+  // Simulate earned XP only in this disposable browser, never in the user profile.
+  await page.evaluate((key) => {
+    const state = JSON.parse(localStorage.getItem(key));
+    state.lab.xp = 120;
+    localStorage.setItem(key, JSON.stringify(state));
+  }, key);
+  await page.reload();
+  await readyLift();
+  await page.locator('[data-collection="stages"]').click();
+  await page.screenshot({ path: `${out}/unlock.png` });
+  await page.locator('[data-equip-stage="arena"]').click();
+  check((await saved()).showroom.owned.includes("arena"), "Level reward unlocks stage");
+  check((await saved()).showroom.equipped === "arena", "Unlocked stage is equipped");
+  await page.reload();
+  await readyLift();
+  check(await page.locator(".collection-view").getAttribute("data-stage") === "arena", "Equipped stage survives reload");
+  await page.emulateMedia({ reducedMotion: "reduce" });
+  await page.locator('[data-show-loadout="2"]').click();
+  await readyLift();
+  check((await saved()).activeLoadoutIndex === 2, "Reduced-motion lift completes");
+  await page.locator('[data-collection="assembly"]').click();
+  check(await page.locator(".game-shell").getAttribute("data-screen") === "assembly", "Workshop still accessible");
+  check(errors.length === 0, `No browser exceptions: ${errors.join("; ")}`);
+  check(!equipDisplayStage(normalizeShowroom(), "arena", 0).ok, "Unlock rejects insufficient level");
+  check(equipDisplayStage(normalizeShowroom(), "arena", 120).ok, "Unlock accepts earned level");
+  check(windParameters({ wind: "强逆风" }).speed === 8, "Old wind presets migrate");
+  console.log(`PASS: ${checks} showroom and wind checks. Captures: ${out}`);
+} finally { await browser.close(); }

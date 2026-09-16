@@ -32,6 +32,10 @@ export function applySurfaceFinish(material, finish = "machined", scale = 1) {
         float grain = finishBand(radius * 420.0);
         float scuff = finishBand(p.x * 83.0 + sin(p.z * 17.0) * 3.0);
         float tint = 0.97 + grain * 0.022 + scuff * 0.015;`,
+      stone: `float grain = finishBand(p.x * 123.0 + sin(p.z * 37.0) * 4.0)
+          * finishBand(p.z * 139.0 + sin(p.x * 31.0) * 3.0);
+        float broad = sin(p.x * 5.7 + sin(p.z * 3.4)) * sin(p.z * 8.3);
+        float tint = 0.84 + grain * 0.17 + broad * 0.1;`,
     }[finish] ?? "float grain = 0.0; float tint = 1.0;";
     shader.fragmentShader = shader.fragmentShader.replace(
       "#include <roughnessmap_fragment>",
