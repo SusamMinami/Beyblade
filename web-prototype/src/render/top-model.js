@@ -47,7 +47,7 @@ function createMaterials(colors, materialType = "stock") {
       polymer: material(ringColor, 0.14, 0.2, { clearcoat: 0.78 }),
       polymerAccent: material(ringAccent, 0.2, 0.16, { clearcoat: 0.88 }),
       core: material(colors.core, 0.42, 0.2, { clearcoat: 0.7 }),
-      metal: material(METAL, 0.96, 0.16),
+      metal: material(colors.metal ?? METAL, 0.96, 0.16),
       darkMetal: material(DARK_METAL, 0.9, 0.25),
       rubber: material(RUBBER, 0.05, 0.82),
       shadow: material(0x263138, 0.48, 0.46),
@@ -538,6 +538,12 @@ export function createTopModel(
     const materials = createMaterials(colors, customization.material);
     top.userData.materials.push(...Object.values(materials));
     const partGroup = builder(partId, materials, customization);
+    if (slot === "coreLock" && colors.emblem) {
+      // Small authored insignia: actual geometry, never a texture placeholder.
+      const count = colors.emblem;
+      addRadialDetails(partGroup, count, 0.13, 0.205,
+        bladeGeometry(count === 2 ? 0.23 : 0.1, 0.038, 0.027), materials.core);
+    }
     compactPart(partGroup);
     partGroup.name = slot;
     partGroup.position.y = SLOT_Y[slot];
@@ -620,4 +626,33 @@ export function disposeTopModel(top) {
     if (child.isMesh) child.geometry.dispose();
   });
   for (const item of top.userData.materials ?? []) item.dispose();
+}
+
+export function applyTopDamage(top, structure) {
+  if (!structure || top.userData.damageRevision === structure.revision) return;
+  top.userData.damageRevision = structure.revision;
+  for (const part of structure.parts) {
+    const group = top.userData.partGroups[part.slot];
+    if (!group) continue;
+    group.traverse((child) => {
+      if (!child.isMesh) return;
+      const position = child.geometry.getAttribute("position");
+      const original = child.userData.undamagedPositions ??= position.array.slice();
+      const baseColor = child.userData.undamagedColor ??= child.material.color.clone();
+      child.material.color.copy(baseColor).lerp(new THREE.Color("#413329"), part.worst * 0.32);
+      child.material.roughness = Math.max(child.material.roughness, part.worst * 0.8);
+      for (let i = 0; i < position.count; i++) {
+        const x = original[i * 3], y = original[i * 3 + 1], z = original[i * 3 + 2];
+        const angle = (Math.atan2(z, x) + Math.PI * 2) % (Math.PI * 2);
+        const at = angle / (Math.PI * 2) * part.sectors.length;
+        const low = Math.floor(at), mix = at - low;
+        const damage = part.sectors[low] * (1 - mix) + part.sectors[(low + 1) % part.sectors.length] * mix;
+        const dent = 1 - damage ** 1.4 * 0.3;
+        position.setXYZ(i, x * dent, y - damage ** 2 * 0.1 * Math.hypot(x, z), z * dent);
+      }
+      position.needsUpdate = true;
+      child.geometry.computeVertexNormals();
+      child.geometry.computeBoundingSphere();
+    });
+  }
 }

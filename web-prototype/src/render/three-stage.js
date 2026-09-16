@@ -12,11 +12,16 @@ import { OutputPass } from "three/addons/postprocessing/OutputPass.js";
 import { applySurfaceFinish } from "./surface-finish.js";
 import { addArenaArchitecture } from "./arena-details.js";
 import { BattleEffects } from "./battle-effects.js";
+import { StreetAtmosphere } from "./street-atmosphere.js";
+import { ChampionshipAtmosphere } from "./championship-atmosphere.js";
+import { createOutdoorEnvironment, normalizeSceneTime, resolveSceneTime } from "./scene-time.js";
+import { createDriveZoneModel, updateDriveZoneModel } from "./drive-zone-model.js";
 import {
   createTopModel,
   disposeTopModel,
   setActivePart,
   updateTopPartFocus,
+  applyTopDamage,
 } from "./top-model.js";
 
 const LAUNCH_MIN_POWER = 0.35;
@@ -300,7 +305,10 @@ export class ThreeStage {
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color("#090d0f");
     this.scene.fog = new THREE.FogExp2("#090d0f", 0.035);
-    this.camera = new THREE.PerspectiveCamera(38, 1, 0.1, 80);
+    this.camera = new THREE.PerspectiveCamera(38, 1, 0.1, 900);
+    this.sceneTime = "auto";
+    this.scenePeriod = resolveSceneTime(this.sceneTime);
+    this.outdoorEnvironments = {};
     this.camera.position.set(0, 3, 7);
     this.cameraTarget = new THREE.Vector3(0, 0, 0);
     this.desiredCameraPosition = this.camera.position.clone();
@@ -342,6 +350,8 @@ export class ThreeStage {
     this.arenaLoadToken = 0;
     this.scenePulse = 0;
     this.energyMaterials = [];
+    this.streetAtmosphere = null;
+    this.championshipAtmosphere = null;
 
     this.arenaRoot = new THREE.Group();
     this.modelRoot = new THREE.Group();
@@ -551,6 +561,7 @@ export class ThreeStage {
     this.scene.add(key);
     const edge = new THREE.DirectionalLight(0x87dbe8, 1.3);
     edge.position.set(-5, 4, -5);
+    this.edgeLight = edge;
     this.scene.add(edge);
     this.spotlights = [0, 1].map((index) => {
       const light = new THREE.SpotLight(index ? 0x9cdcf2 : 0xffe0ac,
@@ -1053,6 +1064,10 @@ export class ThreeStage {
   }
 
   _clearModels() {
+    this.streetAtmosphere?.dispose();
+    this.streetAtmosphere = null;
+    this.championshipAtmosphere?.dispose();
+    this.championshipAtmosphere = null;
     this.battleEffects.reset();
     for (const effect of this.effects) {
       effect.geometry.dispose();
@@ -1365,6 +1380,7 @@ export class ThreeStage {
   }
 
   showArena(arena) {
+    this.scenePeriod = resolveSceneTime(this.sceneTime);
     this.mode = "map";
     this.activeArena = arena;
     this._configureLighting("map");
@@ -1387,8 +1403,11 @@ export class ThreeStage {
     enemySelection,
     playerColors,
     playerCustomizations = {},
+    enemyIdentity = { colors: { ring: "#ec5b45", core: "#dfe9e7" }, customizations: {} },
   ) {
     this.mode = "battle";
+    this.finishElapsed = 0;
+    this.scenePeriod = resolveSceneTime(this.sceneTime);
     this.activeArena = arena;
     this._configureLighting("battle");
     this.partEditorSlot = null;
@@ -1410,10 +1429,7 @@ export class ThreeStage {
       playerColors,
       playerCustomizations,
     );
-    this.enemyTop = createTopModel(enemySelection, {
-      ring: "#ec5b45",
-      core: "#dfe9e7",
-    });
+    this.enemyTop = createTopModel(enemySelection, enemyIdentity.colors, enemyIdentity.customizations);
     this.playerTop.scale.setScalar(0.92);
     this.enemyTop.scale.setScalar(0.92);
     this.playerTop.position.set(0, this._topHeight(this.playerTop, 0, 4.45), 4.45);
@@ -1427,10 +1443,14 @@ export class ThreeStage {
 
   _mountArena(arena) {
     const token=++this.arenaLoadToken;
+    this.driveZoneModel = createDriveZoneModel(arena, (x, z) =>
+      arenaHeightAt(arena, Math.hypot(x, z), Math.atan2(z, x)));
+    this.arenaRoot.add(this.driveZoneModel);
     this.energyMaterials=[];
     this.arenaReady=false;
     this.scenePulse=0;
     const status=(state,message="")=>this.container.dispatchEvent(new CustomEvent("arenastatus",{detail:{state,message}}));
+    this._applySceneTime();
     if (!arena.scene) {
       this.arenaRoot.add(createArenaModel(arena));
       this.arenaReady=true;
@@ -1439,14 +1459,6 @@ export class ThreeStage {
     }
     status("loading","正在准备场景…");
     const urls={championship:championshipUrl,street:streetUrl,floating_ruins:ruinsUrl};
-    const background=arena.id==="street" ? "#a2a18b" : arena.id==="ruins" ? "#25394d" : "#0c1c25";
-    this._setSceneColors(background,arena.id==="ruins" ? .025 : .012);
-    this.keyLight.color.set(arena.id==="street" ? 0xffd092 : 0xc9e6ff);
-    this.keyLight.position.set(-8,12,6);
-    this.keyLight.intensity=arena.id==="street" ? 1.9 : 2.1;
-    this.ambientLight.intensity=arena.id==="street" ? .3 : .5;
-    this.scene.environmentIntensity=arena.id==="street" ? .25 : .36;
-    this.spotlights.forEach(light=>{light.visible=arena.id!=="street";});
     new GLTFLoader().loadAsync(urls[arena.scene]).then(gltf=>{
       if (token!==this.arenaLoadToken) {disposeGroup(gltf.scene);return;}
       gltf.scene.traverse(mesh=>{
@@ -1461,6 +1473,19 @@ export class ThreeStage {
         }
       });
       this.arenaRoot.add(gltf.scene);
+      if (arena.id === "street") {
+        this.streetAtmosphere = new StreetAtmosphere(this.scene, gltf.scene, {
+          renderer: this.renderer,
+          reflectionSize: this.container.clientWidth < 480 ? 512 : 768,
+          exclude: [this.effectRoot],
+          period: this.scenePeriod,
+        });
+      }
+      if (arena.id === "metal") {
+        this.championshipAtmosphere = new ChampionshipAtmosphere(this.scene, gltf.scene, {
+          period: this.scenePeriod,
+        });
+      }
       this.arenaReady=true;
       status("ready");
     }).catch(error=>{
@@ -1468,6 +1493,71 @@ export class ThreeStage {
       console.error("Arena asset failed",arena.scene,error);
       status("error","场景载入失败，请重新选择场地或刷新。");
     });
+  }
+
+  setSceneTime(value) {
+    this.sceneTime = normalizeSceneTime(value);
+    // Re-resolve on scene entry; an automatic clock never changes mid-match.
+    if (this.mode !== "map") return;
+    this.scenePeriod = resolveSceneTime(this.sceneTime);
+    this._applySceneTime();
+  }
+
+  _applySceneTime() {
+    const arena = this.activeArena;
+    if (!arena) return;
+    this._configureLighting(this.mode);
+    const day = this.scenePeriod === "day";
+    const street = arena.id === "street";
+    const ruins = arena.id === "ruins";
+    const championship = arena.id === "metal";
+    this.container.dataset.scenePeriod = this.scenePeriod;
+    if (day || street || ruins) {
+      this.outdoorEnvironments[this.scenePeriod] ??=
+        createOutdoorEnvironment(this.renderer, this.scenePeriod);
+      this.scene.environment = this.outdoorEnvironments[this.scenePeriod].texture;
+    }
+    const background = day ? (street ? "#bed5d9" : ruins ? "#afc9dc" : "#bdcdd1")
+      : street ? "#142635" : ruins ? "#25394d" : arena.scene ? "#0c1c25"
+        : this.mode === "map" ? "#c8cecd" : "#252d30";
+    this._setSceneColors(background, street ? (day ? .0028 : .0038) : ruins ? .025 : .012);
+    if (arena.scene || day) {
+      this.keyLight.color.set(day ? 0xffebca : street ? 0xaac6e5 : 0xc9e6ff);
+      this.keyLight.position.set(...(street ? (day ? [-45, 95, 55] : [-40, 90, 35]) : [-8, 12, 6]));
+      this.keyLight.intensity = day ? 2.5 : street ? .85 : 2.1;
+      this.ambientLight.intensity = day ? 1.15 : street ? .38 : .5;
+      this.ambientLight.color.set(day ? 0xcce9f5 : 0xeaf7ff);
+      this.ambientLight.groundColor.set(day ? 0x9e9579 : 0x403c32);
+      this.scene.environmentIntensity = day ? .72 : street ? .6 : .36;
+    }
+    if (street || day) {
+      this.edgeLight.intensity = day ? .25 : .28;
+      this.renderer.toneMappingExposure = day ? .95 : 1;
+      this.bloom.enabled = true;
+      this.bloom.strength = day ? .10 : .18;
+      this.bloom.threshold = day ? 1.8 : 1.4;
+    }
+    if (street) {
+      const shadow = this.keyLight.shadow.camera;
+      shadow.left = shadow.bottom = -36;
+      shadow.right = shadow.top = 36;
+      shadow.far = 260;
+      shadow.updateProjectionMatrix();
+    }
+    if (championship) {
+      this._setSceneColors(day ? "#9cbbc8" : "#0c1c25", day ? .004 : .017);
+      this.keyLight.intensity = day ? 2.35 : 1.45;
+      this.ambientLight.intensity = day ? .95 : .48;
+      this.edgeLight.intensity = day ? .4 : .9;
+      this.scene.environmentIntensity = day ? .7 : .5;
+      this.renderer.toneMappingExposure = day ? .98 : 1.02;
+      this.bloom.enabled = true;
+      this.bloom.strength = day ? .12 : .26;
+      this.bloom.threshold = day ? 1.65 : 1.35;
+    }
+    this.spotlights.forEach(light => { light.visible = !street && !championship && !day; });
+    this.streetAtmosphere?.setPeriod(this.scenePeriod);
+    this.championshipAtmosphere?.setPeriod(this.scenePeriod);
   }
 
   _frameBattle() {
@@ -1552,12 +1642,24 @@ export class ThreeStage {
   update(delta, simulation = null, paused = false) {
     const battleDelta = paused ? 0 : delta;
     if (simulation && this.playerTop && this.enemyTop) {
+      updateDriveZoneModel(this.driveZoneModel, simulation);
+      if (simulation.phase === "finished") {
+        this.finishElapsed += battleDelta;
+      }
       if (simulation.phase === "ready") {
         this.updateLauncherPreview(this.launcherParams);
       } else {
         this.launcherRoot.visible = false;
         this._applyTopState(this.playerTop, simulation.player, battleDelta);
         this._applyTopState(this.enemyTop, simulation.enemy, battleDelta);
+        if (simulation.phase === "finished") {
+          const won = simulation.result.winner === "player";
+          const winner = won ? this.playerTop : this.enemyTop;
+          const loser = won ? this.enemyTop : this.playerTop;
+          const state = won ? simulation.player : simulation.enemy;
+          winner.rotation.y = state.spinPhase + this.finishElapsed * (this.reducedMotion ? .4 : 2.6);
+          loser.rotation.z += Math.min(this.finishElapsed * 1.8, .85);
+        }
         this._updateBattleCamera(simulation);
       }
       this._updateControlArrow(simulation.player, simulation.phase);
@@ -1575,7 +1677,9 @@ export class ThreeStage {
     }
     this._updateEffects(battleDelta);
     this.visualTime += battleDelta;
+    this.streetAtmosphere?.update(battleDelta, this.reducedMotion);
     this.scenePulse *= Math.exp(-battleDelta*3.8);
+    this.championshipAtmosphere?.update(battleDelta, this.reducedMotion, this.scenePulse);
     const warning=simulation?.phase==="running" &&
       [simulation.player,simulation.enemy].some(top=>top.spinRiskState==="critical" || top.ringRiskState==="critical");
     this.energyMaterials.forEach(({material,color,strength})=>{
@@ -1583,7 +1687,8 @@ export class ThreeStage {
       if (!this.reducedMotion && (warning || this.scenePulse>.06)) {
         material.emissive.lerp(new THREE.Color(warning ? 0xff4934 : 0xffad45),warning ? .72 : this.scenePulse);
       }
-      material.emissiveIntensity=strength*(1+(this.reducedMotion ? 0 : this.scenePulse*.8+Math.sin(this.visualTime*.8)*.08));
+      const periodStrength = this.activeArena?.id === "metal" && this.scenePeriod === "day" ? .28 : 1;
+      material.emissiveIntensity=strength*periodStrength*(1+(this.reducedMotion ? 0 : this.scenePulse*.8+Math.sin(this.visualTime*.8)*.08));
     });
     this.battleEffects.update(battleDelta, [this.playerTop, this.enemyTop],
       this.mode === "battle" && simulation?.phase === "running", this.reducedMotion);
@@ -1757,7 +1862,8 @@ export class ThreeStage {
     model.position.set(state.position.x,
       this._topHeight(model, state.position.x, state.position.y, state.tilt),
       state.position.y);
-    model.rotation.y += state.spin * delta * 0.32;
+    model.rotation.y = state.spinPhase;
+    applyTopDamage(model, state.structure);
     const direction = Math.atan2(state.velocity.y, state.velocity.x);
     model.rotation.x = Math.cos(direction) * state.tilt;
     model.rotation.z = -Math.sin(direction) * state.tilt;
@@ -1765,6 +1871,12 @@ export class ThreeStage {
   }
 
   _updateBattleCamera(simulation) {
+    if (simulation.phase === "finished") {
+      const winner = simulation[simulation.result.winner].position;
+      this.desiredCameraPosition.set(winner.x * .55 + 6.5, 10.5, winner.y * .55 + 9);
+      this.desiredCameraTarget.set(winner.x * .55, -.2, winner.y * .55);
+      return;
+    }
     if (this.activeArena?.scene) {
       this._frameBattle();
       if (!this.reducedMotion) {
@@ -1796,6 +1908,11 @@ export class ThreeStage {
       0.1,
       player.y * 0.6 + enemy.y * 0.4,
     );
+  }
+
+  finishBattleVisual(simulation) {
+    const loser = simulation.result.winner === "player" ? simulation.enemy : simulation.player;
+    this.spawnImpact(loser.position, 1);
   }
 
   _updateControlArrow(player, phase) {
@@ -1924,13 +2041,20 @@ export class ThreeStage {
     const shadow = this.keyLight.shadow.camera;
     shadow.left = shadow.bottom = -extent;
     shadow.right = shadow.top = extent;
+    shadow.far = 35;
     shadow.updateProjectionMatrix();
     this.spotlights.forEach((light) => { light.visible = showsArena; });
     this.keyLight.color.setHex(0xfff3dd);
     this.keyLight.position.set(3,10,5);
     this.keyLight.intensity=2.5;
+    this.scene.environment = this.environmentTarget.texture;
+    this.ambientLight.color.setHex(0xeaf7ff);
+    this.ambientLight.groundColor.setHex(0x403c32);
     this.ambientLight.intensity=.8;
+    this.edgeLight.intensity=1.3;
     this.bloom.enabled = mode === "battle";
+    this.bloom.strength = .22;
+    this.bloom.threshold = 1.35;
     this.scene.environmentIntensity =
       mode === "assembly" ? 0.9 : mode === "map" ? 0.54 : 0.7;
     this.renderer.toneMappingExposure =
@@ -1967,6 +2091,7 @@ export class ThreeStage {
   }
 
   destroy() {
+    this.arenaLoadToken++;
     window.clearTimeout(this.impactClassTimer);
     this.resizeObserver.disconnect();
     this._clearModels();
@@ -1975,6 +2100,7 @@ export class ThreeStage {
     disposeGroup(this.effectRoot);
     this.battleEffects.dispose();
     this.environmentTarget.dispose();
+    Object.values(this.outdoorEnvironments).forEach(target => target.dispose());
     this.composer.passes.forEach((pass) => pass.dispose?.());
     this.composer.dispose();
     this.keyLight.shadow.dispose();

@@ -18,9 +18,11 @@
 | 项目概览 | [根 README](../README.md) | 项目定位、入口；后半部分保留早期设计背景 |
 | Web 开发与运行 | [Web README](../web-prototype/README.md) | 当前操作、存档、检查命令 |
 | Web 视觉与交互 | [Web DESIGN](../web-prototype/DESIGN.md) | 当前配色、布局、动态、减少动态效果 |
+| 任务、宿敌与成长故事 | [回声远征](campaign_direction.md) | 原任务线诊断、五章十战、人物关系、实现边界与后续提案 |
 | 战斗场景与模型 | [battle_worlds](battle_worlds.md) | Blender 源文件、导出、地图与碰撞 |
 | 展览厅原始方向 | [showroom-direction](test_lab/showroom-direction.md) | 参考方向与升降约束；实现细节以 Web DESIGN 为准 |
 | 数值与单位 | [参数基线](top_part_physics_baseline.md) | 15 个零件、DIY、平行轴惯量、游戏平衡单位 |
+| 结构损伤、加速区与对手形象 | [Web v4 战斗设计](structural_battle_design.md) | 局部受损、失衡停转、轮换供能、AI 争夺及近似边界 |
 | 跨端模拟 | [确定性同步](deterministic_battle_sync.md) | 版本差异、共有契约与移植验收 |
 | Godot 实验室 | [资产与运行](test_lab/README.md)、[视觉规范](test_lab/DESIGN.md) | 保留的 Godot 精密实验室，不约束 Web 新功能 |
 | Godot 局部损伤 | [碰撞测试交接](collision_damage_test_handoff.md) | Jolt 实验与正式求解器的职责边界 |
@@ -48,9 +50,13 @@ npm run dev
 | 实验室、报告、经验、商店 | `npm run verify:lab` |
 | 陈列室、升降、舞台、风场 | `npm run verify:showroom` |
 | 战斗场景、障碍碰撞、近景交互 | `npm run verify:worlds` |
+| 冠军场模型、移动灯光、日夜与资源释放 | `npm run verify:championship` |
+| 街头比例、日夜、积水反射与环境资源 | `node tools/verify-street.mjs` |
+| 故事任务、过关结算、战历与远征入口 | `npm run verify:campaign` |
+| 结构损伤、供能、AI 与战斗反馈 | `npm run verify:structure`、`npm run verify:battle-ui` |
 
-浏览器检查需要开发服务器和 Chrome，使用隔离存档。
-三个脚本均支持 `CHROME_PATH` 与 `LAB_TEST_URL`，后者填写源地址（默认
+浏览器检查需要开发服务器和 Chrome，使用隔离存档。`verify:structure` 为纯数值检查，无需浏览器。
+上述脚本均支持 `CHROME_PATH` 与 `LAB_TEST_URL`，后者填写源地址（默认
 `http://127.0.0.1:5173`，不带 `#lab` 等路由）。
 旧检查报告是对应交付时的证据，不代表当前工作区已重新通过检查。
 

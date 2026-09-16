@@ -1,0 +1,32 @@
+.journey-modes .scene-time {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  max-width: 148px;
+  padding: 0 6px;
+  border: 2px solid #12151a;
+  border-radius: 4px;
+  color: #12151a;
+  background: #fffdf7;
+  font-size: 12px;
+}
+.scene-time select {
+  min-width: 0;
+  width: 104px;
+  min-height: 40px;
+  padding: 0 2px;
+  border: 0;
+  border-radius: 2px;
+  font: inherit;
+  color: inherit;
+  background: inherit;
+  cursor: pointer;
+}
+.journey-modes .scene-time:hover { background: #e6f2f7; }
+.scene-time select:focus-visible { outline: 3px solid #266d9c; outline-offset: 1px; }
+.scene-time ::selection { background: #ffd23f; color: #12151a; }
+@media (max-width: 480px) {
+  .journey-modes .scene-time { padding: 0 3px; }
+  .scene-time > span { display: none; }
+  .scene-time select { width: 98px; }
+}

@@ -1,4 +1,7 @@
-export const SIMULATION_VERSION = "2026.09.16-web-v3";
+import { createStructure, applyStructuralImpact } from "./top-structure.js";
+import { driveZoneState, insideDriveZone, DRIVE_ZONE_RULES } from "./drive-zones.js";
+
+export const SIMULATION_VERSION = "2026.09.16-web-v4";
 
 export const BATTLE_RESULT = Object.freeze({
   SPIN_OUT: "spin_out",
@@ -42,6 +45,10 @@ function createTop(build, position) {
     position: { ...position },
     velocity: { x: 0, y: 0 },
     spin: 0,
+    spinPhase: 0,
+    structure: createStructure(build),
+    zone: { id: null, contested: false, gain: 0 },
+    stats: { zoneSeconds: 0, spinHarvested: 0, hits: 0, peakImpulse: 0 },
     durability: build.durability,
     tilt: 0,
     surfaceName: "",
@@ -93,6 +100,9 @@ export class BattleSimulation {
     this.collisionLog = [];
     this.player = createTop(this.playerBuild, { x: 0, y: 4.45 });
     this.enemy = createTop(this.enemyBuild, { x: 0, y: -4.45 });
+    this.driveZone = driveZoneState(this.arena, 0);
+    this.zoneOccupants = [];
+    this.lastZoneKey = "";
   }
 
   getSnapshot() {
@@ -104,6 +114,7 @@ export class BattleSimulation {
       player: this.player,
       enemy: this.enemy,
       events: this.events,
+      driveZone: this.driveZone,
     };
   }
 
@@ -189,6 +200,17 @@ export class BattleSimulation {
     this.time += dt;
     this.frame = (this.frame | 0) + 1;
     this.collisionCooldown = Math.max(this.collisionCooldown - dt, 0);
+    this.driveZone = driveZoneState(this.arena, this.time);
+    // Occupancy is sampled simultaneously, before integrating either actor.
+    this.zoneOccupants = [this.player, this.enemy].filter((top) =>
+      !this.driveZone.cooling && top.spin > MIN_ACTIVE_SPIN &&
+      insideDriveZone(top, this.driveZone.active));
+    const zoneKey = `${this.driveZone.active?.id}:${this.driveZone.cooling}`;
+    if (zoneKey !== this.lastZoneKey) {
+      this.lastZoneKey = zoneKey;
+      this.events.push({ type: "drive_zone", id: this.driveZone.active?.id,
+        cooling: this.driveZone.cooling });
+    }
 
     const enemyCtrl = enemyControl !== null ? enemyControl : this._getEnemyControl();
     this._integrateTop(this.player, playerControl, dt, false);
@@ -210,15 +232,30 @@ export class BattleSimulation {
     const currentSurface = this.arena.surfaceAt(radius);
     top.surfaceName = currentSurface.name;
     const spinBefore = top.spin;
+    top.spinPhase = (top.spinPhase + top.spin * dt * 0.32) % (Math.PI * 2);
+    const inZone = this.zoneOccupants.includes(top);
+    const contested = this.zoneOccupants.length > 1;
+    // Torque / live inertia; motor never repairs damage or revives a stopped top.
+    const supplied = inZone ? DRIVE_ZONE_RULES.torque /
+      top.structure.momentOfInertia * (contested ? 0.35 : 1) *
+      clamp(1 - top.structure.imbalance * 0.6, 0.25, 1) : 0;
+    const gain = Math.min(supplied, Math.max(0,
+      top.build.maxSpinSpeed * DRIVE_ZONE_RULES.spinCap - top.spin) / Math.max(dt, 1e-6));
+    top.zone = { id: inZone ? this.driveZone.active.id : null, contested: inZone && contested, gain };
+    if (inZone) {
+      top.stats.zoneSeconds += dt;
+      top.stats.spinHarvested += gain * dt;
+    }
 
     top.spin = Math.max(
-      top.spin -
-        top.build.spinDecayPerSecond *
+      top.spin + gain * dt -
+        (top.build.spinDecayPerSecond *
           currentSurface.spinDamping *
-          this.tuning.spinScale *
+          this.tuning.spinScale + top.structure.spinDrag) *
           dt,
       0,
     );
+    // Supply may only oppose drag, never exceed the motor's configured ceiling.
 
     const spinRatio = clamp(top.spin / top.build.maxSpinSpeed, 0, 1);
     const rawControl = {
@@ -235,11 +272,11 @@ export class BattleSimulation {
       1,
     );
     const controlAcceleration =
-      (top.build.controlForce / top.build.totalMass) *
+      (top.build.controlForce / top.structure.totalMass) *
       currentSurface.control *
       this.tuning.controlScale *
       mobility *
-      balanceControl;
+      balanceControl * controlMagnitude * top.structure.stiffness;
     top.velocity.x += control.x * controlAcceleration * dt;
     top.velocity.y += control.y * controlAcceleration * dt;
     top.controlInput = scale(control, controlMagnitude);
@@ -262,15 +299,16 @@ export class BattleSimulation {
     }
 
     const eccentricity = Math.hypot(
-      top.build.centerOfMass[0],
-      top.build.centerOfMass[2],
+      top.structure.centerOfMass[0],
+      top.structure.centerOfMass[2],
     );
     if (eccentricity > 0.005 && spinRatio > 0.05) {
       const phase =
         this.time * (5.2 + spinRatio * 3.1) +
         (isEnemy ? 2.1 : 0.4) +
         this.seed * 0.0001;
-      const wobble = eccentricity * 6.5 * (1.2 - top.build.stability);
+      const wobble = eccentricity * 6.5 * Math.max(0.05, 1.2 - top.structure.stability) +
+        top.structure.imbalance * 0.85;
       top.velocity.x += Math.cos(phase) * wobble * dt;
       top.velocity.y += Math.sin(phase) * wobble * dt;
     }
@@ -317,7 +355,7 @@ export class BattleSimulation {
     top.position.y += top.velocity.y * dt;
     this._resolveArenaRim(top, currentSurface);
     this._resolveObstacles(top);
-    top.spinLossRate = Math.max((spinBefore - top.spin) / Math.max(dt, 1e-6), 0);
+    top.spinLossRate = (spinBefore - top.spin) / Math.max(dt, 1e-6);
   }
 
   _resolveArenaRim(top, surface) {
@@ -368,14 +406,15 @@ export class BattleSimulation {
       const nearestX=clamp(px,obstacle.x-obstacle.hx,obstacle.x+obstacle.hx);
       const nearestY=clamp(py,obstacle.z-obstacle.hz,obstacle.z+obstacle.hz);
       let dx=px-nearestX, dy=py-nearestY, distance=Math.hypot(dx,dy);
-      if (distance>=TOP_RADIUS) continue;
-      let depth=TOP_RADIUS-distance;
+      const radius = this._contactRadius(top);
+      if (distance>=radius) continue;
+      let depth=radius-distance;
       if (distance<1e-8) {
         const gapX=obstacle.hx-Math.abs(px-obstacle.x);
         const gapY=obstacle.hz-Math.abs(py-obstacle.z);
         dx=gapX<gapY ? (Math.sign(px-obstacle.x)||1) : 0;
         dy=gapX<gapY ? 0 : (Math.sign(py-obstacle.z)||1);
-        depth=TOP_RADIUS+Math.min(gapX,gapY);
+        depth=radius+Math.min(gapX,gapY);
         distance=1;
       }
       const nx=dx/distance, ny=dy/distance;
@@ -386,12 +425,43 @@ export class BattleSimulation {
       top.velocity.x-=nx*approach*1.52;
       top.velocity.y-=ny*approach*1.52;
       top.spin=Math.max(0,top.spin+approach*.24);
-      if (approach<-.4) this.events.push({type:"obstacle",
+      if (approach<-.4) {
+        const impulse = -approach * top.structure.totalMass * 1.52;
+        applyStructuralImpact(top, impulse * 0.75 * this.tuning.damageScale, Math.atan2(-ny, -nx));
+        this.events.push({type:"obstacle",
         position:{x:nearestX,y:nearestY}, intensity:clamp(-approach/10,.1,1), impulse:-approach});
+      }
     }
   }
 
   _getEnemyControl() {
+    const active = this.driveZone?.active;
+    if (active) {
+      const enemy = this.enemy;
+      const contest = insideDriveZone(this.player, active) &&
+        Math.hypot(this.player.position.x - enemy.position.x, this.player.position.y - enemy.position.y) < 3.2;
+      const target = contest ? this.player.position : active;
+      const attackBias = clamp((enemy.build.attackPower - 0.85) * 1.8, 0, 0.8);
+      const desired = {
+        x: (target.x - enemy.position.x) * (contest ? 2 + attackBias : 1.6) - enemy.velocity.x * (contest ? 0.4 - attackBias * 0.3 : 1.05),
+        y: (target.y - enemy.position.y) * (contest ? 2 + attackBias : 1.6) - enemy.velocity.y * (contest ? 0.4 - attackBias * 0.3 : 1.05),
+      };
+      // Repel from expanded obstacles; pick a lateral bypass if heading into a face.
+      for (const obstacle of this.arena.blockers ?? []) {
+        const dx = enemy.position.x - obstacle.x, dy = enemy.position.y - obstacle.z;
+        const sx = obstacle.hx + 1.25, sy = obstacle.hz + 1.25;
+        if (Math.abs(dx) < sx && Math.abs(dy) < sy) {
+          const strength = (1 - Math.min(Math.abs(dx) / sx, Math.abs(dy) / sy)) * 4;
+          if (Math.abs(dx) / sx > Math.abs(dy) / sy) desired.x += (Math.sign(dx) || 1) * strength;
+          else {
+            desired.y += (Math.sign(dy) || 1) * strength;
+            desired.x += (Math.sign(target.x - obstacle.x) || 1) * 2;
+          }
+        }
+      }
+      const magnitude = length(desired);
+      return magnitude > 1 ? scale(desired, 1 / magnitude) : desired;
+    }
     const toPlayer = {
       x: this.player.position.x - this.enemy.position.x,
       y: this.player.position.y - this.enemy.position.y,
@@ -423,10 +493,10 @@ export class BattleSimulation {
       y: this.enemy.position.y - this.player.position.y,
     };
     const distance = length(delta);
-    const minimumDistance = TOP_RADIUS * 2;
-    if (distance >= minimumDistance || distance <= 0.00001) return;
+    const minimumDistance = this._contactRadius(this.player) + this._contactRadius(this.enemy);
+    if (distance >= minimumDistance) return;
 
-    const normal = scale(delta, 1 / distance);
+    const normal = distance > 0.00001 ? scale(delta, 1 / distance) : { x: 1, y: 0 };
     const relativeVelocity = {
       x: this.enemy.velocity.x - this.player.velocity.x,
       y: this.enemy.velocity.y - this.player.velocity.y,
@@ -437,7 +507,7 @@ export class BattleSimulation {
     this.player.position.y -= normal.y * overlap * 0.5;
     this.enemy.position.x += normal.x * overlap * 0.5;
     this.enemy.position.y += normal.y * overlap * 0.5;
-    if (normalSpeed >= 0) return;
+    if (normalSpeed >= 0.2) return;
 
     const playerSurface = this.arena.surfaceAt(length(this.player.position));
     const enemySurface = this.arena.surfaceAt(length(this.enemy.position));
@@ -448,11 +518,25 @@ export class BattleSimulation {
         0.82,
       ) *
       ((playerSurface.bounce + enemySurface.bounce) * 0.5);
-    const inversePlayerMass = 1 / this.player.build.totalMass;
-    const inverseEnemyMass = 1 / this.enemy.build.totalMass;
-    const impulse =
-      (-(1 + restitution) * normalSpeed) /
+    const inversePlayerMass = 1 / this.player.structure.totalMass;
+    const inverseEnemyMass = 1 / this.enemy.structure.totalMass;
+    const normalImpulse =
+      (-(1 + restitution) * Math.min(normalSpeed, 0)) /
       (inversePlayerMass + inverseEnemyMass);
+    // Rotating rim teeth can separate a sustained contact. Debit the resulting
+    // translational energy from spin; this avoids motionless pushing in a zone.
+    const canStrike = this.collisionCooldown <= 0;
+    const lobeFactor = 0.65 + (this.player.build.parts[0].customization?.shape ?? 0) / 200 +
+      (this.enemy.build.parts[0].customization?.shape ?? 0) / 200;
+    const toothImpulse = canStrike
+      ? Math.min(1.8, Math.min(this.player.spin, this.enemy.spin) * 0.045) * lobeFactor : 0;
+    const inverseMass = inversePlayerMass + inverseEnemyMass;
+    const transferEnergy = Math.max(0, toothImpulse * (normalSpeed + normalImpulse * inverseMass) +
+      0.5 * toothImpulse ** 2 * inverseMass);
+    for (const top of [this.player, this.enemy]) {
+      top.spin = Math.sqrt(Math.max(0, top.spin ** 2 - transferEnergy / top.structure.momentOfInertia));
+    }
+    const impulse = normalImpulse + toothImpulse;
 
     this.player.velocity.x -= normal.x * impulse * inversePlayerMass;
     this.player.velocity.y -= normal.y * impulse * inversePlayerMass;
@@ -472,14 +556,13 @@ export class BattleSimulation {
         baseDamage * this.enemy.build.attackPower * enemySurface.damage;
       const damageToEnemy =
         baseDamage * this.player.build.attackPower * playerSurface.damage;
-      this.player.durability = Math.max(
-        this.player.durability - damageToPlayer,
-        0,
-      );
-      this.enemy.durability = Math.max(
-        this.enemy.durability - damageToEnemy,
-        0,
-      );
+      const angle = Math.atan2(normal.y, normal.x);
+      const playerParts = applyStructuralImpact(this.player, damageToPlayer, angle);
+      const enemyParts = applyStructuralImpact(this.enemy, damageToEnemy, angle + Math.PI);
+      for (const top of [this.player, this.enemy]) {
+        top.stats.hits += 1;
+        top.stats.peakImpulse = Math.max(top.stats.peakImpulse, impulse);
+      }
       this.player.spin = Math.max(this.player.spin - impulse * 0.19, 0);
       this.enemy.spin = Math.max(this.enemy.spin - impulse * 0.19, 0);
       this._applyCollisionImbalance(
@@ -505,6 +588,8 @@ export class BattleSimulation {
         damageToPlayer,
         damageToEnemy,
       );
+      telemetry.player.parts = playerParts;
+      telemetry.enemy.parts = enemyParts;
       this.collisionLog.push(telemetry);
       if (this.collisionLog.length > MAX_COLLISION_LOGS) {
         this.collisionLog.shift();
@@ -525,10 +610,16 @@ export class BattleSimulation {
     }
   }
 
+  _contactRadius(top) {
+    const part = top.build.parts[0];
+    return TOP_RADIUS * (part.customization?.size ?? 1) *
+      (1 + (part.customization?.shape ?? 0) * 0.0006);
+  }
+
   _applyCollisionImbalance(top, incomingAttack, surface, impulse) {
     const spinRatio = clamp(top.spin / top.build.maxSpinSpeed, 0, 1);
     const effectiveStability = Math.max(
-      top.build.stability * surface.stability,
+      top.structure.stability * surface.stability,
       0.2,
     );
     const lowSpinVulnerability = 0.72 + (1 - spinRatio) * 0.55;
@@ -550,6 +641,8 @@ export class BattleSimulation {
       spin: round(top.spin),
       imbalance: round(top.imbalance),
       durability: round(top.durability),
+      structuralImbalance: round(top.structure.imbalance),
+      inertia: round(top.structure.momentOfInertia),
     };
   }
 
@@ -572,7 +665,12 @@ export class BattleSimulation {
       imbalanceDelta: round(next.imbalance - previous.imbalance),
       durabilityBefore: previous.durability,
       durabilityAfter: next.durability,
-      damage: round(damage),
+      damage: round(previous.durability - next.durability),
+      impactLoad: round(damage),
+      structuralImbalanceBefore: previous.structuralImbalance,
+      structuralImbalanceAfter: next.structuralImbalance,
+      inertiaBefore: previous.inertia,
+      inertiaAfter: next.inertia,
     });
     return {
       time: round(this.time),
@@ -591,7 +689,7 @@ export class BattleSimulation {
     const speed = length(top.velocity);
     const spinRatio = clamp(top.spin / top.build.maxSpinSpeed, 0, 1);
     const surface = this.arena.surfaceAt(length(top.position));
-    const effectiveStability = top.build.stability * surface.stability;
+    const effectiveStability = top.structure.stability * surface.stability;
     const instability = clamp(
       1.15 - effectiveStability + top.imbalance * 0.72,
       0,
@@ -608,7 +706,7 @@ export class BattleSimulation {
     top.tilt += (targetTilt - top.tilt) * Math.min(dt * 4, 1);
     const recovery =
       (0.1 + effectiveStability * 0.16) * (0.55 + spinRatio * 0.45);
-    top.imbalance = Math.max(top.imbalance - recovery * dt, 0);
+    top.imbalance = Math.max(top.imbalance - recovery * dt, top.structure.imbalance);
     top.ringOutRisk = this._calculateRingOutRisk(top);
   }
 
@@ -698,7 +796,7 @@ export class BattleSimulation {
       [this.enemy, "player"],
     ];
     for (const [loser, winnerId] of candidates) {
-      if (loser.durability <= 0) {
+      if (loser.durability <= 0 || loser.structure.failed) {
         this._finish(winnerId, BATTLE_RESULT.BREAK);
         return;
       }
@@ -725,7 +823,16 @@ export class BattleSimulation {
 
   _finish(winner, reason) {
     this.phase = "finished";
-    this.result = { winner, reason, time: this.time };
+    const loser = winner === "player" ? this.enemy : this.player;
+    const weakest = [...loser.structure.parts].sort((a, b) => b.worst - a.worst)[0];
+    this.result = { winner, reason, time: this.time,
+      cause: reason === BATTLE_RESULT.SPIN_OUT &&
+        (loser.structure.imbalance > 0.2 || loser.structure.spinDrag > loser.build.spinDecayPerSecond * 0.35)
+        ? "structural_spin_out" : reason,
+      weakestPart: weakest.slot, weakestPartName: weakest.name,
+      loserImbalance: loser.structure.imbalance,
+      stats: { player: { ...this.player.stats }, enemy: { ...this.enemy.stats } },
+    };
     this.events.push({ type: "result", ...this.result });
   }
 
@@ -748,6 +855,11 @@ export class BattleSimulation {
         y: round(top.velocity.y),
       },
       spin: round(top.spin),
+      spinPhase: round(top.spinPhase),
+      structure: JSON.parse(JSON.stringify(top.structure, (key, value) =>
+        typeof value === "number" ? round(value) : value)),
+      zone: { ...top.zone, gain: round(top.zone.gain) },
+      stats: { ...top.stats },
       durability: round(top.durability),
       tilt: round(top.tilt),
       imbalance: round(top.imbalance),
@@ -763,10 +875,11 @@ export class BattleSimulation {
     return {
       phase: this.phase,
       time: round(this.time),
+      frame: this.frame,
+      driveZone: this.driveZone,
       result: this.result
         ? {
-            winner: this.result.winner,
-            reason: this.result.reason,
+            ...this.result,
             time: round(this.result.time),
           }
         : null,

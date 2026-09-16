@@ -117,39 +117,8 @@ def bowl(radius, y, plastic=False):
 
 
 def sci_fi():
-    reset()
-    bowl(6.9,0)
-    cyl("Arena foundation",(0,-1.17,0),13,.4,dark)
-    for row in range(4):
-        r=9+row*.85
-        y=-.3+row*.57
-        for i in range(25):
-            a=math.pi+ i*math.pi/24
-            x,z=math.cos(a)*r,math.sin(a)*r
-            o=box("Tiered seat",(x,y,z),(.72,.19,.65),steel,.04)
-            o.rotation_euler.z=-a-math.pi/2
-            o=box("Seat back",(x,y+.31,z-.18),(.7,.49,.10),dark,.03)
-            o.rotation_euler.z=-a-math.pi/2
-    for i in range(9):
-        a=math.pi+i*math.pi/8
-        x,z=math.cos(a)*10.8,math.sin(a)*10.8
-        box("Industrial tower",(x,2,z),(.65,6,.72),dark,.08)
-        box("Tower face",(x,2.5,z+.4),(.45,2,.06),steel,.015)
-        for y in [.3,1.2,3.8,4.3]:
-            box("Tower luminaires",(x,y,z+.45),(.44,.1,.045),cyan,.01)
-    box("Scoreboard housing",(0,3.5,-9.9),(6.1,3.25,.6),steel,.23)
-    box("Scoreboard glass",(0,3.5,-9.56),(5.7,2.88,.05),dark,.16)
-    for x in [-2.7,2.7]:
-        box("Scoreboard border",(x,3.5,-9.51),(.04,2.55,.035),cyan,.008)
-    for y in [2.18,4.82]:
-        box("Scoreboard border",(0,y,-9.51),(5.4,.04,.035),cyan,.008)
-    engraving("SPIN / CORE",(0,3.55,-9.50),.66,cyan)
-    engraving("CHAMPIONSHIP ARENA",(0,2.85,-9.50),.21,steel)
-    for i in range(16):
-        a=i*math.tau/16
-        o=box("Deck radial panel",(math.cos(a)*8.05,-.85,math.sin(a)*8.05),(1.45,.19,.64),steel,.04)
-        o.rotation_euler.z=-a
-    export("championship")
+    from build_championship_scene import championship
+    championship()
 
 
 def toy(p,scale=1,color=None):
@@ -250,73 +219,9 @@ def desk():
 
 
 def street():
-    reset()
-    asphalt=mat("Worn asphalt",(.15,.15,.13),0,.97)
-    brick=mat("Terracotta brick",(.29,.13,.07),0,.9)
-    mortar=mat("Mortar",(.25,.26,.22),0,1)
-    box("Alley pavement",(0,-1.14,0),(34,.4,44),asphalt,.01)
-    bowl(6.7,0,True)
-    box("Brick wall",(10,3,-6),(.4,8,30),mortar,.02)
-    for row in range(12):
-        for i in range(22):
-            box("Individual brick",(9.76,-.75+row*.64,-20+i*1.34+(row%2)*.67),(.16,.57,1.25),brick,.015)
-    # Original broad paint marks, authored as geometry on the wall.
-    for i in range(30):
-        z=-13+random.random()*22
-        y=.2+random.random()*4
-        rod("Graffiti stroke",(9.65,y,z),(9.65,y+.9,z+.5),.095,[blue,cream,red,gold][i%4])
-    for i in range(60):
-        x,z=random.uniform(-13,9),random.uniform(-17,12)
-        if math.hypot(x,z)<7.4:
-            continue
-        rod("Pavement seam",(x,-.934,z),(x+.4,-.933,z+.9),.009,mortar)
-    leafmats=[mat("Autumn ochre",(.61,.31,.055),0,1),mat("Autumn copper",(.37,.12,.025),0,1)]
-    for i in range(170):
-        x,z=random.uniform(-13,9),random.uniform(-18,10)
-        if math.hypot(x,z)<7.4:
-            continue
-        bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=1,radius=1,location=xyz((x,-.91,z)))
-        o=bpy.context.object
-        o.scale=(.14,.23,.014)
-        o.rotation_euler.z=random.random()*math.tau
-        finish(o,"Fallen leaf",leafmats[i%2],0)
-    case((-8.4,.45,-4.8),2.1)
-    box("Blue parts crate",(7.8,-.14,-4),(2.35,1.6,1.8),blue,.08)
-    box("Crate inset",(7.8,.68,-4),(2.06,.04,1.52),dark,.02)
-    for i in range(4):
-        toy((7.2+(i%2)*1.05,.71,-4.4+(i//2)*.75),1.2,[blue,red,gold,green][i])
-    box("Backpack",(8.1,.9,-8.1),(1.8,3.15,1.1),red,.35)
-    box("Backpack front pocket",(8.1,.4,-7.45),(1.44,1.38,.35),dark,.18)
-    for x in [7.5,8.7]:
-        rod("Backpack strap",(x,-.7,-7.4),(x,2.4,-7.7),.065,dark)
-    cyl("Drink bottle",(-7.5,-.12,-1.8),.29,1.5,blue)
-    cyl("Bottle cap",(-7.5,.68,-1.8),.18,.18,red)
-    launcher((6.7,-.73,6.5),2.2)
-    for i in range(3):
-        toy((-7.6+i*.7,-.87,3.6+i),1.2,[blue,gold,red][i])
-    for x in [-12,12]:
-        box("Distant building",(x,7,-20),(5,16,5),stone,.1)
-    facade=mat("Old alley plaster",(.34,.29,.20),0,.96)
-    for side in [-1,1]:
-        for depth in [-17,-24,-31]:
-            box("Alley facade",(side*10,4,depth),(2.5,10,5.8),facade,.08)
-            for y in [1.5,4.4,7.3]:
-                for dz in [-1.5,1.5]:
-                    box("Recessed alley window",(side*8.69,y,depth+dz),(.04,1.7,1.1),dark,.035)
-                    box("Window sill",(side*8.59,y-.86,depth+dz),(.30,.10,1.25),cream,.02)
-    for x,z in [(-8.6,-12.8),(-8.6,-22)]:
-        rod("Autumn tree trunk",(x,-.9,z),(x+.2,5.7,z),.23,wood)
-        for i in range(6):
-            a=i*math.tau/6
-            end=(x+math.cos(a)*1.8,5+random.random()*2,z+math.sin(a)*1.5)
-            rod("Autumn branch",(x,3.8,z),end,.075,wood)
-            bpy.ops.mesh.primitive_ico_sphere_add(subdivisions=2,radius=1.45,location=xyz(end))
-            finish(bpy.context.object,"Autumn tree crown",leafmats[i%2],0)
-    for z in [-13,-23]:
-        rod("Alley light post",(-7.8,-1,z),(-7.8,5.9,z),.10,dark)
-        rod("Lamp arm",(-7.8,5.9,z),(-6.6,5.9,z),.07,dark)
-        box("Alley lamp",(-6.6,5.8,z),(.65,.14,.45),gold,.05)
-    export("street")
+    # Full-world and standalone rebuilds share the same detailed street.
+    from build_street_scene import street as build_street
+    build_street()
 
 
 def ruins():

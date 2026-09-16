@@ -1,0 +1,79 @@
+.drive-zone-hud {
+  display: none;
+}
+
+.game-shell[data-screen="battle"] .drive-zone-hud:not([hidden]) {
+  display: block;
+  position: absolute;
+  top: 81px;
+  left: 16px;
+  right: 16px;
+  padding: 7px 10px;
+  color: #fff0ad;
+  background: #253536;
+  border: 1px solid #b2a779;
+  border-radius: 3px;
+  font-size: 13px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+  pointer-events: none;
+  z-index: 5;
+}
+
+.game-shell[data-screen="battle"] .drive-zone-hud[data-contested="true"] {
+  color: #ffccbb;
+  border-color: #e99578;
+}
+
+.game-shell[data-screen="battle"] .campaign-brief {
+  top: 124px;
+}
+
+.game-shell[data-screen="battle"] .result-card .result-cause,
+.game-shell[data-screen="battle"] .result-card .result-telemetry p {
+  color: #263c42;
+  text-align: left;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.result-telemetry {
+  border-block: 1px solid #889a9a;
+  padding-block: 7px;
+  margin-block: 12px;
+  font-variant-numeric: tabular-nums;
+}
+
+.result-telemetry summary {
+  color: #263c42;
+  padding-block: 8px;
+  cursor: pointer;
+  font-size: 14px;
+}
+
+.result-telemetry summary:hover { color: #266d9c; }
+.result-telemetry summary:focus-visible { outline: 3px solid #266d9c; outline-offset: 2px; }
+
+.game-shell[data-screen="battle"] .result-telemetry p {
+  margin-block: 3px;
+}
+
+.game-shell[data-screen="battle"] .battle-top-fighter > small {
+  white-space: normal;
+  font-size: 11px;
+  line-height: 1.3;
+  color: #c0d5d1;
+}
+
+@media (max-height: 700px) {
+  .game-shell[data-screen="battle"] .drive-zone-hud:not([hidden]) {
+    top: 74px;
+    padding-block: 4px;
+    font-size: 12px;
+  }
+  .game-shell[data-screen="battle"] .campaign-brief {
+    top: 110px;
+    font-size: 12px;
+  }
+}

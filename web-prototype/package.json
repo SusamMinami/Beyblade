@@ -10,7 +10,11 @@
     "test": "vitest run",
     "verify:lab": "node tools/verify-lab.mjs",
     "verify:showroom": "node tools/verify-showroom.mjs",
-    "verify:worlds": "node tools/verify-worlds.mjs"
+    "verify:worlds": "node tools/verify-worlds.mjs",
+    "verify:championship": "node tools/verify-championship.mjs",
+    "verify:campaign": "node tools/verify-campaign.mjs",
+    "verify:structure": "node tools/verify-structure.mjs",
+    "verify:battle-ui": "node tools/verify-battle-ui.mjs"
   },
   "dependencies": {
     "three": "^0.178.0",

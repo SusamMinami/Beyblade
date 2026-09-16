@@ -1,0 +1,10 @@
+[
+  {
+    "reducedMotion": "no-preference",
+    "delayMs": 855
+  },
+  {
+    "reducedMotion": "reduce",
+    "delayMs": 0
+  }
+]

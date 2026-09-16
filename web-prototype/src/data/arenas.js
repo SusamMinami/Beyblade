@@ -107,7 +107,7 @@ export const ARENAS = Object.freeze({
   }),
   street: arena({
     id: "street", scene: "street", number: "04", name: "放学后的街头", shortName: "街头对决",
-    tag: "童年", description: "暖阳、涂鸦与落叶中的玩具盘。沿用标准碗的均衡材料与回中心力。",
+    tag: "童年", description: "雨后亮着暖灯的小店、湿润街道与放学后的玩具盘。沿用标准碗的均衡材料与回中心力。",
     accent: "#e7b66e", ringOutRadius: 7.2, wallRadius: 6.7, bowlForce: .86,
     surfaceAt: () => SURFACES.standard,
   }),
@@ -118,6 +118,11 @@ export const ARENAS = Object.freeze({
     wallRadius: collisionManifest.ruins.halfExtent, bowlForce: 0,
     boundary: "square", groundHeight: collisionManifest.ruins.groundHeight,
     blockers: [...collisionManifest.ruins.blockers, ...(collisionManifest.ruins.pillars ?? [])],
+    driveZones: [
+      { id: "A", x: -2.35, y: 0, radius: 1 },
+      { id: "B", x: 2.35, y: 0, radius: 1 },
+      { id: "C", x: 0, y: 2.35, radius: 1 },
+    ],
     surfaceAt: () => SURFACES.standard,
   }),
 });

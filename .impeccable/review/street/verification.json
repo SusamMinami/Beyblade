@@ -1,0 +1,27 @@
+{
+  "results": [
+    "Mobile has no horizontal overflow",
+    "Detailed street launches through the real UI",
+    "Reflection target contains the actual rendered model",
+    "animated",
+    "paused",
+    "reduced",
+    "released",
+    "standardLights",
+    "stableMemory",
+    "No browser / WebGL errors: "
+  ],
+  "measurements": {
+    "changed": 320907,
+    "animated": true,
+    "paused": true,
+    "reduced": true,
+    "released": true,
+    "standardLights": true,
+    "stableMemory": true,
+    "submittedTriangles": 758992,
+    "drawCalls": 139,
+    "reflectionSize": 768
+  },
+  "errors": []
+}
