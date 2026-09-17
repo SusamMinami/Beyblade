@@ -35,6 +35,11 @@ colors:
   campaign-yellow: "#ffd23f"
   campaign-text: "#4d555d"
   campaign-blue: "#266d9c"
+  campaign-button-hover: "#bfe4ff"
+  campaign-disclosure-hover-ink: "#145888"
+  campaign-disclosure-hover-paper: "#e6f2f7"
+  flow-coach-ink: "#234d5e"
+  flow-separator: "#b2bbb9"
 ---
 
 # Web visual conventions
@@ -400,7 +405,8 @@ incumbent campaign colors, not replacements for the laboratory or stage palettes
 an opaque paper panel, inset 16px horizontally and positioned at top 97px, with
 8px 10px padding, a 1px ink border, 3px corners and 13px/1.5 text. Campaign result
 paragraphs must remain 14px/1.6, left-aligned and dark on the result surface;
-the battle result card scrolls within `calc(100% - 40px)` maximum height.
+the battle result card now scrolls within `calc(100% - 32px)` maximum height,
+as extended by the game-flow styles below.
 
 The collection's existing five-item navigation retains its stage styling:
 the fourth item is the story entrance, with Chinese title and `JOURNEY` subtitle.
@@ -420,6 +426,137 @@ full campaign balance, keyboard operation or motion behavior. Supplied main
 verification: campaign PASS65, worlds PASS31, lab PASS27, showroom PASS25,
 `npm test` 29 passed and build passed with the existing Three.js chunk warning.
 These are inherited results, not checks rerun for this documentation-only merge.
+
+### Preparation, result advice and pause
+Implemented in Web on 2026-09-17, following the
+[game-flow direction](../docs/game_flow_optimization.md). Its current execution
+items are implemented; the separately listed future opportunities remain proposals.
+This is a local interaction extension: retain campaign paper, existing navigation,
+fixed portrait framing, all street/championship art and other world conventions.
+No new shipping raster, physics, economy, ownership or progression model is added.
+
+- Mission sheet: show opponent, objective and current loadout/preparation links
+  before the story. Story and opponent intelligence remain available in separate
+  native disclosures, closed initially; the existing bottom launch action stays
+  outside the mission sheet's scroll area.
+- Preparation return: use the current tab's `sessionStorage` key
+  `spin-core-preparing-mission`, not a new field in the v2 save. Reading, writing
+  and using the target require completed/skipped onboarding and a playable
+  mission. Assembly, lab and collection reuse their existing navigation to return
+  to that mission, including replaying an older mission after cross-page moves
+  or refresh. Show the opponent with the return label; retain testing/lift guards.
+  Locked previews cannot establish a target. Explicit free-mode selection or
+  preparing a new battle clears it. Storage failure warns and limits persistence.
+- Result advice: give one next step from the player's own measured damage,
+  imbalance and zone time, never the loser's metadata. A lost ring-out prioritizes
+  control; significant structural damage points to the affected part; low zone
+  time prompts zone control, then other losses suggest the tip. A win can retain
+  the current build. A part action focuses the existing assembly slot without
+  buying or equipping anything. First-training results retain the existing
+  first-purchase guidance instead of a part-coach shortcut.
+- Result presentation: use `flow-coach-ink` for left-aligned 14px/1.6 advice.
+  Full telemetry and part damage are initially folded into a native disclosure;
+  reward receipt and next actions remain outside it. The scrollable result card
+  uses contained overscroll; its opaque paper action row sticks at bottom -20px
+  with 10px vertical padding. Action labels wrap and buttons are at least 44px high.
+- Pause dialog: native modal with named heading/description, paper/ink surfaces,
+  2px border, 5px corners and 24px padding; width is
+  `min(380px, calc(100vw - 40px))`, maximum height `calc(100dvh - 40px)` with
+  scrolling. Keep 24px heading, 14px/1.6 body, 44px minimum-height buttons and
+  a 3px blue focus outline offset by 3px. Continue is yellow and initially focused;
+  exit is secondary and explicitly says no coins or mission progress are settled.
+  Timer/Escape pauses a running match; Escape in the dialog explicitly resumes.
+  Window blur or hidden visibility clears keys, joystick and pointer capture,
+  then pauses. Returning focus alone never resumes; continuing clears input
+  again and returns focus to the timer. Leaving discards the match without
+  rewards or battle history. In the ready phase, the control returns instead.
+
+Local interaction colors come from `src/ui/game-flow.css` and `campaign.css`:
+`campaign-button-hover` is the existing button hover blue;
+`campaign-disclosure-hover-ink` and `campaign-disclosure-hover-paper` retain
+the existing disclosure/link hover pair. `flow-coach-ink` is the paper report's
+deep teal advice text. These are local tokens, not new world palettes.
+Sources: `src/main.js`, `src/core/battle-coach.js`, `src/ui/game-flow.css`,
+`campaign-panel.js`, `lab-screen.js` and `showroom-screen.js` under `src/ui/`.
+
+Recorded [flow finish review](../.impeccable/review/flow/finish-review.md):
+**SHIP**, limited to eight static captures in that directory: `desktop.png`,
+`mobile.png`, `result-desktop.png`, `result-mobile.png`, `pause-desktop.png`,
+`pause-mobile.png`, `lab-mobile.png` and `collection-mobile.png`. This does not
+independently certify runtime, motion, full keyboard/accessibility paths, every
+advice branch or real-device performance. Supplied main evidence: unit 29,
+flow 41, campaign 65, lab 27, showroom 25 and battle-ui 20 PASS; build PASS with
+the existing approximately 888 kB Three.js chunk warning. These are inherited
+results, not tests, browser checks or an independent review rerun for this
+documentation-only merge.
+
+### Staged training, build comparison and chapter replies
+Implemented in Web on 2026-09-17 within the existing aesthetic; see the
+[second-round flow scope](../docs/game_flow_round2.md). These components extend
+the incumbent paper guidance, assembly and campaign reports, with no new raster,
+world palette, physics, economy or progression authority.
+
+- Staged tutorial: reuse one polite live guidance card for both training matches.
+  Ready emphasizes direct launch; running first asks for joystick or keyboard
+  steering, then follows the active supply zone and its cooling state. Steering
+  is acknowledged only after control magnitude exceeds 0.15 in a solver step;
+  replenishment is acknowledged only after actual `spinHarvested > 0`. These
+  cues do not gate the match or rewards. Skip remains available, and guidance
+  hides when the match finishes. The first-part action opens the existing part
+  selector; purchase still requires the existing confirmation. Before the second
+  match, assembly summarizes theoretical changes, not a promise of victory.
+- Tutorial presentation: opaque campaign paper, inherited type, 18px/1.35
+  heading, 13px/1.5 copy and a soft `0 5px 16px #12151a33` shadow, without backdrop
+  blur. Battle guidance sits at top 180px with 16px side insets and 10px 12px
+  padding; at heights up to 700px, top becomes 145px, vertical padding 6px and
+  heading 16px. Assembly guidance sits 280px above the bottom. Tutorial controls
+  use a 3px campaign-blue focus outline with 2px offset.
+- Same-slot comparison: assembly and mission preparation compare the current
+  loadout against that slot's latest completed-battle build and normalized DIY.
+  Results compare the actual pre-match snapshot against the retained prior
+  baseline before replacing it in the existing v2 save's `battleNotes`. Abandoned
+  matches do not overwrite the baseline. Missing history gets an explicit empty
+  state, not a sample build. Show changed parts/DIY and five rounded theoretical
+  ratings (0-100), with previous/current columns and signed deltas from the
+  canonical calculation model. Unchanged builds suggest trying another control
+  route; the qualification explains that map, launch and steering affect results.
+- Comparison presentation: native disclosures start closed. Assembly places its
+  paper container below the loadout controls at top 140px, inset 16px, with 10px
+  horizontal padding, a 1px separator border and 3px corners. Opening it hides
+  assembly guidance and limits the scroll area to `min(340px, 45dvh)` with contained
+  overscroll; DIY editing hides the comparison. Mission comparison stays inside
+  the mission sheet, and result comparison nests inside the existing report
+  disclosure, leaving primary actions outside the disclosures and retaining
+  the sticky result action row. Use
+  13px/1.5 copy, a 12px table caption, tabular numerals, left-aligned row headings
+  and right-aligned values with 5px 8px cell padding. Disclosure summaries have
+  40px minimum height, 9px vertical padding, the existing disclosure hover pair
+  and a 3px blue focus outline offset by 2px.
+- Chapter replies: each of the five existing chapter-ending missions has an
+  attributed response. Only first-clear results insert that response and name
+  the next destination or final memory action; replay does not repeat a first
+  clear. The mission sheet's initially closed replies disclosure shows the
+  unlocked count out of five and only responses whose chapter-ending mission is
+  completed, or an explanatory empty state. Existing completion facts also
+  restore replies for older saves, without extra rewards or locked-chapter
+  spoilers. Recall titles are 15px; result replies retain 14px/1.6 narrative text
+  in `flow-coach-ink`, with separator borders and 12px vertical padding.
+
+`flow-separator` names the existing muted grey-green border reused by first-round
+result advice and the comparison table/container, reply articles and result
+reply. It is a local paper-interface separator, not a new palette or recoloring
+request. Sources: `src/ui/growth-flow.css`, `src/ui/build-comparison.js`,
+`src/ui/campaign-panel.js`, `src/core/growth-state.js`, `src/data/chapter-moments.js`
+and tutorial/result wiring in `src/main.js`.
+
+Recorded [growth finish review](../.impeccable/review/growth/finish-review.md):
+**SHIP**, no material findings or fixes, scoped to the local extension, inspected
+code and supplied evidence including ten desktop/mobile captures. Chapter
+captures show a migrated completion fixture; they do not visually demonstrate
+all five replies or live chapter-ending transitions. This documentation merge
+does not rerun context loading, browser checks, detectors or tests, and does not
+extend the review to human learning, difficulty, full accessibility, device
+performance or Godot.
 
 ### Web v4 battle structure extension
 Built for Web `2026.09.16-web-v4`, following the

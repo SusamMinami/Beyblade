@@ -1,0 +1,83 @@
+/* Guidance shares the existing paper surface and stays out of the launch path. */
+.game-shell .tutorial-card {
+  font-family: inherit;
+  background: #fffdf7;
+  box-shadow: 0 5px 16px #12151a33;
+  backdrop-filter: none;
+}
+.game-shell .tutorial-card h2 { font-family: inherit; font-size: 18px; line-height: 1.35; }
+.game-shell .tutorial-card p { font-size: 13px; line-height: 1.5; }
+.game-shell .tutorial-head > span, .game-shell .tutorial-head button { font-size: 12px; letter-spacing: 0; }
+.game-shell .tutorial-head > span { color: #266d9c; }
+.game-shell .tutorial-action { font-size: 13px; }
+.game-shell[data-screen="battle"] .tutorial-card {
+  top: 180px;
+  left: 16px;
+  right: 16px;
+  width: auto;
+  padding: 10px 12px;
+  border-width: 1px;
+}
+.game-shell[data-screen="battle"]:not([data-tutorial-stage="complete"]) .launcher-heading { display: none; }
+.game-shell[data-screen="assembly"] .tutorial-card {
+  top: auto;
+  bottom: 280px;
+  left: 16px;
+  right: 16px;
+  width: auto;
+  padding: 10px 12px;
+  border-width: 1px;
+}
+.game-shell[data-screen="assembly"]:has(#assembly-comparison[open]) .tutorial-card { display: none; }
+.game-shell .tutorial-card :focus-visible,
+.comparison-disclosure summary:focus-visible {
+  outline: 3px solid #266d9c;
+  outline-offset: 2px;
+}
+.comparison-disclosure {
+  color: #263c42;
+  font-size: 13px;
+  line-height: 1.5;
+}
+.comparison-disclosure > summary {
+  cursor: pointer;
+  min-height: 40px;
+  padding-block: 9px;
+  font-weight: 700;
+}
+.comparison-disclosure > summary:hover { background: #e6f2f7; color: #145888; }
+.build-comparison { width: 100%; border-collapse: collapse; font-variant-numeric: tabular-nums; }
+.build-comparison caption { text-align: left; font-size: 12px; padding-bottom: 6px; }
+.build-comparison th, .build-comparison td {
+  text-align: right;
+  padding: 5px 8px;
+  border-bottom: 1px solid #b2bbb9;
+}
+.build-comparison th:first-child { text-align: left; }
+.comparison-disclosure p { margin-block: 8px; }
+.game-shell[data-screen="battle"] .result-card .comparison-note { font-size: 12px; }
+#assembly-comparison {
+  position: absolute;
+  top: 140px;
+  left: 16px;
+  right: 16px;
+  z-index: 15;
+  background: #fffdf7;
+  padding-inline: 10px;
+  border: 1px solid #b2bbb9;
+  border-radius: 3px;
+  pointer-events: auto;
+}
+#assembly-comparison[open] { max-height: min(340px, 45dvh); overflow-y: auto; overscroll-behavior: contain; }
+.game-shell[data-diy-editing="true"] #assembly-comparison { display: none; }
+.journey-moments h3 { font-size: 15px; margin: 16px 0 6px; }
+.journey-moments article + article { border-top: 1px solid #b2bbb9; }
+.game-shell[data-screen="battle"] .campaign-result .chapter-moment {
+  border-block: 1px solid #b2bbb9;
+  padding-block: 12px;
+  color: #234d5e;
+}
+@media (max-height: 700px) {
+  .game-shell[data-screen="battle"] .tutorial-card { top: 145px; padding-block: 6px; }
+  .game-shell .tutorial-card h2 { font-size: 16px; }
+}

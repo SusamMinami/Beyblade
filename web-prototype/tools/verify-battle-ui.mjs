@@ -27,7 +27,9 @@ try {
     page.on("pageerror", (error) => errors.push(error.message));
     await page.goto(`${base}/#journey`);
     await page.locator("#mission-select").waitFor();
-    check((await page.locator(".journey-identity").textContent()).includes("六瓣"), `${name}: authored identity is visible`);
+    await page.locator(".journey-story > summary").click();
+    check(await page.locator(".journey-identity").isVisible() &&
+      (await page.locator(".journey-identity").textContent()).includes("六瓣"), `${name}: authored identity is available in story details`);
     await page.locator("#start-battle").click();
     await page.waitForFunction(() => !document.querySelector("#launch-button").disabled, { timeout: 15000 });
     await page.locator(".game-shell").screenshot({ path: `${out}/launch-${name}.png` });
@@ -50,7 +52,7 @@ try {
     const pausedTime = await page.locator("#battle-time").textContent();
     await page.locator(".game-shell").screenshot({ path: `${out}/${name}.png` });
     check(await page.locator("#battle-time").textContent() === pausedTime, `${name}: capture respects pause`);
-    await page.locator("#pause-battle").click();
+    await page.locator("#pause-resume").click();
     await page.locator("#result-card:not(.is-hidden)").waitFor({ timeout: 100000 });
     check((await page.locator("#result-cause").textContent()).length > 15, `${name}: actual finishing cause is reported`);
     check((await page.locator("#result-telemetry").textContent()).includes("占区"), `${name}: zone contribution appears in report`);

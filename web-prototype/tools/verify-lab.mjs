@@ -53,7 +53,7 @@ try {
   });
   check(layout.every((item) => item.inside), "All phone controls fit onscreen");
   await button("records").click();
-  check((await page.locator("dialog").textContent()).includes("还没有测试报告"), "Honest empty history");
+  check((await page.locator(".lab-view dialog").textContent()).includes("还没有测试报告"), "Honest empty history");
   await close();
   await finishTest();
   let state = await saved();
@@ -89,7 +89,7 @@ try {
   await page.locator('.lab-loadout-list [data-loadout="1"]').click();
   check((await saved()).activeLoadoutIndex === 1, "Loadout selector shares existing saved state");
   await button("gems").click();
-  check((await page.locator("dialog").textContent()).includes("尚未开放"), "Diamond interface declares future status");
+  check((await page.locator(".lab-view dialog").textContent()).includes("尚未开放"), "Diamond interface declares future status");
   await close();
   await button("shop").click();
   const part = PARTS.find((item) => !Object.values(DEFAULT_BUILD).includes(item.id));

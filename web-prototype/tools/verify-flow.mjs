@@ -1,0 +1,168 @@
+import { chromium } from "playwright";
+import assert from "node:assert/strict";
+import { mkdir, writeFile } from "node:fs/promises";
+import { resolve } from "node:path";
+import { CAMPAIGN_MISSIONS } from "../src/data/campaign.js";
+import { battleCoach } from "../src/core/battle-coach.js";
+import { calculateBuild } from "../src/core/assembly-calculator.js";
+import { DEFAULT_BUILD } from "../src/data/parts.js";
+import { BattleSimulation } from "../src/core/battle-simulation.js";
+import { getArena } from "../src/data/arenas.js";
+
+let checks = 0;
+const check = (value, message) => { assert.ok(value, message); checks++; };
+const sim = new BattleSimulation({ playerBuild: calculateBuild(DEFAULT_BUILD), enemyBuild: calculateBuild(DEFAULT_BUILD), arena: getArena("standard") });
+check(battleCoach({ winner: "enemy", reason: "ring_out" }, sim.player).slot === null, "Ring-out advice prioritizes control");
+const damaged = structuredClone(sim.player);
+damaged.structure.parts.find(p => p.slot === "tip").worst = .8;
+damaged.structure.imbalance = .3;
+check(battleCoach({ winner: "player", weakestPart: "attackRing" }, damaged).slot === "tip", "Winning advice reads own damage, not losing opponent");
+check(battleCoach({ winner: "enemy", reason: "spin_out", time: 30 }, sim.player).text.includes("占区"), "Low supply participation gets tactical advice");
+
+const out = resolve("../.impeccable/review/flow");
+await mkdir(out, { recursive: true });
+const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? "C:/Program Files/Google/Chrome/Application/chrome.exe", headless: true });
+const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: "reduce" });
+const key = "spin-core-web-prototype-v2";
+const first = CAMPAIGN_MISSIONS[0].id;
+await context.addInitScript(({ key, first }) => {
+  if (!localStorage.getItem(key)) localStorage.setItem(key, JSON.stringify({
+    version: 2, coins: 700, sound: false, arenaId: "standard",
+    tutorial: { completed: true, stage: "complete", firstRewardClaimed: true },
+    campaign: { completed: [first], mastered: [], journal: [] },
+  }));
+}, { key, first });
+const page = await context.newPage();
+const errors = [];
+page.on("pageerror", e => errors.push(e.message));
+const base = process.env.LAB_TEST_URL ?? "http://127.0.0.1:5173";
+const state = () => page.evaluate(key => JSON.parse(localStorage.getItem(key)), key);
+const capture = async name => {
+  if (process.env.FLOW_CAPTURE === "0") return;
+  // Let ResizeObserver and the renderer settle before measuring a full-page shot.
+  await page.evaluate(() => new Promise(resolve => requestAnimationFrame(() => requestAnimationFrame(resolve))));
+  await page.screenshot({ path: `${out}/${name}.png`, fullPage: true });
+};
+const ready = () => page.waitForFunction(() => !document.querySelector("#launch-button")?.disabled);
+try {
+  await page.goto(`${base}/#journey`);
+  await page.selectOption("#mission-select", first);
+  await page.waitForFunction(() => document.querySelector("#three-stage")?.dataset.assetState === "ready");
+  await capture("desktop");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await capture("mobile");
+  check(await page.locator(".journey-prep").evaluate(el => {
+    const a = el.getBoundingClientRect(), b = el.closest(".journey-panel").getBoundingClientRect();
+    return a.bottom <= b.bottom;
+  }), "Preparation appears in first mobile viewport");
+  await page.locator('.journey-prep [data-go="assembly"]').click();
+  check((await page.locator("#go-map").textContent()).includes("阿砾"), "Assembly names replay opponent");
+  await page.reload();
+  check(new URL(page.url()).hash === "#assembly" && (await page.locator("#go-map").textContent()).includes("阿砾"), "Assembly refresh keeps route and replay preparation");
+  await page.locator("#go-map").click();
+  check(await page.locator("#mission-select").inputValue() === first, "Assembly returns replay instead of next mission");
+  await page.locator('.journey-prep [data-go="lab"]').click();
+  await page.reload();
+  check((await page.locator('[data-lab="battle"]').textContent()).includes("阿砾"), "Lab refresh names the same replay");
+  await capture("lab-mobile");
+  await page.locator('[data-lab="collection"]').click();
+  await page.waitForFunction(() => document.querySelector("[data-show-loadout]")?.disabled === false);
+  check((await page.locator('[data-collection="journey"]').textContent()).includes("阿砾"), "Collection shares preparation context");
+  await page.reload();
+  await page.waitForFunction(() => document.querySelector("[data-show-loadout]")?.disabled === false);
+  await capture("collection-mobile");
+  await page.locator('[data-collection="journey"]').click();
+  check(await page.locator("#mission-select").inputValue() === first, "Collection returns replay after refresh");
+  const before = await state();
+  await page.selectOption("#mission-select", CAMPAIGN_MISSIONS[9].id);
+  check(await page.locator("#start-battle").isDisabled(), "Locked preview stays locked");
+  await page.locator('.journey-prep [data-go="lab"]').click();
+  check(!(await page.locator('[data-lab="battle"]').textContent()).includes("返回约战"), "Locked preview never creates preparation");
+  await page.locator('[data-lab="battle"]').click();
+  check(new URL(page.url()).hash === "#map", "Explicit free navigation clears the story target");
+  check(JSON.stringify(await state()) === JSON.stringify(before), "Preparation and preview do not change economic save");
+  await page.locator('[data-map-mode="story"]').click();
+  await page.selectOption("#mission-select", first);
+  await page.locator("#start-battle").click();
+  await ready();
+  await page.locator("#pause-battle").click();
+  check(new URL(page.url()).hash === "#journey", "Ready state can return without launching");
+  await page.locator("#start-battle").click();
+  await ready();
+  await page.locator("#launch-button").click();
+  await page.keyboard.down("ArrowLeft");
+  // Simulate OS blur only: the app and physics remain unmodified.
+  await page.evaluate(() => window.dispatchEvent(new Event("blur")));
+  await page.locator("#battle-pause-dialog[open]").waitFor();
+  check(await page.locator("#joystick-input-power").textContent() === "0", "Blur clears control telemetry");
+  const pausedAt = await page.locator("#battle-time").textContent();
+  await page.waitForTimeout(350); // Bounded observation of frozen simulation clock.
+  check(await page.locator("#battle-time").textContent() === pausedAt, "Pause freezes elapsed time");
+  await capture("pause-mobile");
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await capture("pause-desktop");
+  await page.locator("#pause-resume").click();
+  await page.waitForFunction(t => document.querySelector("#battle-time").textContent !== t, pausedAt);
+  check(await page.locator("#joystick-input-power").textContent() === "0", "Resume begins without stale pointer force");
+  const joystick = await page.locator("#joystick").boundingBox();
+  await page.mouse.move(joystick.x + joystick.width * .75, joystick.y + joystick.height * .5);
+  await page.mouse.down();
+  check(Number(await page.locator("#joystick-input-power").textContent()) > 0, "Pointer supplies real control input");
+  await page.evaluate(() => window.dispatchEvent(new Event("blur")));
+  check(await page.locator("#joystick-input-power").textContent() === "0", "Pausing releases held pointer input");
+  await page.mouse.up();
+  await page.locator("#pause-resume").click();
+  check(await page.locator("#joystick-input-power").textContent() === "0", "Resume requires fresh pointer input");
+  await page.keyboard.up("ArrowLeft");
+  await page.keyboard.press("Escape");
+  check(await page.locator("#battle-pause-dialog").evaluate(el => el.open), "Escape pauses the running battle");
+  await page.keyboard.press("Escape");
+  check(!(await page.locator("#battle-pause-dialog").evaluate(el => el.open)), "Escape resumes via native dialog cancellation");
+  await page.locator("#pause-battle").click();
+  await page.locator("#pause-exit").click();
+  check(new URL(page.url()).hash === "#journey", "Pause exit returns to encounter");
+  check(JSON.stringify(await state()) === JSON.stringify(before), "Abandon grants no coins or journal record");
+  await page.locator("#start-battle").click();
+  await ready();
+  await page.locator("#launch-button").click();
+  console.log("Preparation, refresh, lock, pause and abandonment checks passed; waiting for real solver result.");
+  await page.locator("#result-card:not(.is-hidden)").waitFor({ timeout: 100000 });
+  check((await page.locator("#result-coach").textContent()).length > 15, "Real result provides actionable advice");
+  check(!(await page.locator("#result-details").evaluate(el => el.open)), "Verbose report starts collapsed");
+  const after = await state();
+  check(after.campaign.journal.length === 1 && [740, 820].includes(after.coins), "Actual completion settles exactly one canonical reward");
+  await capture("result-desktop");
+  await page.setViewportSize({ width: 390, height: 844 });
+  await capture("result-mobile");
+  await page.locator("#result-details > summary").click();
+  check(await page.locator("#result-telemetry").isVisible(), "Detailed telemetry remains accessible");
+  await page.locator("#result-assembly").click();
+  check((await page.locator("#go-map").textContent()).includes("阿砾"), "Result adjustment retains encounter");
+  await page.locator("#go-map").click();
+  check(await page.locator("#mission-select").inputValue() === first, "Result preparation returns to same mission");
+  await page.reload();
+  check((await state()).coins === after.coins, "Reload cannot grant result reward twice");
+  check(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth), "No mobile horizontal overflow");
+  check(errors.length === 0, `No runtime errors: ${errors.join("; ")}`);
+  // A genuinely fresh save must still complete the original training reward path.
+  const fresh = await browser.newContext({ viewport: { width: 390, height: 844 }, reducedMotion: "reduce" });
+  const novice = await fresh.newPage();
+  novice.on("pageerror", e => errors.push(e.message));
+  await novice.goto(base);
+  await novice.waitForFunction(() => document.querySelector("#launch-button")?.disabled === false);
+  check(await novice.locator("#enemy-name").textContent() === "训练对手", "Fresh player begins original training");
+  await novice.locator("#launch-button").click();
+  await novice.locator("#result-card:not(.is-hidden)").waitFor({ timeout: 100000 });
+  const training = await novice.evaluate(key => JSON.parse(localStorage.getItem(key)), key);
+  check(training.coins === 180 && training.tutorial.stage === "buy_first_part", "First training grants canonical bounty and advances tutorial");
+  check(await novice.locator("#result-restart").isHidden(), "First training directs to first-part purchase");
+  check((await novice.locator("#result-coach").textContent()).includes("第一个零件"), "Training advice points to its own next step");
+  await novice.locator("#result-assembly").click();
+  check(await novice.locator("#tutorial-title").textContent() === "用赏金解锁第一个零件", "Training result reaches purchase guidance");
+  await novice.reload();
+  check(await novice.evaluate(key => JSON.parse(localStorage.getItem(key)).coins, key) === 180, "Training refresh cannot repeat bounty");
+  await fresh.close();
+  check(errors.length === 0, `Training has no runtime errors: ${errors.join("; ")}`);
+  await writeFile(`${out}/verification.json`, JSON.stringify({ checks, status: "PASS", errors }, null, 2));
+  console.log(`PASS: ${checks} flow checks. Captures: ${out}`);
+} finally { await browser.close(); }

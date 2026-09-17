@@ -5,6 +5,8 @@ import { getArena } from "../data/arenas.js";
 import "./campaign.css";
 import { opponentIdentity } from "../data/opponent-identities.js";
 import { PART_MATERIALS } from "../core/part-customization.js";
+import { renderBuildComparison } from "./build-comparison.js";
+import { unlockedChapterMoments } from "../data/chapter-moments.js";
 
 const html = (value) => String(value).replace(/[&<>"']/g, (c) =>
   ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" })[c]);
@@ -25,6 +27,7 @@ export function renderCampaign(app) {
   const tutorialReady = app.state.tutorial.completed;
   const identity = opponentIdentity(mission);
   const ringDIY = identity.customizations[mission.enemyBuild.attackRing];
+  const moments = unlockedChapterMoments(campaign);
 
   app.root.querySelector("#campaign-panel").innerHTML = `
     <div class="journey-heading"><h1>回声远征</h1><span>${campaign.completed.length} / 10 旅途纪念</span></div>
@@ -36,14 +39,19 @@ export function renderCampaign(app) {
     </label>
     <p class="journey-place">第 ${Math.floor(index / 2) + 1} 章 · ${chapter.name} / ${getArena(mission.arenaId).shortName}</p>
     <h2>${mission.title}</h2>
-    <p>${mission.intro}</p>
     <div class="journey-opponent"><strong>${mission.opponent}</strong><span>${mission.topName} · ${mission.role}</span></div>
-    <p class="journey-identity">${identity.description}</p>
-    <blockquote>${mission.quote}</blockquote>
     <div class="journey-objective"><b>${completed ? "已完成" : "本局目标"}</b><span>${mission.objectiveLabel}</span></div>
+    <div class="journey-prep"><span>出战：${html(loadout.name)}</span><button class="journey-link" data-go="assembly">改装</button><button class="journey-link" data-go="lab">测试</button><button class="journey-link" data-go="collection">换陀螺</button></div>
     <p class="journey-challenge">${campaign.mastered.includes(mission.id) ? "挑战已达成" : "选做挑战"}：${mission.challenge.label}（不阻塞主线）</p>
     ${!playable ? `<p class="journey-lock">先完成「${CAMPAIGN_MISSIONS[index - 1].title}」才能出战。现在仅预览。</p>` : ""}
     ${!tutorialReady ? '<p class="journey-lock">先完成新手训练，或点击下方跳过引导，再开始远征。</p><button class="journey-link" data-journey-action="tutorial">继续新手训练</button><button class="journey-link" data-journey-action="skip">跳过引导，开始远征</button>' : ""}
+    <details class="journey-story">
+      <summary>约战缘由 · ${mission.opponent}</summary>
+      <p>${chapter.stakes}</p>
+      <p>${mission.intro}</p>
+      <p class="journey-identity">${identity.description}</p>
+      <blockquote>${mission.quote}</blockquote>
+    </details>
     <details class="journey-intel">
       <summary>对手情报与改装建议</summary>
       <p>${mission.tactic}</p>
@@ -52,7 +60,15 @@ export function renderCampaign(app) {
       <p>可考虑：${part.name} · ${owned ? "已拥有" : `${part.price} 金币 / ${app.state.coins >= part.price ? "当前可购买" : `还差 ${part.price - app.state.coins} 金币`}`}。这不是出战要求。</p>
       <p class="journey-parts">对手零件：${Object.values(mission.enemyBuild).map((id) => getPart(id).name).join("、")}。</p>
     </details>
-    <div class="journey-prep"><span>出战：${html(loadout.name)}</span><button class="journey-link" data-go="assembly">改装</button><button class="journey-link" data-go="lab">测试</button><button class="journey-link" data-go="collection">换陀螺</button></div>
+    <details class="comparison-disclosure journey-comparison">
+      <summary>这次配置与上次出战相比</summary>
+      ${renderBuildComparison(app.state.battleNotes[loadout.id], loadout)}
+    </details>
+    <details class="journey-moments">
+      <summary>同行人的回信 · ${moments.length} / 5</summary>
+      ${moments.length ? moments.map(moment => `<article><h3>${moment.speaker} · ${moment.title}</h3><p>${moment.text}</p></article>`).join("") :
+        "<p>完成一章后，同行人的回应会留在这里。先从眼前这场约战开始。</p>"}
+    </details>
     <details class="journey-log">
       <summary>旅途纪念与战历 · ${campaign.journal.length} 场记录</summary>
       <p>首次完成获得纪念；胜利 120 / 失败 40 金币，无额外首通金币。</p>

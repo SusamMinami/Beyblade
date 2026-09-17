@@ -40,8 +40,15 @@ import { canPlayMission, nextMission, normalizeCampaign, settleMission } from ".
 import { renderCampaign } from "./ui/campaign-panel.js";
 import { opponentIdentity } from "./data/opponent-identities.js";
 import "./ui/battle-structure.css";
+import { battleCoach } from "./core/battle-coach.js";
+import "./ui/game-flow.css";
+import { normalizeBattleNotes, trainingCue } from "./core/growth-state.js";
+import { renderBuildComparison, buildChangeSummary } from "./ui/build-comparison.js";
+import { chapterMoment } from "./data/chapter-moments.js";
+import "./ui/growth-flow.css";
 
 const STORAGE_KEY = "spin-core-web-prototype-v2";
+const PREPARATION_KEY = "spin-core-preparing-mission";
 const LEGACY_STORAGE_KEY = "spin-core-web-prototype-v1";
 const FIXED_STEP = 1 / 60;
 const RESULT_LABELS = {
@@ -117,6 +124,7 @@ function loadState() {
       lab: normalizeLabState(saved?.lab),
       showroom: normalizeShowroom(saved?.showroom),
       campaign: normalizeCampaign(saved?.campaign),
+      battleNotes: normalizeBattleNotes(saved?.battleNotes),
       sceneTime: normalizeSceneTime(saved?.sceneTime),
       tuning: { ...fallback.tuning, ...saved?.tuning },
     };
@@ -132,6 +140,7 @@ function loadState() {
       lab: normalizeLabState(),
       showroom: normalizeShowroom(),
       campaign: normalizeCampaign(),
+      battleNotes: {},
     };
   }
 }
@@ -154,6 +163,11 @@ class BeybladeApp {
     this.resultHandled = false;
     this.mapMode = location.hash === "#journey" ? "story" : "free";
     this.viewMissionId = nextMission(this.state.campaign)?.id ?? CAMPAIGN_MISSIONS.at(-1).id;
+    try {
+      const id = sessionStorage.getItem(PREPARATION_KEY);
+      this.preparingMissionId = this.state.tutorial.completed && canPlayMission(this.state.campaign, id) ? id : null;
+      if (this.preparingMissionId) this.viewMissionId = this.preparingMissionId;
+    } catch (error) { console.warn("约战返回目标无法读取，将使用当前旅程进度。", error); }
     this.activeEncounter = null;
     this.campaignResult = null;
     this.control = { x: 0, y: 0 };
@@ -187,6 +201,8 @@ class BeybladeApp {
       this.goTo("map");
     } else if (location.hash === "#journey") {
       this.goTo("journey");
+    } else if (location.hash === "#assembly") {
+      this.goTo("assembly");
     } else if (this.state.tutorial.stage === TUTORIAL_STAGE.FIRST_BATTLE) {
       this.goTo("battle");
     } else {
@@ -310,7 +326,11 @@ class BeybladeApp {
             <h2 id="result-title">对战结束</h2>
             <p id="result-copy"></p>
             <p id="result-cause" class="result-cause"></p>
-            <div id="result-telemetry" class="result-telemetry"></div>
+            <p id="result-coach" class="result-coach"></p>
+            <details id="result-details"><summary>展开战报与零件损伤</summary>
+              <div id="result-telemetry" class="result-telemetry"></div>
+              <details class="comparison-disclosure"><summary>这次改装改变了什么</summary><div id="result-comparison"></div></details>
+            </details>
             <div class="campaign-result is-hidden" id="campaign-result"></div>
             <div class="result-reward">
               <small>本局赏金</small>
@@ -324,6 +344,14 @@ class BeybladeApp {
           </div>
           <div class="victory-celebration is-hidden" id="victory-celebration" aria-hidden="true"></div>
           <div class="toast is-hidden" id="toast" role="status" aria-live="polite"></div>
+          <dialog id="battle-pause-dialog" aria-labelledby="pause-title" aria-describedby="pause-copy">
+            <h2 id="pause-title">对局已暂停</h2>
+            <p id="pause-copy">继续后恢复计时。退出本局不会结算金币或任务进度。</p>
+            <div class="pause-actions">
+              <button class="button primary" id="pause-resume" autofocus>继续对局</button>
+              <button class="button ghost" id="pause-exit">退出本局</button>
+            </div>
+          </dialog>
         </main>
 
         <section class="workspace">
@@ -337,6 +365,9 @@ class BeybladeApp {
               <button id="next-loadout" aria-label="下一个陀螺">›</button>
             </div>
             <div class="loadout-dots" id="loadout-dots"></div>
+            <details class="comparison-disclosure" id="assembly-comparison">
+              <summary>对比上次出战</summary><div></div>
+            </details>
             <div class="assembly-customizer is-hidden" id="assembly-customizer">
               <div class="part-heading">
                 <div>
@@ -353,7 +384,7 @@ class BeybladeApp {
               <div class="metric-panel">
                 <div class="metric-head">
                   <span>实时性能谱</span>
-                  <b id="build-mass">1.22 kg</b>
+                  <b id="build-mass">质量 1.22（平衡单位）</b>
                 </div>
                 <div class="metric-grid" id="metric-grid"></div>
               </div>
@@ -496,6 +527,17 @@ class BeybladeApp {
       .addEventListener("click", () => {
         if (this.state.tutorial.stage === TUTORIAL_STAGE.SECOND_BATTLE) {
           this.goTo("battle");
+        } else if (this.state.tutorial.stage === TUTORIAL_STAGE.BUY_FIRST_PART) {
+          const candidate = getPartsByType("driverShaft").find(part => {
+            const access = getPartAccess(part, this.state);
+            return access.affordable;
+          });
+          this.activeSlot = candidate?.type ?? "attackRing";
+          this._renderAssembly();
+          this.stage.showAssembly(this.state.loadouts, this.state.activeLoadoutIndex, this.activeSlot);
+          this._renderTutorial();
+        } else if (this.state.tutorial.stage === TUTORIAL_STAGE.FIRST_BATTLE) {
+          this.goTo("battle");
         }
       });
     this.root.querySelector("#three-stage").addEventListener(
@@ -597,7 +639,11 @@ class BeybladeApp {
         .addEventListener("click", () => this._setPurchaseDialog(false));
     }
     this.root.querySelector("#go-map").addEventListener("click", () => {
-      this.goTo(this.state.tutorial.completed ? "journey" : "map");
+      if (!this.state.tutorial.completed && this.state.tutorial.stage !== TUTORIAL_STAGE.BUY_FIRST_PART) {
+        this.goTo("battle");
+        return;
+      }
+      this.goTo(this.preparingMission || this.state.tutorial.completed ? "journey" : "map");
     });
     this.root.querySelector(".journey-modes").addEventListener("click", (event) => {
       const mode = event.target.closest("button")?.dataset.mapMode;
@@ -648,6 +694,15 @@ class BeybladeApp {
     this.root
       .querySelector("#pause-battle")
       .addEventListener("click", () => this._togglePause());
+    this.root.querySelector("#pause-resume").addEventListener("click", () => this._setPaused(false));
+    this.root.querySelector("#pause-exit").addEventListener("click", () => {
+      const route = this.activeEncounter ? "journey" : this.state.tutorial.completed ? "map" : "assembly";
+      this.goTo(route);
+    });
+    this.root.querySelector("#battle-pause-dialog").addEventListener("cancel", (event) => {
+      event.preventDefault();
+      this._setPaused(false);
+    });
     this.root
       .querySelector("#result-restart")
       .addEventListener("click", () => {
@@ -660,7 +715,15 @@ class BeybladeApp {
       });
     this.root
       .querySelector("#result-assembly")
-      .addEventListener("click", () => this.goTo("assembly"));
+      .addEventListener("click", () => {
+        const slot = this.resultCoachSlot;
+        this.goTo("assembly");
+        if (slot) {
+          this.activeSlot = slot;
+          this._renderAssembly();
+          this.stage.showAssembly(this.state.loadouts, this.state.activeLoadoutIndex, slot);
+        }
+      });
 
     this.root
       .querySelector("#sound-toggle")
@@ -784,6 +847,13 @@ class BeybladeApp {
         this._setPurchaseDialog(false);
         return;
       }
+      if (this.root.querySelector("dialog[open]") || event.target.closest("input, select, textarea, [contenteditable]")) return;
+      if (event.key === "Escape" && this.screen === "battle") {
+        event.preventDefault();
+        this._togglePause();
+        return;
+      }
+      if (this.screen !== "battle" || this.paused || this.simulation?.phase !== "running") return;
       this.keys.add(event.key.toLowerCase());
       if (["arrowup", "arrowdown", "arrowleft", "arrowright"].includes(
         event.key.toLowerCase(),
@@ -793,6 +863,10 @@ class BeybladeApp {
     });
     window.addEventListener("keyup", (event) => {
       this.keys.delete(event.key.toLowerCase());
+    });
+    window.addEventListener("blur", () => { this._clearBattleInput(); this._setPaused(true); });
+    document.addEventListener("visibilitychange", () => {
+      if (document.hidden) { this._clearBattleInput(); this._setPaused(true); }
     });
   }
 
@@ -928,6 +1002,7 @@ class BeybladeApp {
     const joystick = this.root.querySelector("#joystick");
     const knob = this.root.querySelector("#joystick-knob");
     const update = (event) => {
+      if (this.paused || this.simulation?.phase !== "running" || this.screen !== "battle") return;
       const bounds = joystick.getBoundingClientRect();
       const radius = bounds.width * 0.34;
       const rawX = event.clientX - (bounds.left + bounds.width * 0.5);
@@ -948,6 +1023,8 @@ class BeybladeApp {
       this.root.querySelector("#joystick-input-power").textContent = "0";
     };
     joystick.addEventListener("pointerdown", (event) => {
+      if (this.paused || this.simulation?.phase !== "running" || this.joystickActive) return;
+      this.joystickPointerId = event.pointerId;
       this.joystickActive = true;
       joystick.classList.add("is-active");
       joystick.setPointerCapture(event.pointerId);
@@ -967,10 +1044,13 @@ class BeybladeApp {
       joystick.classList.remove("is-active");
       reset();
     });
+    joystick.addEventListener("lostpointercapture", () => this._clearBattleInput());
   }
 
   _renderAssembly() {
     const loadout = this.state.loadouts[this.state.activeLoadoutIndex];
+    this.root.querySelector("#assembly-comparison > div").innerHTML =
+      renderBuildComparison(this.state.battleNotes[loadout.id], loadout);
     this.root.querySelector("#loadout-index").textContent =
       `${String(this.state.activeLoadoutIndex + 1).padStart(2, "0")} / ${String(this.state.loadouts.length).padStart(2, "0")}`;
     this.root.querySelector("#loadout-name").textContent = loadout.name;
@@ -1033,7 +1113,7 @@ class BeybladeApp {
       )
       .join("");
     this.root.querySelector("#build-mass").textContent =
-      `${this.playerBuild.totalMass.toFixed(2)} kg · ${this.playerBuild.maxSpinSpeed.toFixed(0)} rad/s`;
+      `质量 ${this.playerBuild.totalMass.toFixed(2)} · 转速 ${this.playerBuild.maxSpinSpeed.toFixed(0)}（平衡单位）`;
     this.root.querySelector("#ring-color").value = this.state.colors.ring;
     this.root.querySelector("#core-color").value = this.state.colors.core;
   }
@@ -1156,6 +1236,7 @@ class BeybladeApp {
     this.root.querySelector(".game-shell").dataset.diyEditing = "false";
     this.stage.exitPartEditor();
     this._renderAssembly();
+    this._renderTutorial();
     this.stage.showAssembly(
       this.state.loadouts,
       this.state.activeLoadoutIndex,
@@ -1182,6 +1263,7 @@ class BeybladeApp {
     this.activeSlot = null;
     this._save();
     this._renderAssembly();
+    this._renderTutorial();
     this.stage.switchAssemblyLoadout(
       this.state.activeLoadoutIndex,
       null,
@@ -1311,11 +1393,11 @@ class BeybladeApp {
     const card = this.root.querySelector("#tutorial-card");
     const { stage, completed } = this.state.tutorial;
     const visibleOnScreen =
-      (stage === TUTORIAL_STAGE.FIRST_BATTLE && this.screen === "battle") ||
+      (stage === TUTORIAL_STAGE.FIRST_BATTLE && ["battle", "assembly"].includes(this.screen)) ||
       (stage === TUTORIAL_STAGE.BUY_FIRST_PART &&
         this.screen === "assembly") ||
-      stage === TUTORIAL_STAGE.SECOND_BATTLE;
-    const hidden = completed || !visibleOnScreen;
+      (stage === TUTORIAL_STAGE.SECOND_BATTLE && ["battle", "assembly"].includes(this.screen));
+    const hidden = completed || !visibleOnScreen || (this.screen === "battle" && this.simulation?.phase === "finished");
     card.classList.toggle("is-hidden", hidden);
     this.root.querySelector(".game-shell").dataset.tutorialStage = completed
       ? TUTORIAL_STAGE.COMPLETE
@@ -1326,20 +1408,34 @@ class BeybladeApp {
       [TUTORIAL_STAGE.FIRST_BATTLE]: {
         progress: "新手训练 · 1/3",
         title: "先把木质陀螺转起来",
-        copy: "调节发射力度、方向和倾角后出手。开战后拖动摇杆，自己探索碰撞和转速的关系。",
+        copy: "先完成一场训练，胜负都能拿到首件零件的赏金。",
+        action: "返回训练场",
       },
       [TUTORIAL_STAGE.BUY_FIRST_PART]: {
         progress: "新手训练 · 2/3",
         title: "用赏金解锁第一个零件",
-        copy: "轻点陀螺上的任意部件进入改装。灰色零件尚未解锁；带金色钱币标记的零件现在可以买。",
+        copy: this.activeSlot ? "比较下方零件，再决定是否购买。金币标记表示可购买，确认后才扣款并装备。" :
+          "先选一个部位看看。用首战赏金买一件零件，观察配置取舍，再打一场。",
+        action: this.activeSlot ? null : "查看首件零件",
       },
       [TUTORIAL_STAGE.SECOND_BATTLE]: {
         progress: "新手训练 · 3/3",
         title: "验证你的第一次改装",
-        copy: "新零件已自动装备。再次进入标准竞技场，感受属性变化带来的战斗差异。",
+        copy: `${buildChangeSummary(this.state.battleNotes[this.state.loadouts[this.state.activeLoadoutIndex].id],
+          this.state.loadouts[this.state.activeLoadoutIndex])}。这是理论评分变化，再打一场观察实际表现。`,
         action: "使用新零件出战",
       },
     }[stage];
+    if (this.screen === "battle") {
+      const cue = trainingCue({
+        phase: this.simulation?.phase, steered: this.trainingSteered,
+        spinHarvested: this.simulation?.player.stats.spinHarvested ?? 0,
+        zone: this.simulation?.driveZone, second: stage === TUTORIAL_STAGE.SECOND_BATTLE,
+      });
+      content.title = cue.title;
+      content.copy = cue.copy;
+      this.trainingCueId = cue.id;
+    }
     this.root.querySelector("#tutorial-progress").textContent =
       content.progress;
     this.root.querySelector("#tutorial-title").textContent = content.title;
@@ -1370,6 +1466,7 @@ class BeybladeApp {
 
   _setMapMode(mode) {
     this.mapMode = mode === "story" ? "story" : "free";
+    if (this.mapMode === "free") this._setPreparation(null);
     this.root.querySelector(".game-shell").dataset.mapMode = this.mapMode;
     this.root.querySelectorAll(".journey-modes button").forEach((button) => {
       button.setAttribute("aria-pressed", String(button.dataset.mapMode === this.mapMode));
@@ -1447,7 +1544,31 @@ class BeybladeApp {
     this.audio.playUi();
   }
 
+  get preparingMission() {
+    return this.state.tutorial.completed && canPlayMission(this.state.campaign, this.preparingMissionId)
+      ? getMission(this.preparingMissionId) : null;
+  }
+
+  _setPreparation(id) {
+    this.preparingMissionId = this.state.tutorial.completed && canPlayMission(this.state.campaign, id) ? id : null;
+    try {
+      if (this.preparingMissionId) sessionStorage.setItem(PREPARATION_KEY, this.preparingMissionId);
+      else sessionStorage.removeItem(PREPARATION_KEY);
+    } catch (error) { console.warn("约战返回目标仅保留到本次刷新前。", error); }
+  }
+
   goTo(screen) {
+    const preparation = ["assembly", "lab", "collection"];
+    if (preparation.includes(screen)) {
+      if (this.screen === "map" && this.mapMode === "story") this._setPreparation(this.viewMissionId);
+      else if (this.screen === "battle" && this.activeEncounter) this._setPreparation(this.activeEncounter.missionId);
+    }
+    if (screen === "journey" && preparation.includes(this.screen) && this.preparingMission) {
+      this.viewMissionId = this.preparingMission.id;
+    }
+    this.root.querySelector("#battle-pause-dialog").close();
+    this._clearBattleInput();
+    this.paused = false;
     const journey = screen === "journey";
     if (journey) screen = "map";
     if (screen !== "battle") {
@@ -1480,6 +1601,9 @@ class BeybladeApp {
     shell.dataset.screen = screen;
     if (screen === "lab") this.labScreen.enter();
     if (screen === "collection") this.showroomScreen.enter();
+    this.root.querySelector("#go-map").textContent = this.preparingMission
+      ? `返回约战 · ${this.preparingMission.opponent} →` : !this.state.tutorial.completed &&
+        this.state.tutorial.stage !== TUTORIAL_STAGE.BUY_FIRST_PART ? "返回训练场 →" : "故事远征 / 对战 →";
     const route = journey ? "journey" : screen;
     if (location.hash !== `#${route}`) history.replaceState(null, "", `#${route}`);
     shell.dataset.arena = this.selectedArena.id;
@@ -1528,6 +1652,12 @@ class BeybladeApp {
   }
 
   _prepareBattle() {
+    this._setPreparation(null);
+    this._clearBattleInput();
+    this.root.querySelector("#battle-pause-dialog").close();
+    this.resultCoachSlot = null;
+    this.trainingSteered = false;
+    this.trainingCueId = null;
     const mission = getMission(this.activeEncounter?.missionId);
     const firstBattle =
       !mission && this.state.tutorial.stage === TUTORIAL_STAGE.FIRST_BATTLE;
@@ -1553,6 +1683,10 @@ class BeybladeApp {
       playerSelection,
       playerCustomizations,
     );
+    const loadout = this.state.loadouts[this.state.activeLoadoutIndex];
+    this.battleSnapshot = { id: loadout.id, build: structuredClone(playerSelection),
+      customizations: structuredClone(playerCustomizations) };
+    this.battleBaseline = this.state.battleNotes[loadout.id] ?? null;
     const enemySelection = mission ? mission.enemyBuild : firstBattle
       ? DEFAULT_BUILD
       : ENEMY_BUILDS[this.selectedArena.id] ?? ENEMY_BUILDS.standard;
@@ -1586,16 +1720,18 @@ class BeybladeApp {
     this.root.querySelector("#campaign-result").classList.add("is-hidden");
     this.root.querySelector("#enemy-name").textContent = mission?.opponent ?? (firstBattle ? "训练对手" : "AI");
     const brief = this.root.querySelector("#campaign-brief");
-    brief.classList.remove("is-hidden");
+    brief.classList.toggle("is-hidden", !this.state.tutorial.completed);
     brief.textContent = `${mission ? `${mission.opponent} / ${mission.topName} · ${mission.objectiveLabel}。` : ""}追逐亮起的 A/B/C 加速区；撞开对手独享补转，破损不会修复。`;
     this._showVictoryCelebration(false);
     this.root.querySelector("#top-influence").classList.add("is-hidden");
-    this.root.querySelector("#battle-pause-label").textContent = "待发";
+    this.root.querySelector("#battle-pause-label").textContent = "返回";
+    this.root.querySelector("#pause-battle").setAttribute("aria-label", "返回准备");
     this.root.querySelector("#battle-message").textContent = firstBattle
       ? "木质训练陀螺等待发射"
       : "等待发射参数";
     this._updateLaunchOutputs();
     this._updateHud();
+    this._renderTutorial();
   }
 
   async _launch() {
@@ -1608,15 +1744,48 @@ class BeybladeApp {
     this.stage.launchBattleVisual();
     this.audio.playLaunch(power);
     this.root.querySelector("#battle-pause-label").textContent = "暂停";
+    this.root.querySelector("#pause-battle").setAttribute("aria-label", "暂停战斗");
     this.root.querySelector("#launch-controls").classList.add("is-hidden");
     this.root.querySelector("#battle-controls").classList.remove("is-hidden");
     this.root.querySelector("#battle-message").textContent =
       "拖动摇杆微调轨迹";
+    this._renderTutorial();
   }
 
   _togglePause() {
-    if (!this.simulation || this.simulation.phase !== "running") return;
-    this.paused = !this.paused;
+    if (this.simulation?.phase === "ready") {
+      this.goTo(this.activeEncounter ? "journey" : this.state.tutorial.completed ? "map" : "assembly");
+      return;
+    }
+    this._setPaused(!this.paused);
+  }
+
+  _clearBattleInput() {
+    this.keys.clear();
+    this.control = { x: 0, y: 0 };
+    this.joystickActive = false;
+    const joystick = this.root.querySelector("#joystick");
+    if (this.joystickPointerId != null && joystick.hasPointerCapture(this.joystickPointerId)) {
+      joystick.releasePointerCapture(this.joystickPointerId);
+    }
+    this.joystickPointerId = null;
+    joystick.classList.remove("is-active");
+    this.root.querySelector("#joystick-knob").style.transform = "translate(-50%, -50%)";
+    this.root.querySelector("#joystick-input-power").textContent = "0";
+  }
+
+  _setPaused(paused) {
+    if (this.screen !== "battle" || this.simulation?.phase !== "running") return;
+    this.paused = paused;
+    this._clearBattleInput();
+    this.accumulator = 0;
+    this.lastTime = performance.now();
+    const dialog = this.root.querySelector("#battle-pause-dialog");
+    if (paused && !dialog.open) dialog.showModal();
+    if (!paused) {
+      dialog.close();
+      this.root.querySelector("#pause-battle").focus();
+    }
     this.root.querySelector("#battle-pause-label").textContent = this.paused
       ? "继续"
       : "暂停";
@@ -1721,6 +1890,12 @@ class BeybladeApp {
       });
       if (this.campaignResult.ok) this.state.campaign = this.campaignResult.campaign;
     }
+    this.root.querySelector("#result-comparison").innerHTML =
+      renderBuildComparison(this.battleBaseline, this.battleSnapshot);
+    this.state.battleNotes = normalizeBattleNotes({
+      ...this.state.battleNotes,
+      [this.battleSnapshot.id]: { ...this.battleSnapshot, time, winner },
+    });
     this._save();
     this._renderPersistentState();
     this._renderTutorial();
@@ -1744,6 +1919,11 @@ class BeybladeApp {
           : reason === BATTLE_RESULT.RING_OUT ? `${loserLabel}越过边界，碰撞后的动量决定了这一局。`
             : reason === BATTLE_RESULT.TIME ? "时间到，按剩余转速与结构完整度判定。"
               : `${loserLabel}先耗尽转速。抢区补转与保持结构完整，都能延长下一局的续航。`;
+    const coach = battleCoach(outcome, this.simulation.player);
+    this.resultCoachSlot = tutorialStage === TUTORIAL_STAGE.FIRST_BATTLE ? null : coach.slot;
+    this.root.querySelector("#result-coach").textContent = tutorialStage === TUTORIAL_STAGE.FIRST_BATTLE
+      ? "训练赏金已到账。去改装台查看并购买你的第一个零件，再试一次。" : coach.text;
+    this.root.querySelector("#result-details").open = false;
     const report = this.root.querySelector("#result-telemetry");
     report.replaceChildren();
     for (const [label, actor] of [["你", this.simulation.player], ["对手", this.simulation.enemy]]) {
@@ -1791,11 +1971,19 @@ class BeybladeApp {
       back.dataset.go = "journey";
       back.textContent = "返回远征";
       narrative.append(story, memory, challenge, back);
+      const moment = this.campaignResult.firstClear && chapterMoment(mission.id);
+      if (moment) {
+        const bridge = document.createElement("p");
+        bridge.className = "chapter-moment";
+        bridge.textContent = `${moment.speaker} · ${moment.title}：${moment.text}`;
+        narrative.insertBefore(bridge, back);
+        restartButton.textContent = moment.nextLabel;
+      }
     }
     assemblyButton.textContent =
       tutorialStage === TUTORIAL_STAGE.FIRST_BATTLE
-        ? "领取奖励并前往组装"
-        : "返回改装";
+        ? "前往改装台"
+        : this.resultCoachSlot ? `检查${PART_TYPE_META[this.resultCoachSlot].name}` : "返回改装";
     restartButton.classList.toggle(
       "is-hidden",
       tutorialStage === TUTORIAL_STAGE.FIRST_BATTLE,
@@ -1843,6 +2031,11 @@ class BeybladeApp {
   _updateHud() {
     if (!this.simulation) return;
     const { player, enemy, time } = this.simulation;
+    if (!this.state.tutorial.completed && this.screen === "battle" && this.simulation.phase === "running") {
+      const cue = trainingCue({ phase: "running", steered: this.trainingSteered,
+        spinHarvested: player.stats.spinHarvested, zone: this.simulation.driveZone });
+      if (cue.id !== this.trainingCueId) this._renderTutorial();
+    }
     this.root.querySelector("#player-spin").textContent =
       `${Math.round(player.spin)} 转速`;
     this.root.querySelector("#enemy-spin").textContent =
@@ -1917,7 +2110,9 @@ class BeybladeApp {
     ) {
       this.accumulator += delta;
       while (this.accumulator >= FIXED_STEP) {
-        this.simulation.step(FIXED_STEP, this._keyboardControl());
+        const control = this._keyboardControl();
+        if (Math.hypot(control.x, control.y) > .15) this.trainingSteered = true;
+        this.simulation.step(FIXED_STEP, control);
         this._processEvents();
         this.accumulator -= FIXED_STEP;
       }

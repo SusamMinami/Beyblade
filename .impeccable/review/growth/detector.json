@@ -1,0 +1,38 @@
+[
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\growth-flow.css",
+    "line": 54,
+    "snippet": "Undocumented color #b2bbb9 is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#b2bbb9"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\growth-flow.css",
+    "line": 67,
+    "snippet": "Undocumented color #b2bbb9 is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#b2bbb9"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\growth-flow.css",
+    "line": 74,
+    "snippet": "Undocumented color #b2bbb9 is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#b2bbb9"
+  }
+]

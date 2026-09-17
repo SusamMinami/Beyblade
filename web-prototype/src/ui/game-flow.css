@@ -1,0 +1,86 @@
+.journey-panel .journey-opponent { margin-top: 8px; }
+.journey-panel .journey-objective { margin-top: 10px; }
+
+#battle-pause-dialog {
+  width: min(380px, calc(100vw - 40px));
+  max-height: calc(100dvh - 40px);
+  overflow: auto;
+  padding: 24px;
+  border: 2px solid #12151a;
+  border-radius: 5px;
+  color: #12151a;
+  background: #fffdf7;
+  box-shadow: 0 16px 48px #12151a66;
+  font: inherit;
+}
+#battle-pause-dialog::backdrop { background: #12151ab3; }
+#battle-pause-dialog h2 { margin: 0 0 12px; font-size: 24px; }
+#battle-pause-dialog p { margin: 0 0 20px; font-size: 14px; line-height: 1.6; }
+.pause-actions { display: grid; gap: 10px; }
+#battle-pause-dialog .button {
+  min-height: 44px;
+  color: #12151a;
+  background: #fffdf7;
+  border: 1px solid #12151a;
+  border-radius: 3px;
+  font-size: 14px;
+}
+#battle-pause-dialog .primary { background: #ffd23f; }
+#battle-pause-dialog .button:hover { background: #bfe4ff; }
+#battle-pause-dialog :focus-visible, #result-details summary:focus-visible {
+  outline: 3px solid #266d9c;
+  outline-offset: 3px;
+}
+#battle-pause-dialog ::selection { color: #12151a; background: #ffd23f; }
+.game-shell[data-screen="battle"] .result-card .result-coach {
+  color: #234d5e;
+  font-size: 14px;
+  line-height: 1.6;
+  text-align: left;
+  padding-block: 10px;
+  border-block: 1px solid #b2bbb9;
+}
+#result-details { text-align: left; margin-block: 8px 12px; }
+#result-details > summary {
+  min-height: 40px;
+  padding-block: 8px;
+  cursor: pointer;
+  font-size: 14px;
+  color: #263c42;
+}
+#result-details > summary:hover { color: #145888; background: #e6f2f7; }
+.game-shell[data-screen="battle"] .result-card {
+  max-height: calc(100% - 32px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+  scrollbar-width: thin;
+  scrollbar-color: #266d9c #e5e9e6;
+}
+.game-shell[data-screen="battle"] .result-actions {
+  position: sticky;
+  bottom: -20px;
+  padding-block: 10px;
+  background: #fffdf7;
+}
+.game-shell[data-screen="battle"] .result-actions .button {
+  white-space: normal;
+  min-height: 44px;
+  height: auto;
+}
+.game-shell[data-screen="battle"] .result-reward {
+  display: flex;
+  justify-content: space-between;
+  gap: 8px;
+  padding: 10px;
+  border-width: 1px;
+  box-shadow: none;
+  transform: none;
+}
+.game-shell[data-screen="battle"] .result-reward strong {
+  font-family: inherit;
+  font-size: 24px;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.game-shell[data-screen="battle"] .result-reward small,
+.game-shell[data-screen="battle"] .result-reward em { font-size: 12px; letter-spacing: 0; }

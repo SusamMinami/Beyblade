@@ -180,6 +180,11 @@ export class LabScreen {
   }
 
   refresh() {
+    const mission = this.app.preparingMission;
+    const returnButton = this.root.querySelector('[data-lab="battle"]');
+    returnButton.querySelector("span").textContent = mission ? "返回约战" : "对战";
+    returnButton.querySelector("small").textContent = mission?.opponent ?? "BATTLE";
+    returnButton.title = mission ? `返回约战：${mission.title} · ${mission.opponent}` : "选择自由对战地图";
     this.buildSnapshot = calculateBuild(this.loadout.build, this.loadout.customizations);
     this.app.playerBuild = this.buildSnapshot;
     this.stage?.setSpecimen(this.loadout, this.build);
@@ -343,7 +348,7 @@ export class LabScreen {
     if (action === "next" || action === "previous") return this.selectLoadout(this.app.state.activeLoadoutIndex + (action === "next" ? 1 : -1));
     if (action === "assembly" || action === "battle") {
       if (this.busy) return this.notify("请等待当前检测完成。");
-      this.app.goTo(action === "battle" ? "map" : "assembly");
+      this.app.goTo(action === "battle" ? (this.app.preparingMission ? "journey" : "map") : "assembly");
       return;
     }
     if (action === "lab") return this.closeSheet();

@@ -1,6 +1,6 @@
 # 文档导航与维护
 
-最后核对：2026-09-16。当前开发目标是 **Web 原型**，验收后再移植 Godot。
+最后核对：2026-09-17。当前开发目标是 **Web 原型**，验收后再移植 Godot。
 
 ## 接手顺序
 
@@ -19,6 +19,8 @@
 | Web 开发与运行 | [Web README](../web-prototype/README.md) | 当前操作、存档、检查命令 |
 | Web 视觉与交互 | [Web DESIGN](../web-prototype/DESIGN.md) | 当前配色、布局、动态、减少动态效果 |
 | 任务、宿敌与成长故事 | [回声远征](campaign_direction.md) | 原任务线诊断、五章十战、人物关系、实现边界与后续提案 |
+| 游戏流程、约战准备与暂停 | [流程优化](game_flow_optimization.md) | 流程诊断、返回原任务、结算建议和中断恢复；后续提案单列 |
+| 新手训练、改装对比与章节回应 | [第二轮流程优化](game_flow_round2.md) | 分阶段操作提示、真实参赛配置快照、章节回信及验证边界 |
 | 战斗场景与模型 | [battle_worlds](battle_worlds.md) | Blender 源文件、导出、地图与碰撞 |
 | 展览厅原始方向 | [showroom-direction](test_lab/showroom-direction.md) | 参考方向与升降约束；实现细节以 Web DESIGN 为准 |
 | 数值与单位 | [参数基线](top_part_physics_baseline.md) | 15 个零件、DIY、平行轴惯量、游戏平衡单位 |
@@ -53,6 +55,8 @@ npm run dev
 | 冠军场模型、移动灯光、日夜与资源释放 | `npm run verify:championship` |
 | 街头比例、日夜、积水反射与环境资源 | `node tools/verify-street.mjs` |
 | 故事任务、过关结算、战历与远征入口 | `npm run verify:campaign` |
+| 跨页面约战准备、暂停退出与结算建议 | `npm run verify:flow` |
+| 两场新手训练、改装参照与章节回信 | `npm run verify:growth` |
 | 结构损伤、供能、AI 与战斗反馈 | `npm run verify:structure`、`npm run verify:battle-ui` |
 
 浏览器检查需要开发服务器和 Chrome，使用隔离存档。`verify:structure` 为纯数值检查，无需浏览器。

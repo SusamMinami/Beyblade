@@ -1,0 +1,6 @@
+{
+  "status": "PASS",
+  "checks": 11,
+  "errors": [],
+  "fixture": "isolated first-echo completion and owned low-center core; real solver battles"
+}

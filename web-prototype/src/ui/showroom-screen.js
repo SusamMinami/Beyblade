@@ -126,7 +126,11 @@ export class ShowroomScreen {
   refresh() {
     const { state } = this.app;
     const mission = nextMission(state.campaign);
-    this.root.querySelector('[data-collection="journey"]').title = mission
+    const returnButton = this.root.querySelector('[data-collection="journey"]');
+    const preparing = this.app.preparingMission;
+    returnButton.querySelector("span").textContent = preparing ? "返回约战" : "故事远征";
+    returnButton.querySelector("small").textContent = preparing?.opponent ?? "JOURNEY";
+    returnButton.title = preparing ? `返回约战：${preparing.title} · ${preparing.opponent}` : mission
       ? `回声远征：${mission.title} · ${state.campaign.completed.length}/10` : "远征完成 · 查看旅途纪念";
     this.root.querySelector(".collection-coins").textContent = state.coins.toLocaleString();
     const level = labLevel(state.lab.xp);
