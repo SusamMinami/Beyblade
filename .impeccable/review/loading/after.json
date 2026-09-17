@@ -1,0 +1,887 @@
+[
+  {
+    "cpuRate": 1,
+    "browser": "152.0.7977.84",
+    "environment": {
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4080 (0x00002704) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "parallelCompile": true,
+      "pixelRatio": 1
+    },
+    "phases": [
+      {
+        "name": "collection-first",
+        "syncMs": 507,
+        "readyMs": 2053.100000023842,
+        "frameMs": 2.199999988079071,
+        "visibleMs": 2062.600000023842,
+        "selectedArena": "standard",
+        "events": [
+          {
+            "phase": "collection-first",
+            "kind": "pmrem",
+            "ms": 18
+          },
+          {
+            "phase": "collection-first",
+            "kind": "gltf-fetch-parse",
+            "ms": 500.5999999642372,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/showroom/holo.glb"
+          },
+          {
+            "phase": "collection-first",
+            "kind": "longtask",
+            "ms": 1092
+          }
+        ],
+        "resources": [
+          {
+            "name": "holo.glb",
+            "ms": 485.30000001192093,
+            "transfer": 1756636,
+            "bytes": 1756336
+          }
+        ]
+      },
+      {
+        "name": "lab-first",
+        "syncMs": 66.5,
+        "readyMs": 470.2000000476837,
+        "frameMs": 1.2999999523162842,
+        "visibleMs": 474.9000000357628,
+        "selectedArena": "standard",
+        "events": [
+          {
+            "phase": "lab-first",
+            "kind": "longtask",
+            "ms": 66
+          },
+          {
+            "phase": "lab-first",
+            "kind": "gltf-fetch-parse",
+            "ms": 54.5,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/battle_worlds/childhood_lab.glb"
+          }
+        ],
+        "resources": [
+          {
+            "name": "childhood_lab.glb",
+            "ms": 49,
+            "transfer": 912536,
+            "bytes": 912236
+          }
+        ]
+      },
+      {
+        "name": "collection-return",
+        "syncMs": 6.699999988079071,
+        "readyMs": 6.699999988079071,
+        "frameMs": 2,
+        "visibleMs": 31.80000001192093,
+        "selectedArena": "standard",
+        "events": [],
+        "resources": []
+      },
+      {
+        "name": "lab-return",
+        "syncMs": 6.100000023841858,
+        "readyMs": 6.400000035762787,
+        "frameMs": 0.5999999642372131,
+        "visibleMs": 29.5,
+        "selectedArena": "standard",
+        "events": [],
+        "resources": []
+      },
+      {
+        "name": "standard-map",
+        "syncMs": 62.59999996423721,
+        "readyMs": 672,
+        "frameMs": 1.5,
+        "visibleMs": 679.3000000119209,
+        "arena": "standard",
+        "selectedArena": "standard",
+        "events": [
+          {
+            "phase": "standard-map",
+            "kind": "longtask",
+            "ms": 63
+          },
+          {
+            "phase": "standard-map",
+            "kind": "longtask",
+            "ms": 381
+          }
+        ],
+        "resources": []
+      },
+      {
+        "name": "metal-first",
+        "syncMs": 5.699999988079071,
+        "readyMs": 1324.8999999761581,
+        "frameMs": 1.9000000357627869,
+        "visibleMs": 1331.0999999642372,
+        "arena": "metal",
+        "selectedArena": "metal",
+        "events": [
+          {
+            "phase": "metal-first",
+            "kind": "gltf-fetch-parse",
+            "ms": 55.5,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/battle_worlds/championship.glb"
+          },
+          {
+            "phase": "metal-first",
+            "kind": "longtask",
+            "ms": 814
+          }
+        ],
+        "resources": [
+          {
+            "name": "championship.glb",
+            "ms": 35.60000002384186,
+            "transfer": 6657820,
+            "bytes": 6657520
+          }
+        ]
+      },
+      {
+        "name": "metal-battle",
+        "syncMs": 84.39999997615814,
+        "readyMs": 518.5,
+        "frameMs": 3.300000011920929,
+        "visibleMs": 531.1999999880791,
+        "arena": "metal",
+        "selectedArena": "metal",
+        "events": [
+          {
+            "phase": "metal-battle",
+            "kind": "longtask",
+            "ms": 84
+          }
+        ],
+        "resources": []
+      },
+      {
+        "name": "metal-return",
+        "syncMs": 6.099999964237213,
+        "readyMs": 6.099999964237213,
+        "frameMs": 9,
+        "visibleMs": 22.899999976158142,
+        "arena": "metal",
+        "selectedArena": "metal",
+        "events": [],
+        "resources": []
+      },
+      {
+        "name": "street-first",
+        "syncMs": 30.30000001192093,
+        "readyMs": 3200.400000035763,
+        "frameMs": 3.5,
+        "visibleMs": 3212.900000035763,
+        "arena": "street",
+        "selectedArena": "street",
+        "events": [
+          {
+            "phase": "street-first",
+            "kind": "pmrem",
+            "ms": 25.399999976158142
+          },
+          {
+            "phase": "street-first",
+            "kind": "gltf-fetch-parse",
+            "ms": 70.39999997615814,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/battle_worlds/street.glb"
+          },
+          {
+            "phase": "street-first",
+            "kind": "pmrem",
+            "ms": 11.099999964237213
+          },
+          {
+            "phase": "street-first",
+            "kind": "pmrem",
+            "ms": 11.5
+          },
+          {
+            "phase": "street-first",
+            "kind": "longtask",
+            "ms": 513
+          },
+          {
+            "phase": "street-first",
+            "kind": "longtask",
+            "ms": 1993
+          }
+        ],
+        "resources": [
+          {
+            "name": "street.glb",
+            "ms": 41.10000002384186,
+            "transfer": 7934732,
+            "bytes": 7934432
+          }
+        ]
+      },
+      {
+        "name": "street-battle",
+        "syncMs": 50.30000001192093,
+        "readyMs": 1011.8999999761581,
+        "frameMs": 6,
+        "visibleMs": 1031.8999999761581,
+        "arena": "street",
+        "selectedArena": "street",
+        "events": [
+          {
+            "phase": "street-battle",
+            "kind": "longtask",
+            "ms": 50
+          }
+        ],
+        "resources": []
+      },
+      {
+        "name": "street-return",
+        "syncMs": 4.399999976158142,
+        "readyMs": 4.399999976158142,
+        "frameMs": 14.800000011920929,
+        "visibleMs": 30.69999998807907,
+        "arena": "street",
+        "selectedArena": "street",
+        "events": [],
+        "resources": []
+      },
+      {
+        "name": "ruins-first",
+        "syncMs": 3.599999964237213,
+        "readyMs": 244.5999999642372,
+        "frameMs": 0.6000000238418579,
+        "visibleMs": 256.19999998807907,
+        "arena": "ruins",
+        "selectedArena": "ruins",
+        "events": [
+          {
+            "phase": "ruins-first",
+            "kind": "gltf-fetch-parse",
+            "ms": 20.400000035762787,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/battle_worlds/floating_ruins.glb"
+          }
+        ],
+        "resources": [
+          {
+            "name": "floating_ruins.glb",
+            "ms": 13.399999976158142,
+            "transfer": 1748384,
+            "bytes": 1748084
+          }
+        ]
+      },
+      {
+        "name": "ruins-battle",
+        "syncMs": 48.89999997615814,
+        "readyMs": 380.89999997615814,
+        "frameMs": 1.699999988079071,
+        "visibleMs": 386.5,
+        "arena": "ruins",
+        "selectedArena": "ruins",
+        "events": [],
+        "resources": []
+      },
+      {
+        "name": "ruins-return",
+        "syncMs": 4.399999976158142,
+        "readyMs": 4.399999976158142,
+        "frameMs": 15.600000023841858,
+        "visibleMs": 28.599999964237213,
+        "arena": "ruins",
+        "selectedArena": "ruins",
+        "events": [],
+        "resources": []
+      },
+      {
+        "name": "street-revisit",
+        "syncMs": 2.900000035762787,
+        "readyMs": 218,
+        "frameMs": 3.5,
+        "visibleMs": 229.70000004768372,
+        "arena": "street",
+        "selectedArena": "street",
+        "events": [
+          {
+            "phase": "street-revisit",
+            "kind": "gltf-fetch-parse",
+            "ms": 76,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/battle_worlds/street.glb"
+          },
+          {
+            "phase": "street-revisit",
+            "kind": "pmrem",
+            "ms": 10.699999988079071
+          },
+          {
+            "phase": "street-revisit",
+            "kind": "pmrem",
+            "ms": 10.699999988079071
+          },
+          {
+            "phase": "street-revisit",
+            "kind": "longtask",
+            "ms": 75
+          }
+        ],
+        "resources": [
+          {
+            "name": "street.glb",
+            "ms": 54.90000003576279,
+            "transfer": 7934732,
+            "bytes": 7934432
+          }
+        ]
+      },
+      {
+        "name": "metal-revisit",
+        "syncMs": 3.100000023841858,
+        "readyMs": 144.39999997615814,
+        "frameMs": 1.2000000476837158,
+        "visibleMs": 148.19999998807907,
+        "arena": "metal",
+        "selectedArena": "metal",
+        "events": [
+          {
+            "phase": "metal-revisit",
+            "kind": "gltf-fetch-parse",
+            "ms": 56.30000001192093,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/battle_worlds/championship.glb"
+          },
+          {
+            "phase": "metal-revisit",
+            "kind": "longtask",
+            "ms": 51
+          }
+        ],
+        "resources": [
+          {
+            "name": "championship.glb",
+            "ms": 37.799999952316284,
+            "transfer": 6657820,
+            "bytes": 6657520
+          }
+        ]
+      }
+    ],
+    "errors": []
+  },
+  {
+    "cpuRate": 4,
+    "browser": "152.0.7977.84",
+    "environment": {
+      "renderer": "ANGLE (NVIDIA, NVIDIA GeForce RTX 4080 (0x00002704) Direct3D11 vs_5_0 ps_5_0, D3D11)",
+      "parallelCompile": true,
+      "pixelRatio": 1
+    },
+    "phases": [
+      {
+        "name": "collection-first",
+        "syncMs": 814.7000000476837,
+        "readyMs": 1110,
+        "frameMs": 15.100000023841858,
+        "visibleMs": 1174.2000000476837,
+        "selectedArena": "standard",
+        "events": [
+          {
+            "phase": "collection-first",
+            "kind": "pmrem",
+            "ms": 58.59999996423721
+          },
+          {
+            "phase": "collection-first",
+            "kind": "gltf-fetch-parse",
+            "ms": 771.6000000238419,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/showroom/holo.glb"
+          },
+          {
+            "phase": "collection-first",
+            "kind": "longtask",
+            "ms": 67
+          },
+          {
+            "phase": "collection-first",
+            "kind": "longtask",
+            "ms": 194
+          }
+        ],
+        "resources": [
+          {
+            "name": "holo.glb",
+            "ms": 678.0999999642372,
+            "transfer": 1756636,
+            "bytes": 1756336
+          }
+        ]
+      },
+      {
+        "name": "lab-first",
+        "syncMs": 399.39999997615814,
+        "readyMs": 666.2999999523163,
+        "frameMs": 13.5,
+        "visibleMs": 711,
+        "selectedArena": "standard",
+        "events": [
+          {
+            "phase": "lab-first",
+            "kind": "longtask",
+            "ms": 401
+          },
+          {
+            "phase": "lab-first",
+            "kind": "gltf-fetch-parse",
+            "ms": 323.19999998807907,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/battle_worlds/childhood_lab.glb"
+          },
+          {
+            "phase": "lab-first",
+            "kind": "longtask",
+            "ms": 86
+          },
+          {
+            "phase": "lab-first",
+            "kind": "longtask",
+            "ms": 117
+          }
+        ],
+        "resources": [
+          {
+            "name": "childhood_lab.glb",
+            "ms": 249.29999995231628,
+            "transfer": 912536,
+            "bytes": 912236
+          }
+        ]
+      },
+      {
+        "name": "collection-return",
+        "syncMs": 63.5,
+        "readyMs": 64.10000002384186,
+        "frameMs": 22.19999998807907,
+        "visibleMs": 160.5,
+        "selectedArena": "standard",
+        "events": [],
+        "resources": []
+      },
+      {
+        "name": "lab-return",
+        "syncMs": 56.19999998807907,
+        "readyMs": 58.5,
+        "frameMs": 7.699999988079071,
+        "visibleMs": 104.60000002384186,
+        "selectedArena": "standard",
+        "events": [
+          {
+            "phase": "lab-return",
+            "kind": "longtask",
+            "ms": 67
+          }
+        ],
+        "resources": []
+      },
+      {
+        "name": "standard-map",
+        "syncMs": 376.5999999642372,
+        "readyMs": 601.5,
+        "frameMs": 16.30000001192093,
+        "visibleMs": 665,
+        "arena": "standard",
+        "selectedArena": "standard",
+        "events": [
+          {
+            "phase": "standard-map",
+            "kind": "longtask",
+            "ms": 378
+          },
+          {
+            "phase": "standard-map",
+            "kind": "longtask",
+            "ms": 97
+          },
+          {
+            "phase": "standard-map",
+            "kind": "longtask",
+            "ms": 138
+          }
+        ],
+        "resources": []
+      },
+      {
+        "name": "metal-first",
+        "syncMs": 33.30000001192093,
+        "readyMs": 453.19999998807907,
+        "frameMs": 13.899999976158142,
+        "visibleMs": 506.0999999642372,
+        "arena": "metal",
+        "selectedArena": "metal",
+        "events": [
+          {
+            "phase": "metal-first",
+            "kind": "gltf-fetch-parse",
+            "ms": 167.30000001192093,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/battle_worlds/championship.glb"
+          },
+          {
+            "phase": "metal-first",
+            "kind": "longtask",
+            "ms": 53
+          },
+          {
+            "phase": "metal-first",
+            "kind": "longtask",
+            "ms": 90
+          },
+          {
+            "phase": "metal-first",
+            "kind": "longtask",
+            "ms": 166
+          }
+        ],
+        "resources": [
+          {
+            "name": "championship.glb",
+            "ms": 63.89999997615814,
+            "transfer": 6657820,
+            "bytes": 6657520
+          }
+        ]
+      },
+      {
+        "name": "metal-battle",
+        "syncMs": 462.19999998807907,
+        "readyMs": 816.3000000119209,
+        "frameMs": 22.80000001192093,
+        "visibleMs": 910,
+        "arena": "metal",
+        "selectedArena": "metal",
+        "events": [
+          {
+            "phase": "metal-battle",
+            "kind": "longtask",
+            "ms": 465
+          },
+          {
+            "phase": "metal-battle",
+            "kind": "longtask",
+            "ms": 219
+          },
+          {
+            "phase": "metal-battle",
+            "kind": "longtask",
+            "ms": 143
+          }
+        ],
+        "resources": []
+      },
+      {
+        "name": "metal-return",
+        "syncMs": 32.5,
+        "readyMs": 32.59999996423721,
+        "frameMs": 26,
+        "visibleMs": 103.19999998807907,
+        "arena": "metal",
+        "selectedArena": "metal",
+        "events": [
+          {
+            "phase": "metal-return",
+            "kind": "longtask",
+            "ms": 60
+          }
+        ],
+        "resources": []
+      },
+      {
+        "name": "street-first",
+        "syncMs": 75,
+        "readyMs": 713.3999999761581,
+        "frameMs": 34.10000002384186,
+        "visibleMs": 836.5,
+        "arena": "street",
+        "selectedArena": "street",
+        "events": [
+          {
+            "phase": "street-first",
+            "kind": "pmrem",
+            "ms": 36.40000003576279
+          },
+          {
+            "phase": "street-first",
+            "kind": "longtask",
+            "ms": 76
+          },
+          {
+            "phase": "street-first",
+            "kind": "gltf-fetch-parse",
+            "ms": 235.60000002384186,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/battle_worlds/street.glb"
+          },
+          {
+            "phase": "street-first",
+            "kind": "pmrem",
+            "ms": 30.80000001192093
+          },
+          {
+            "phase": "street-first",
+            "kind": "pmrem",
+            "ms": 25.200000047683716
+          },
+          {
+            "phase": "street-first",
+            "kind": "longtask",
+            "ms": 58
+          },
+          {
+            "phase": "street-first",
+            "kind": "longtask",
+            "ms": 180
+          },
+          {
+            "phase": "street-first",
+            "kind": "longtask",
+            "ms": 125
+          },
+          {
+            "phase": "street-first",
+            "kind": "longtask",
+            "ms": 197
+          }
+        ],
+        "resources": [
+          {
+            "name": "street.glb",
+            "ms": 68.19999998807907,
+            "transfer": 7934732,
+            "bytes": 7934432
+          }
+        ]
+      },
+      {
+        "name": "street-battle",
+        "syncMs": 278.5,
+        "readyMs": 618.8000000119209,
+        "frameMs": 70.09999996423721,
+        "visibleMs": 844.5999999642372,
+        "arena": "street",
+        "selectedArena": "street",
+        "events": [
+          {
+            "phase": "street-battle",
+            "kind": "longtask",
+            "ms": 280
+          },
+          {
+            "phase": "street-battle",
+            "kind": "longtask",
+            "ms": 144
+          },
+          {
+            "phase": "street-battle",
+            "kind": "longtask",
+            "ms": 247
+          },
+          {
+            "phase": "street-battle",
+            "kind": "longtask",
+            "ms": 78
+          }
+        ],
+        "resources": []
+      },
+      {
+        "name": "street-return",
+        "syncMs": 34.200000047683716,
+        "readyMs": 34.30000001192093,
+        "frameMs": 52.30000001192093,
+        "visibleMs": 181.5,
+        "arena": "street",
+        "selectedArena": "street",
+        "events": [
+          {
+            "phase": "street-return",
+            "kind": "longtask",
+            "ms": 68
+          },
+          {
+            "phase": "street-return",
+            "kind": "longtask",
+            "ms": 88
+          }
+        ],
+        "resources": []
+      },
+      {
+        "name": "ruins-first",
+        "syncMs": 25.19999998807907,
+        "readyMs": 185,
+        "frameMs": 4.599999964237213,
+        "visibleMs": 204.29999995231628,
+        "arena": "ruins",
+        "selectedArena": "ruins",
+        "events": [
+          {
+            "phase": "ruins-first",
+            "kind": "gltf-fetch-parse",
+            "ms": 73.19999998807907,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/battle_worlds/floating_ruins.glb"
+          },
+          {
+            "phase": "ruins-first",
+            "kind": "longtask",
+            "ms": 52
+          }
+        ],
+        "resources": [
+          {
+            "name": "floating_ruins.glb",
+            "ms": 19.299999952316284,
+            "transfer": 1748384,
+            "bytes": 1748084
+          }
+        ]
+      },
+      {
+        "name": "ruins-battle",
+        "syncMs": 317.7000000476837,
+        "readyMs": 579.7000000476837,
+        "frameMs": 19.19999998807907,
+        "visibleMs": 646,
+        "arena": "ruins",
+        "selectedArena": "ruins",
+        "events": [
+          {
+            "phase": "ruins-battle",
+            "kind": "longtask",
+            "ms": 319
+          },
+          {
+            "phase": "ruins-battle",
+            "kind": "longtask",
+            "ms": 118
+          },
+          {
+            "phase": "ruins-battle",
+            "kind": "longtask",
+            "ms": 146
+          }
+        ],
+        "resources": []
+      },
+      {
+        "name": "ruins-return",
+        "syncMs": 27.399999976158142,
+        "readyMs": 27.399999976158142,
+        "frameMs": 34.69999998807907,
+        "visibleMs": 94.30000001192093,
+        "arena": "ruins",
+        "selectedArena": "ruins",
+        "events": [
+          {
+            "phase": "ruins-return",
+            "kind": "longtask",
+            "ms": 64
+          }
+        ],
+        "resources": []
+      },
+      {
+        "name": "street-revisit",
+        "syncMs": 21.900000035762787,
+        "readyMs": 588.5,
+        "frameMs": 38,
+        "visibleMs": 704.1000000238419,
+        "arena": "street",
+        "selectedArena": "street",
+        "events": [
+          {
+            "phase": "street-revisit",
+            "kind": "gltf-fetch-parse",
+            "ms": 232,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/battle_worlds/street.glb"
+          },
+          {
+            "phase": "street-revisit",
+            "kind": "pmrem",
+            "ms": 29.69999998807907
+          },
+          {
+            "phase": "street-revisit",
+            "kind": "pmrem",
+            "ms": 24.30000001192093
+          },
+          {
+            "phase": "street-revisit",
+            "kind": "longtask",
+            "ms": 64
+          },
+          {
+            "phase": "street-revisit",
+            "kind": "longtask",
+            "ms": 140
+          },
+          {
+            "phase": "street-revisit",
+            "kind": "longtask",
+            "ms": 110
+          },
+          {
+            "phase": "street-revisit",
+            "kind": "longtask",
+            "ms": 188
+          }
+        ],
+        "resources": [
+          {
+            "name": "street.glb",
+            "ms": 77,
+            "transfer": 7934732,
+            "bytes": 7934432
+          }
+        ]
+      },
+      {
+        "name": "metal-revisit",
+        "syncMs": 19,
+        "readyMs": 353.30000001192093,
+        "frameMs": 9.599999964237213,
+        "visibleMs": 386.0999999642372,
+        "arena": "metal",
+        "selectedArena": "metal",
+        "events": [
+          {
+            "phase": "metal-revisit",
+            "kind": "gltf-fetch-parse",
+            "ms": 159.10000002384186,
+            "detail": "/@fs/C:/Users/Admin/Downloads/%E6%88%98%E6%96%97%E9%99%80%E8%9E%BA/resources/battle_worlds/championship.glb"
+          },
+          {
+            "phase": "metal-revisit",
+            "kind": "longtask",
+            "ms": 50
+          },
+          {
+            "phase": "metal-revisit",
+            "kind": "longtask",
+            "ms": 72
+          },
+          {
+            "phase": "metal-revisit",
+            "kind": "longtask",
+            "ms": 99
+          }
+        ],
+        "resources": [
+          {
+            "name": "championship.glb",
+            "ms": 58.09999996423721,
+            "transfer": 6657820,
+            "bytes": 6657520
+          }
+        ]
+      }
+    ],
+    "errors": []
+  }
+]

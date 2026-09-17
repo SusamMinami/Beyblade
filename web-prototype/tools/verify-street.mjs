@@ -155,11 +155,13 @@ try {
     const nightPlastic = a.plastics[0].envMap;
     const nightSun = s.keyLight.position.clone();
     s.setSceneTime("day");
+    await Promise.all([...s.preparations]);
     const dayMaterials = a.materials.every(({ material, base }) => material.emissiveIntensity < base * .08);
     const dayEnvironment = s.scene.environment !== nightEnvironment && a.plastics[0].envMap !== nightPlastic &&
       !s.keyLight.position.equals(nightSun) && s.scenePeriod === "day";
     s.update(0);
     s.setSceneTime("night");
+    await Promise.all([...s.preparations]);
     s.renderer.info.autoReset = false;
     s.renderer.info.reset();
     s.update(0);
@@ -169,6 +171,7 @@ try {
     let disposedTarget = false;
     rt.addEventListener("dispose", () => { disposedTarget = true; });
     s.showArena(window.arenas.standard);
+    await Promise.all([...s.preparations]);
     s.update(0);
     const released = a.disposed && disposedTarget && !a.root.parent && s.streetAtmosphere === null;
     const standardLights = s.edgeLight.intensity === 1.3 && !s.bloom.enabled;
@@ -187,6 +190,7 @@ try {
       });
       s.update(0);
       s.showArena(window.arenas.standard);
+      await Promise.all([...s.preparations]);
       s.update(0);
     }
     const stableMemory = s.renderer.info.memory.geometries === baseline.geometries &&

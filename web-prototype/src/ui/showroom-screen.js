@@ -85,13 +85,6 @@ export class ShowroomScreen {
     this.root.addEventListener("keydown",e=>{
       if (e.key==="Escape" && !this.dialog.open) this.stage.setInspection(false);
     });
-    this.stage.ready.then(() => {
-      this.ready = true;
-      this.root.querySelector(".collection-loading").hidden = true;
-      this.updateBusy();
-    }).catch(() => {
-      this.root.querySelector(".collection-loading").textContent = "舞台载入失败，请刷新重试。";
-    });
   }
 
   get loadout() { return this.app.state.loadouts[this.app.state.activeLoadoutIndex]; }
@@ -110,10 +103,10 @@ export class ShowroomScreen {
   }
 
   enter() {
-    this.stage.attach();
-    this.stage.setStage(this.showroom.equipped);
+    this.loadStage(this.showroom.equipped);
     this.previewing = null;
     this.stage.setSpecimen(this.loadout);
+    this.stage.attach();
     this.refresh();
   }
 
@@ -121,6 +114,25 @@ export class ShowroomScreen {
     this.stage.detach();
     this.dialog.close();
     this.previewing = null;
+  }
+
+  loadStage(id) {
+    const token = this.stageLoadToken = (this.stageLoadToken ?? 0) + 1;
+    this.ready = false;
+    const loading = this.root.querySelector(".collection-loading");
+    loading.hidden = this.ready;
+    loading.textContent = "正在准备升降舞台…";
+    this.stage.setStage(id).then(() => {
+      if (token !== this.stageLoadToken) return;
+      this.ready = true;
+      loading.hidden = true;
+      this.updateBusy();
+    }).catch(() => {
+      if (token !== this.stageLoadToken) return;
+      loading.textContent = "舞台载入失败，请重新选择舞台或刷新重试。";
+      this.updateBusy();
+    });
+    this.updateBusy();
   }
 
   refresh() {
@@ -168,7 +180,8 @@ export class ShowroomScreen {
   updateBusy() {
     const busy = Boolean(this.stage.transition);
     this.root.dataset.lift = busy ? (this.stage.transition.swapped ? "rising" : "lowering") : "idle";
-    this.root.querySelectorAll("[data-show-loadout], .lab-arrow, [data-collection='stages']").forEach((button) => { button.disabled = busy || !this.ready; });
+    this.root.querySelectorAll("[data-show-loadout], .lab-arrow").forEach((button) => { button.disabled = busy || !this.ready; });
+    this.root.querySelector("[data-collection='stages']").disabled = busy;
     this.root.querySelector(".collection-use").textContent = busy ? (this.stage.transition.swapped ? "正在升起…" : "正在收起…") : "使用中";
   }
 
@@ -235,7 +248,7 @@ export class ShowroomScreen {
   preview(id) {
     if (!DISPLAY_STAGES.some((stage) => stage.id === id)) return;
     this.previewing = id !== this.showroom.equipped ? id : null;
-    this.stage.setStage(id);
+    this.loadStage(id);
     this.updateStageLabel();
     this.dialog.close();
     if (this.previewing) this.notify("舞台预览中 · 可在展示舞台中解锁，离开页面恢复已装备舞台");
@@ -249,7 +262,7 @@ export class ShowroomScreen {
     try { this.app._save(); }
     catch { this.app.state.showroom = previous; return this.notify("舞台未保存，请检查本机存储。"); }
     this.previewing = null;
-    this.stage.setStage(id);
+    this.loadStage(id);
     this.updateStageLabel();
     this.dialog.close();
     this.notify("展示舞台已装备");

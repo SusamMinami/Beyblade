@@ -117,10 +117,12 @@ try {
     const night = { beam: a.fixtures[0].beam.material.uniforms.strength.value,
       light: a.fixtures[0].light.intensity, runner: a.runners[0].material.uniforms.level.value };
     s.setSceneTime("day");
+    await Promise.all([...s.preparations]);
     const day = { beam: a.fixtures[0].beam.material.uniforms.strength.value,
       light: a.fixtures[0].light.intensity, runner: a.runners[0].material.uniforms.level.value };
     const dayReduced = Object.keys(day).every(k => day[k] < night[k]) && s.scenePeriod === "day";
     s.setSceneTime("night");
+    await Promise.all([...s.preparations]);
     s.update(0);
     const defaultSpotsDisabled = s.spotlights.every(l => !l.visible);
     const metalMaterial = s.arenaRoot.children.flatMap(c => c.children)

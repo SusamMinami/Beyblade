@@ -14,6 +14,7 @@ import { addArenaArchitecture } from "./arena-details.js";
 import { BattleEffects } from "./battle-effects.js";
 import { StreetAtmosphere } from "./street-atmosphere.js";
 import { ChampionshipAtmosphere } from "./championship-atmosphere.js";
+import { prepareScene } from "./prepare-scene.js";
 import { createOutdoorEnvironment, normalizeSceneTime, resolveSceneTime } from "./scene-time.js";
 import { createDriveZoneModel, updateDriveZoneModel } from "./drive-zone-model.js";
 import {
@@ -348,6 +349,8 @@ export class ThreeStage {
     this.activeArena = null;
     this.arenaReady = false;
     this.arenaLoadToken = 0;
+    this.preparationToken = 0;
+    this.preparations = new Set();
     this.scenePulse = 0;
     this.energyMaterials = [];
     this.streetAtmosphere = null;
@@ -1063,11 +1066,14 @@ export class ThreeStage {
     });
   }
 
-  _clearModels() {
-    this.streetAtmosphere?.dispose();
-    this.streetAtmosphere = null;
-    this.championshipAtmosphere?.dispose();
-    this.championshipAtmosphere = null;
+  _clearModels({ keepArena = false } = {}) {
+    if (!keepArena) {
+      this.streetAtmosphere?.dispose();
+      this.streetAtmosphere = null;
+      this.championshipAtmosphere?.dispose();
+      this.championshipAtmosphere = null;
+      this.mountedArenaId = null;
+    }
     this.battleEffects.reset();
     for (const effect of this.effects) {
       effect.geometry.dispose();
@@ -1094,6 +1100,7 @@ export class ThreeStage {
     { preserveCamera = false } = {},
   ) {
     this.mode = "assembly";
+    this.preparationToken++;
     this.arenaLoadToken++;
     this.energyMaterials = [];
     this.activeArena = null;
@@ -1380,6 +1387,8 @@ export class ThreeStage {
   }
 
   showArena(arena) {
+    const keepArena = this.mountedArenaId === arena.id;
+    this.preparationToken++;
     this.scenePeriod = resolveSceneTime(this.sceneTime);
     this.mode = "map";
     this.activeArena = arena;
@@ -1387,8 +1396,8 @@ export class ThreeStage {
     this.launchVectorRoot.visible = false;
     this.partEditorSlot = null;
     this._setSceneColors("#c8cecd", 0.012);
-    this._clearModels();
-    disposeGroup(this.arenaRoot);
+    this._clearModels({ keepArena });
+    if (!keepArena) disposeGroup(this.arenaRoot);
     disposeGroup(this.launcherRoot);
     this.launcherRoot.visible = false;
     this._mountArena(arena);
@@ -1405,6 +1414,8 @@ export class ThreeStage {
     playerCustomizations = {},
     enemyIdentity = { colors: { ring: "#ec5b45", core: "#dfe9e7" }, customizations: {} },
   ) {
+    const keepArena = this.mountedArenaId === arena.id;
+    this.preparationToken++;
     this.mode = "battle";
     this.finishElapsed = 0;
     this.scenePeriod = resolveSceneTime(this.sceneTime);
@@ -1417,8 +1428,8 @@ export class ThreeStage {
       composite: "#302c29",
     };
     this._setSceneColors(battleBackgrounds[arena.id] ?? "#11181b", 0.028);
-    this._clearModels();
-    disposeGroup(this.arenaRoot);
+    this._clearModels({ keepArena });
+    if (!keepArena) disposeGroup(this.arenaRoot);
     disposeGroup(this.launcherRoot);
     this._mountArena(arena);
     this.launcherRoot.add(createLauncherModel());
@@ -1442,19 +1453,36 @@ export class ThreeStage {
   }
 
   _mountArena(arena) {
+    const status=(state,message="")=>this.container.dispatchEvent(new CustomEvent("arenastatus",{detail:{state,message}}));
+    if (this.mountedArenaId === arena.id) {
+      // Preview -> match -> preview retains the GLB, reflection targets and
+      // compiled materials. Only round-local models and zone colors reset.
+      disposeGroup(this.driveZoneModel);
+      this.driveZoneModel.removeFromParent();
+      this.driveZoneModel = createDriveZoneModel(arena, (x, z) =>
+        arenaHeightAt(arena, Math.hypot(x, z), Math.atan2(z, x)));
+      this.arenaRoot.add(this.driveZoneModel);
+      this.scenePulse = 0;
+      this._applySceneTime();
+      if (this.arenaLoaded) this._prepareArena();
+      else status("loading", "正在准备场景…");
+      return;
+    }
     const token=++this.arenaLoadToken;
+    this.mountedArenaId = arena.id;
+    this.preparedMapPeriod = null;
     this.driveZoneModel = createDriveZoneModel(arena, (x, z) =>
       arenaHeightAt(arena, Math.hypot(x, z), Math.atan2(z, x)));
     this.arenaRoot.add(this.driveZoneModel);
     this.energyMaterials=[];
     this.arenaReady=false;
+    this.arenaLoaded=false;
     this.scenePulse=0;
-    const status=(state,message="")=>this.container.dispatchEvent(new CustomEvent("arenastatus",{detail:{state,message}}));
     this._applySceneTime();
     if (!arena.scene) {
       this.arenaRoot.add(createArenaModel(arena));
-      this.arenaReady=true;
-      status("ready");
+      this.arenaLoaded=true;
+      this._prepareArena();
       return;
     }
     status("loading","正在准备场景…");
@@ -1486,13 +1514,50 @@ export class ThreeStage {
           period: this.scenePeriod,
         });
       }
-      this.arenaReady=true;
-      status("ready");
+      this.arenaLoaded=true;
+      this._prepareArena();
     }).catch(error=>{
       if (token!==this.arenaLoadToken) return;
+      this.mountedArenaId = null;
       console.error("Arena asset failed",arena.scene,error);
       status("error","场景载入失败，请重新选择场地或刷新。");
     });
+  }
+
+  _prepareArena() {
+    const token = ++this.preparationToken;
+    const current = () => token === this.preparationToken;
+    const status = (state, message = "") => this.container.dispatchEvent(
+      new CustomEvent("arenastatus", { detail: { state, message } }));
+    // Returning to an already drawn preview uses the same live arena materials.
+    // There are no new top/launcher variants to prepare in this direction.
+    if (this.mode === "map" && this.preparedMapPeriod === this.scenePeriod) {
+      this.arenaReady = true;
+      status("ready");
+      return;
+    }
+    this.arenaReady = false;
+    status("loading", "正在准备场景画面…");
+    // Let navigation finish mounting the launcher's actual loadouts before
+    // compiling, and allow the loading indicator to paint.
+    const task = new Promise(resolve => requestAnimationFrame(resolve)).then(async () => {
+      if (!current()) return;
+      await prepareScene(this.renderer, this.scene, this.camera, {
+        target: this.bloom.enabled ? this.composer.readBuffer : null,
+        current,
+        draw: () => this._renderFrame(0),
+      });
+      if (!current()) return;
+      this.arenaReady = true;
+      if (this.mode === "map") this.preparedMapPeriod = this.scenePeriod;
+      status("ready");
+    }).catch(error => {
+      if (!current()) return;
+      this.mountedArenaId = null;
+      console.error("Arena preparation failed", error);
+      status("error", "场景准备失败，请重新选择场地或刷新。");
+    }).finally(() => this.preparations.delete(task));
+    this.preparations.add(task);
   }
 
   setSceneTime(value) {
@@ -1501,6 +1566,7 @@ export class ThreeStage {
     if (this.mode !== "map") return;
     this.scenePeriod = resolveSceneTime(this.sceneTime);
     this._applySceneTime();
+    if (this.arenaLoaded) this._prepareArena();
   }
 
   _applySceneTime() {
@@ -1704,6 +1770,11 @@ export class ThreeStage {
     this.camera.position.lerp(this.desiredCameraPosition, cameraEase);
     this.cameraTarget.lerp(this.desiredCameraTarget, cameraEase);
     this.camera.lookAt(this.cameraTarget);
+    if (this.mode !== "assembly" && !this.arenaReady) return;
+    this._renderFrame(delta);
+  }
+
+  _renderFrame(delta) {
     if (this.bloom.enabled) {
       this.composer.render(delta);
     } else {
@@ -2092,6 +2163,7 @@ export class ThreeStage {
 
   destroy() {
     this.arenaLoadToken++;
+    this.preparationToken++;
     window.clearTimeout(this.impactClassTimer);
     this.resizeObserver.disconnect();
     this._clearModels();
@@ -2105,6 +2177,8 @@ export class ThreeStage {
     this.composer.dispose();
     this.keyLight.shadow.dispose();
     window.cancelAnimationFrame(this.diyChangeFrame);
-    this.renderer.dispose();
+    // Three's async compiler polls renderer material properties until complete.
+    // Keep that registry alive even if the scene is destroyed during a load.
+    Promise.allSettled([...this.preparations]).then(() => this.renderer.dispose());
   }
 }

@@ -44,11 +44,6 @@ export class LabScreen {
     this.mount();
     try {
       this.stage = new LabStage(this.root.querySelector(".lab-scene"));
-      this.stage.ready.then(() => {
-        this.loaded = true;
-        this.root.querySelector(".lab-loading").hidden = true;
-        if (this.active) this.refresh();
-      }).catch(() => this.assetError());
     } catch {
       this.assetError();
     }
@@ -134,7 +129,7 @@ export class LabScreen {
       if (!this.persist(next)) return;
       this.complete = false;
       this.stage?.setQuality(this.lab.settings.quality);
-      this.stage?.setRoom(this.lab.settings.room);
+      this.loadRoom();
       this.root.dataset.room=this.lab.settings.room;
       this.stage?.clearTrace();
       this.updateWindControls();
@@ -149,6 +144,8 @@ export class LabScreen {
 
   assetError() {
     this.failed = true;
+    this.loaded = false;
+    this.root.querySelector(".lab-loading").hidden = false;
     this.root.querySelector(".lab-loading").innerHTML = "<span>实验台载入失败</span><small>请刷新页面重试，已有配置仍保留。</small>";
     this.root.querySelector('[data-lab="test"]').disabled = true;
   }
@@ -166,14 +163,16 @@ export class LabScreen {
 
   enter() {
     this.active = true;
+    if (this.stage) this.stage.active = true;
     if (this.stage) this.root.querySelector(".lab-scene").append(this.stage.renderer.domElement);
     this.refresh();
     this.updateWindControls();
-    requestAnimationFrame(() => this.stage?.resize());
+    this.stage?.resize();
   }
 
   leave() {
     this.active = false;
+    if (this.stage) this.stage.active = false;
     this.busy = false;
     this.complete = false;
     this.closeSheet();
@@ -189,7 +188,7 @@ export class LabScreen {
     this.app.playerBuild = this.buildSnapshot;
     this.stage?.setSpecimen(this.loadout, this.build);
     this.stage?.setQuality(this.lab.settings.quality);
-    this.stage?.setRoom(this.lab.settings.room);
+    this.loadRoom();
     this.root.dataset.room=this.lab.settings.room;
     this.root.querySelector("#lab-sample-name").textContent = this.loadout.name;
     this.root.querySelector("#lab-coins").textContent = this.app.state.coins.toLocaleString();
@@ -209,6 +208,28 @@ export class LabScreen {
     this.complete = false;
     this.updateButtons();
     this.draw();
+  }
+
+  loadRoom() {
+    if (!this.stage) return;
+    const room = this.lab.settings.room;
+    const token = this.roomLoadToken = (this.roomLoadToken ?? 0) + 1;
+    this.failed = false;
+    const ready = this.stage.setRoom(room);
+    this.loaded = this.stage.frameReady;
+    const loading = this.root.querySelector(".lab-loading");
+    loading.hidden = this.loaded;
+    if (!this.loaded) loading.innerHTML = "<span>正在准备实验台</span><small>载入仪器与当前陀螺</small>";
+    ready.then(() => {
+      if (token !== this.roomLoadToken) return;
+      this.loaded = true;
+      loading.hidden = true;
+      this.updateButtons();
+      this.draw();
+    }).catch(() => {
+      if (token === this.roomLoadToken) this.assetError();
+    });
+    this.updateButtons();
   }
 
   updateButtons() {

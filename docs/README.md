@@ -22,6 +22,7 @@
 | 游戏流程、约战准备与暂停 | [流程优化](game_flow_optimization.md) | 流程诊断、返回原任务、结算建议和中断恢复；后续提案单列 |
 | 新手训练、改装对比与章节回应 | [第二轮流程优化](game_flow_round2.md) | 分阶段操作提示、真实参赛配置快照、章节回信及验证边界 |
 | 战斗场景与模型 | [battle_worlds](battle_worlds.md) | Blender 源文件、导出、地图与碰撞 |
+| 场景加载与切换性能 | [加载诊断与优化](scene_loading_performance.md) | 首帧测量、按需加载、缓存边界与验证结果 |
 | 展览厅原始方向 | [showroom-direction](test_lab/showroom-direction.md) | 参考方向与升降约束；实现细节以 Web DESIGN 为准 |
 | 数值与单位 | [参数基线](top_part_physics_baseline.md) | 15 个零件、DIY、平行轴惯量、游戏平衡单位 |
 | 结构损伤、加速区与对手形象 | [Web v4 战斗设计](structural_battle_design.md) | 局部受损、失衡停转、轮换供能、AI 争夺及近似边界 |
@@ -53,6 +54,7 @@ npm run dev
 | 陈列室、升降、舞台、风场 | `npm run verify:showroom` |
 | 战斗场景、障碍碰撞、近景交互 | `npm run verify:worlds` |
 | 冠军场模型、移动灯光、日夜与资源释放 | `npm run verify:championship` |
+| 场景加载、缓存与异步切换 | `npm run verify:loading`、`npm run measure:loading -- <记录名>` |
 | 街头比例、日夜、积水反射与环境资源 | `node tools/verify-street.mjs` |
 | 故事任务、过关结算、战历与远征入口 | `npm run verify:campaign` |
 | 跨页面约战准备、暂停退出与结算建议 | `npm run verify:flow` |

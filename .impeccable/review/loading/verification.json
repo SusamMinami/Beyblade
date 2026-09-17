@@ -1,0 +1,22 @@
+{
+  "checks": [
+    "Collection requests only the equipped stage",
+    "No background lab room loaded",
+    "Lab loads only the selected room on demand",
+    "Lab and collection share thumbnail cache",
+    "Unchanged showroom specimen survives navigation",
+    "Unchanged lab specimen survives navigation",
+    "Repeated entry issues no GLB requests",
+    "In-place color edits invalidate specimen and thumbnail, with bounded cache",
+    "In-place DIY edits invalidate specimen",
+    "Failed preview leaves stage chooser usable for recovery",
+    "Retry displays locked stage without changing equip or ownership",
+    "Leaving preview restores equip and shared canvas ownership",
+    "Preview to battle retains arena, lighting and loaded assets",
+    "A new round resets tops and pulse while retaining atmosphere",
+    "Late map response cannot replace the currently selected world",
+    "Destroying a world during compilation settles without stale draw or renderer access",
+    "No uncaught errors during async switches or destruction: "
+  ],
+  "errors": []
+}

@@ -9,6 +9,13 @@
 文档核对：2026-09-17。[按任务查找文档](../docs/README.md)；
 视觉规范见 [DESIGN.md](DESIGN.md)，模型和地图见 [场景说明](../docs/battle_worlds.md)。
 
+场景加载已改为按需准备：同一地图预览与比赛复用场景，未改变的陀螺和缩略图
+直接复用。进入其他地图仍释放旧场景，实验室/展示舞台按选择加载。
+首次材质准备仍需要时间，结果与后续空间见
+[加载诊断与测量](../docs/scene_loading_performance.md)。
+`npm run verify:loading` 检查缓存、失败重试及异步切换；
+`npm run measure:loading -- <记录名>` 记录固定路径进入耗时，需要 dev server 和 Chrome。
+
 ## 故事远征：回声远征
 
 打开 `http://127.0.0.1:5173/#journey`，或从陀螺陈列室点击“故事远征”。

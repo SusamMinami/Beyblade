@@ -3,6 +3,8 @@ import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { RoomEnvironment } from "three/addons/environments/RoomEnvironment.js";
 import { createTopModel, disposeTopModel } from "./top-model.js";
 import { applySurfaceFinish } from "./surface-finish.js";
+import { loadoutVisualKey } from "./loadout-visual-key.js";
+import { prepareScene } from "./prepare-scene.js";
 import labAssetUrl from "../../../resources/test_lab/test_lab.glb?url";
 import childhoodUrl from "../../../resources/battle_worlds/childhood_lab.glb?url";
 import { windParameters } from "../core/lab-state.js";
@@ -93,32 +95,41 @@ export class LabStage {
     this.scene.add(monitor);
     this.monitor = monitor;
     this.createWindField();
+    this.active = false;
+    this.roomSets = {};
+    this.roomLoads = {};
+    this.thumbnailCache = new Map();
     this.resizeObserver = new ResizeObserver(() => this.resize());
     this.resizeObserver.observe(container);
-    this.resize();
-    this.ready = this.loadSet();
+    this.ready = Promise.resolve(this);
   }
 
-  async loadSet() {
-    const loader = new GLTFLoader();
-    const assets = await Promise.all([loader.loadAsync(childhoodUrl), loader.loadAsync(labAssetUrl)]);
-    this.roomSets = {};
-    assets.forEach((gltf, i) => {
+  loadSet(room) {
+    if (this.roomSets[room]) return Promise.resolve(this);
+    if (this.roomLoads[room]) return this.roomLoads[room];
+    this.roomLoads[room] = new GLTFLoader().loadAsync(room === "advanced" ? labAssetUrl : childhoodUrl).then(gltf => {
       gltf.scene.traverse((mesh) => {
-      if (!mesh.isMesh) return;
-      mesh.castShadow = true;
-      mesh.receiveShadow = true;
-      const material = mesh.material;
-      material.envMapIntensity = 1.05;
-      if (mesh.geometry.attributes.color) material.vertexColors = true;
-      if (material.metalness > 0.4) applySurfaceFinish(material, "machined", 0.75);
-      if (material.name === "Honey oak") applySurfaceFinish(material, "wood", .45);
+        if (!mesh.isMesh) return;
+        mesh.castShadow = true;
+        mesh.receiveShadow = true;
+        const material = mesh.material;
+        material.envMapIntensity = 1.05;
+        if (mesh.geometry.attributes.color) material.vertexColors = true;
+        if (material.metalness > 0.4) applySurfaceFinish(material, "machined", 0.75);
+        if (material.name === "Honey oak") applySurfaceFinish(material, "wood", .45);
       });
+      gltf.scene.visible = room === this.room;
       this.scene.add(gltf.scene);
-      this.roomSets[i === 0 ? "childhood" : "advanced"] = gltf.scene;
+      this.roomSets[room] = gltf.scene;
+      if (room === this.room) {
+        this.labSet = gltf.scene;
+        this.setView(this.view);
+      }
+      return this;
+    }).finally(() => {
+      delete this.roomLoads[room];
     });
-    this.setRoom(this.room ?? "childhood");
-    return this;
+    return this.roomLoads[room];
   }
 
   setRoom(room) {
@@ -132,18 +143,43 @@ export class LabStage {
     this.scene.environmentIntensity=this.room==="childhood" ? .38 : .8;
     this.scene.background.set(this.room==="childhood" ? "#b6bba5" : "#a6b4b7");
     this.setView(this.view);
+    const selected = this.room;
+    const token = this.prepareToken = (this.prepareToken ?? 0) + 1;
+    const key = `${selected}:${this.specimenKey}:${this.quality}:${this.view}`;
+    this.frameReady = this.preparedKey === key;
+    this.ready = this.loadSet(selected).then(async () => {
+      if (token !== this.prepareToken || !this.active || this.frameReady) return this;
+      await prepareScene(this.renderer, this.scene, this.camera, {
+        current: () => token === this.prepareToken && this.active,
+        draw: () => {
+          this.renderer.render(this.scene, this.camera);
+          this.frameReady = true;
+          this.preparedKey = key;
+        },
+      });
+      return this;
+    });
+    return this.ready;
   }
 
   resize() {
+    // This renderer also serves the showroom. An inactive lab must not resize
+    // or draw over the canvas owned by the current page.
+    if (!this.active) return;
     const { width, height } = this.container.getBoundingClientRect();
     if (!width || !height) return;
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height, false);
-    this.renderer.render(this.scene, this.camera);
+    if (this.frameReady) this.renderer.render(this.scene, this.camera);
   }
 
   setSpecimen(loadout, build) {
+    this.build = build;
+    this.center.position.fromArray(build.centerOfMass);
+    const key = loadoutVisualKey(loadout);
+    if (this.top && this.specimenKey === key) return;
+    this.specimenKey = key;
     if (this.top) {
       this.rotor.remove(this.top);
       disposeTopModel(this.top);
@@ -202,6 +238,21 @@ export class LabStage {
   }
 
   renderThumbnails(loadouts, canvases) {
+    const keys = loadouts.map(loadoutVisualKey);
+    // Bound storage to the current inventory (including identical loadouts).
+    for (const key of this.thumbnailCache.keys()) {
+      if (!keys.includes(key)) this.thumbnailCache.delete(key);
+    }
+    const missing = loadouts.filter((_, i) => !this.thumbnailCache.has(keys[i]));
+    if (missing.length) this._renderMissingThumbnails(missing);
+    canvases.forEach((canvas, i) => {
+      canvas.width = 300;
+      canvas.height = 200;
+      canvas.getContext("2d").drawImage(this.thumbnailCache.get(keys[i]), 0, 0);
+    });
+  }
+
+  _renderMissingThumbnails(loadouts) {
     const scene = new THREE.Scene();
     scene.environment = this.environment.texture;
     scene.environmentIntensity = 0.8;
@@ -213,23 +264,28 @@ export class LabStage {
     const camera = new THREE.PerspectiveCamera(34, 1.5, 0.1, 20);
     camera.position.set(0, 2.5, 3.4);
     camera.lookAt(0, 0, 0);
+    const previousSize = this.renderer.getSize(new THREE.Vector2());
+    const previousRatio = this.renderer.getPixelRatio();
     this.renderer.setPixelRatio(1);
     this.renderer.setSize(300, 200, false);
-    loadouts.forEach((loadout, i) => {
+    loadouts.forEach((loadout) => {
+      const key = loadoutVisualKey(loadout);
+      if (this.thumbnailCache.has(key)) return;
       const top = createTopModel(loadout.build, loadout.colors, loadout.customizations);
       const size = new THREE.Box3().setFromObject(top).getSize(new THREE.Vector3());
       top.scale.setScalar(2.15 / Math.max(size.x, size.y, size.z));
       scene.add(top);
       this.renderer.render(scene, camera);
-      const canvas = canvases[i];
+      const canvas = document.createElement("canvas");
       canvas.width = 300;
       canvas.height = 200;
       canvas.getContext("2d").drawImage(this.renderer.domElement, 0, 0);
+      this.thumbnailCache.set(key, canvas);
       scene.remove(top);
       disposeTopModel(top);
     });
-    this.setQuality(this.quality ?? "high");
-    this.resize();
+    this.renderer.setPixelRatio(previousRatio);
+    this.renderer.setSize(previousSize.x, previousSize.y, false);
   }
 
   setQuality(value) {
@@ -316,7 +372,7 @@ export class LabStage {
     this.center.visible = showCenter;
     this.scan.visible = running;
     this.scan.position.y = 0.46 + (0.5 - Math.cos(progress * Math.PI * 4) * 0.5) * 1.21;
-    this.renderer.render(this.scene, this.camera);
+    if (this.frameReady) this.renderer.render(this.scene, this.camera);
     return { rpm: this.rpm, lean: THREE.MathUtils.radToDeg(this.lean), drift, angle: this.rotor.rotation.y };
   }
 }

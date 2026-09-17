@@ -2,6 +2,8 @@ import * as THREE from "three";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import { createTopModel, disposeTopModel, setActivePart, updateTopPartFocus } from "./top-model.js";
 import { applySurfaceFinish } from "./surface-finish.js";
+import { loadoutVisualKey } from "./loadout-visual-key.js";
+import { prepareScene } from "./prepare-scene.js";
 import holoUrl from "../../../resources/showroom/holo.glb?url";
 import arenaUrl from "../../../resources/showroom/arena.glb?url";
 
@@ -53,6 +55,7 @@ export class ShowroomStage {
     this.elapsed = 0;
     this.active = false;
     this.sets = {};
+    this.setLoads = {};
     this.createEffects();
     this.inspection = false;
     this.orbit = { yaw: 0, pitch: .34, radius: 5.8 };
@@ -60,13 +63,13 @@ export class ShowroomStage {
     this.bindInspection();
     this.observer = new ResizeObserver(() => { if (this.active) this.resize(); });
     this.observer.observe(container);
-    this.ready = this.loadSets();
+    this.ready = Promise.resolve(this);
   }
 
-  async loadSets() {
-    const loader = new GLTFLoader();
-    const assets = await Promise.all([loader.loadAsync(holoUrl), loader.loadAsync(arenaUrl)]);
-    assets.forEach((asset, i) => {
+  loadSet(id) {
+    if (this.sets[id]) return Promise.resolve(this);
+    if (this.setLoads[id]) return this.setLoads[id];
+    this.setLoads[id] = new GLTFLoader().loadAsync(id === "arena" ? arenaUrl : holoUrl).then(asset => {
       asset.scene.traverse((mesh) => {
         if (!mesh.isMesh) return;
         mesh.castShadow = true;
@@ -74,11 +77,14 @@ export class ShowroomStage {
         if (mesh.material.metalness > .4) applySurfaceFinish(mesh.material, "machined", .55);
         mesh.material.envMapIntensity = .65;
       });
-      asset.scene.visible = false;
+      asset.scene.visible = this.stageId === id;
       this.scene.add(asset.scene);
-      this.sets[i === 0 ? "holo" : "arena"] = asset.scene;
+      this.sets[id] = asset.scene;
+      return this;
+    }).finally(() => {
+      delete this.setLoads[id];
     });
-    this.setStage(this.stageId ?? "holo");
+    return this.setLoads[id];
   }
 
   createEffects() {
@@ -140,6 +146,26 @@ export class ShowroomStage {
       spot.color.setHex(color);
       beam.material.color.setHex(color);
     });
+    const token = this.prepareToken = (this.prepareToken ?? 0) + 1;
+    this.frameReady = false;
+    this.ready = this.loadSet(id).then(async () => {
+      const key = `${id}:${this.specimenKey}`;
+      if (token !== this.prepareToken || !this.active) return this;
+      if (key === this.preparedKey) {
+        this.frameReady = true;
+        return this;
+      }
+      await prepareScene(this.renderer, this.scene, this.camera, {
+        current: () => token === this.prepareToken && this.active,
+        draw: () => {
+          this.renderer.render(this.scene, this.camera);
+          this.frameReady = true;
+          this.preparedKey = key;
+        },
+      });
+      return this;
+    });
+    return this.ready;
   }
 
   bindInspection() {
@@ -244,15 +270,19 @@ export class ShowroomStage {
   }
 
   resize() {
+    if (!this.active) return;
     const { width, height } = this.container.getBoundingClientRect();
     if (!width || !height) return;
     this.camera.aspect = width / height;
     this.camera.updateProjectionMatrix();
     this.renderer.setSize(width, height, false);
-    this.renderer.render(this.scene, this.camera);
+    if (this.frameReady) this.renderer.render(this.scene, this.camera);
   }
 
   setSpecimen(loadout) {
+    const key = loadoutVisualKey(loadout);
+    if (this.top && this.specimenKey === key) return;
+    this.specimenKey = key;
     if (this.top) {
       this.specimen.remove(this.top);
       disposeTopModel(this.top);
@@ -325,6 +355,6 @@ export class ShowroomStage {
     this.camera.lookAt(this.cameraTarget);
     this.hologram.material.uniforms.time.value = reducedMotion ? 0 : this.elapsed;
     this.particles.rotation.y = reducedMotion ? 0 : this.elapsed * .018;
-    this.renderer.render(this.scene, this.camera);
+    if (this.frameReady) this.renderer.render(this.scene, this.camera);
   }
 }
