@@ -515,7 +515,7 @@ function buildTip(id, materials, customization) {
   return group;
 }
 
-export function createTopModel(
+function* buildTopSteps(
   selection,
   colors = { ring: "#23c8b2", core: "#efbd3c" },
   customizations = {},
@@ -532,39 +532,69 @@ export function createTopModel(
     tip: buildTip,
   };
 
-  Object.entries(builders).forEach(([slot, builder]) => {
-    const partId = selection[slot];
-    const customization = normalizePartCustomization(customizations[partId]);
-    const materials = createMaterials(colors, customization.material);
-    top.userData.materials.push(...Object.values(materials));
-    const partGroup = builder(partId, materials, customization);
-    if (slot === "coreLock" && colors.emblem) {
-      // Small authored insignia: actual geometry, never a texture placeholder.
-      const count = colors.emblem;
-      addRadialDetails(partGroup, count, 0.13, 0.205,
-        bladeGeometry(count === 2 ? 0.23 : 0.1, 0.038, 0.027), materials.core);
+  let complete = false;
+  try {
+    for (const [slot, builder] of Object.entries(builders)) {
+      const partId = selection[slot];
+      const customization = normalizePartCustomization(customizations[partId]);
+      const materials = createMaterials(colors, customization.material);
+      top.userData.materials.push(...Object.values(materials));
+      const partGroup = builder(partId, materials, customization);
+      if (slot === "coreLock" && colors.emblem) {
+        // Small authored insignia: actual geometry, never a texture placeholder.
+        const count = colors.emblem;
+        addRadialDetails(partGroup, count, 0.13, 0.205,
+          bladeGeometry(count === 2 ? 0.23 : 0.1, 0.038, 0.027), materials.core);
+      }
+      compactPart(partGroup);
+      partGroup.name = slot;
+      partGroup.position.y = SLOT_Y[slot];
+      partGroup.userData.baseY = SLOT_Y[slot];
+      partGroup.userData.baseScale = new THREE.Vector3(
+        customization.size,
+        customization.height,
+        customization.size,
+      );
+      partGroup.scale.copy(partGroup.userData.baseScale);
+      partGroup.traverse((child) => {
+        if (!child.isMesh) return;
+        child.material = cloneSurfaceMaterial(child.material);
+        top.userData.materials.push(child.material);
+      });
+      top.userData.partGroups[slot] = partGroup;
+      top.add(partGroup);
+      yield;
     }
-    compactPart(partGroup);
-    partGroup.name = slot;
-    partGroup.position.y = SLOT_Y[slot];
-    partGroup.userData.baseY = SLOT_Y[slot];
-    partGroup.userData.baseScale = new THREE.Vector3(
-      customization.size,
-      customization.height,
-      customization.size,
-    );
-    partGroup.scale.copy(partGroup.userData.baseScale);
-    partGroup.traverse((child) => {
-      if (!child.isMesh) return;
-      child.material = cloneSurfaceMaterial(child.material);
-      top.userData.materials.push(child.material);
-    });
-    top.userData.partGroups[slot] = partGroup;
-    top.add(partGroup);
-  });
-  top.updateMatrixWorld(true);
-  top.userData.contactOffset = -new THREE.Box3().setFromObject(top).min.y;
-  return top;
+    top.updateMatrixWorld(true);
+    top.userData.contactOffset = -new THREE.Box3().setFromObject(top).min.y;
+    complete = true;
+    return top;
+  } finally {
+    if (!complete) disposeTopModel(top);
+  }
+}
+
+export function createTopModel(...args) {
+  const steps = buildTopSteps(...args);
+  let step;
+  do { step = steps.next(); } while (!step.done);
+  return step.value;
+}
+
+// Optional next-battle work yields between the same five builders used by the
+// synchronous path. Cancellation disposes even a partially constructed top.
+export async function prepareTopModel(selection, colors, customizations, current) {
+  const steps = buildTopSteps(selection, colors, customizations);
+  try {
+    while (current()) {
+      const step = steps.next();
+      if (step.done) return step.value;
+      await new Promise(resolve => requestAnimationFrame(resolve));
+    }
+    return null;
+  } finally {
+    steps.return();
+  }
 }
 
 export function setActivePart(top, activeSlot = null, immediate = true) {

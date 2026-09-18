@@ -652,6 +652,7 @@ class BeybladeApp {
     this.root.querySelector("#scene-time").addEventListener("change", event => {
       this.state.sceneTime = normalizeSceneTime(event.target.value);
       this.stage.setSceneTime(this.state.sceneTime);
+      this._queueBattleWarmup();
       this._save();
       this.audio.playUi();
     });
@@ -1485,6 +1486,7 @@ class BeybladeApp {
         this.root.querySelector(`.arena-card[data-arena="${this.selectedArena.id}"]`), "auto"));
     }
     this.stage.showArena(this.selectedArena);
+    this._queueBattleWarmup();
     this.root.querySelector(".game-shell").dataset.arena = this.selectedArena.id;
     this.root.querySelector("#stage-title").textContent = this.selectedArena.shortName;
     if (this.screen === "map") history.replaceState(null, "", this.mapMode === "story" ? "#journey" : "#map");
@@ -1508,6 +1510,7 @@ class BeybladeApp {
         this.selectedArena.shortName;
     }
     this.stage.showArena(this.selectedArena);
+    this._queueBattleWarmup();
     this._save();
     this.audio.playUi();
   }
@@ -1571,6 +1574,7 @@ class BeybladeApp {
     this.paused = false;
     const journey = screen === "journey";
     if (journey) screen = "map";
+    if (screen !== "map" && screen !== "battle") this.stage.cancelBattleWarmup();
     if (screen !== "battle") {
       this.activeEncounter = null;
       this.campaignResult = null;
@@ -1651,6 +1655,32 @@ class BeybladeApp {
     this.audio.playUi();
   }
 
+  _battleSelections(mission) {
+    const firstBattle = !mission && this.state.tutorial.stage === TUTORIAL_STAGE.FIRST_BATTLE;
+    const arena = mission ? getArena(mission.arenaId) : firstBattle ? getArena("standard") : this.selectedArena;
+    return {
+      firstBattle, arena,
+      playerSelection: firstBattle ? DEFAULT_BUILD : this.state.build,
+      playerCustomizations: firstBattle ? {} : this.state.customizations,
+      playerColors: firstBattle ? TRAINING_COLORS : this.state.colors,
+      enemySelection: mission ? mission.enemyBuild : firstBattle ? DEFAULT_BUILD
+        : ENEMY_BUILDS[arena.id] ?? ENEMY_BUILDS.standard,
+      identity: opponentIdentity(mission, arena.id),
+    };
+  }
+
+  _queueBattleWarmup() {
+    const mission = this.mapMode === "story" ? getMission(this.viewMissionId) : null;
+    if (mission && (!this.state.tutorial.completed || !canPlayMission(this.state.campaign, mission.id))) {
+      this.stage.cancelBattleWarmup();
+      return;
+    }
+    const plan = this._battleSelections(mission);
+    if (plan.arena.id !== this.selectedArena.id) return;
+    this.stage.queueBattleWarmup(plan.arena, plan.playerSelection, plan.enemySelection,
+      plan.playerColors, plan.playerCustomizations, plan.identity);
+  }
+
   _prepareBattle() {
     this._setPreparation(null);
     this._clearBattleInput();
@@ -1659,8 +1689,9 @@ class BeybladeApp {
     this.trainingSteered = false;
     this.trainingCueId = null;
     const mission = getMission(this.activeEncounter?.missionId);
-    const firstBattle =
-      !mission && this.state.tutorial.stage === TUTORIAL_STAGE.FIRST_BATTLE;
+    const { firstBattle, arena, playerSelection, playerCustomizations, playerColors,
+      enemySelection, identity } = this._battleSelections(mission);
+    this.selectedArena = arena;
     if (mission) {
       this.selectedArena = getArena(mission.arenaId);
       this.activeEncounter = {
@@ -1675,10 +1706,6 @@ class BeybladeApp {
       this.selectedArena = getArena("standard");
       this.state.arenaId = "standard";
     }
-    const playerSelection = firstBattle ? DEFAULT_BUILD : this.state.build;
-    const playerCustomizations = firstBattle
-      ? {}
-      : this.state.customizations;
     const battlePlayerBuild = calculateBuild(
       playerSelection,
       playerCustomizations,
@@ -1687,10 +1714,6 @@ class BeybladeApp {
     this.battleSnapshot = { id: loadout.id, build: structuredClone(playerSelection),
       customizations: structuredClone(playerCustomizations) };
     this.battleBaseline = this.state.battleNotes[loadout.id] ?? null;
-    const enemySelection = mission ? mission.enemyBuild : firstBattle
-      ? DEFAULT_BUILD
-      : ENEMY_BUILDS[this.selectedArena.id] ?? ENEMY_BUILDS.standard;
-    const identity = opponentIdentity(mission, this.selectedArena.id);
     const enemyBuild = calculateBuild(enemySelection, identity.customizations);
     this.simulation = new BattleSimulation({
       playerBuild: battlePlayerBuild,
@@ -1705,7 +1728,7 @@ class BeybladeApp {
       this.selectedArena,
       playerSelection,
       enemySelection,
-      firstBattle ? TRAINING_COLORS : this.state.colors,
+      playerColors,
       playerCustomizations,
       identity,
     );

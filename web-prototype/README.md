@@ -13,8 +13,12 @@
 直接复用。进入其他地图仍释放旧场景，实验室/展示舞台按选择加载。
 首次材质准备仍需要时间，结果与后续空间见
 [加载诊断与测量](../docs/scene_loading_performance.md)。
+地图稳定后会在空闲时间预热实际下一场陀螺、发射器和材质；换图、换配置或离开
+会取消。预热尚未完成也可直接准备发射，沿用正常加载流程，不影响存档或进度。
 `npm run verify:loading` 检查缓存、失败重试及异步切换；
 `npm run measure:loading -- <记录名>` 记录固定路径进入耗时，需要 dev server 和 Chrome。
+`npm run verify:gpu` 检查预热采用、取消和 GPU 资源释放；
+`npm run measure:gpu -- <记录名>` 分别记录首次准备及停留阅读后的开战耗时。
 
 ## 故事远征：回声远征
 

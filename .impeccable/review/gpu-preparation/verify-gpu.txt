@@ -1,0 +1,5 @@
+
+> beyblade-web-prototype@0.1.0 verify:gpu
+> node tools/verify-gpu-preparation.mjs
+
+PASS: 21 GPU preparation checks

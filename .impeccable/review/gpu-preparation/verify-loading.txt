@@ -1,0 +1,5 @@
+
+> beyblade-web-prototype@0.1.0 verify:loading
+> node tools/verify-loading.mjs
+
+PASS: 17 loading lifecycle checks

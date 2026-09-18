@@ -1,0 +1,23 @@
+
+> beyblade-web-prototype@0.1.0 verify:championship
+> node tools/verify-championship.mjs
+
+PASS: 24 championship checks {
+  movingPixels: 1739,
+  illuminatedPixels: 2121,
+  paused: true,
+  reduced: true,
+  hidden: true,
+  dayReduced: true,
+  defaultSpotsDisabled: true,
+  physicalMetal: true,
+  noShadowMaps: true,
+  lightCount: 6,
+  released: true,
+  standardRestored: true,
+  stableMemory: true,
+  drawCalls: 70,
+  triangles: 533926,
+  day: { beam: 0.012, light: 55, runner: 0.28 },
+  night: { beam: 0.085, light: 380, runner: 0.9 }
+}

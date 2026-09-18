@@ -15,10 +15,12 @@ import { BattleEffects } from "./battle-effects.js";
 import { StreetAtmosphere } from "./street-atmosphere.js";
 import { ChampionshipAtmosphere } from "./championship-atmosphere.js";
 import { prepareScene } from "./prepare-scene.js";
+import { loadoutVisualKey } from "./loadout-visual-key.js";
 import { createOutdoorEnvironment, normalizeSceneTime, resolveSceneTime } from "./scene-time.js";
 import { createDriveZoneModel, updateDriveZoneModel } from "./drive-zone-model.js";
 import {
   createTopModel,
+  prepareTopModel,
   disposeTopModel,
   setActivePart,
   updateTopPartFocus,
@@ -1067,7 +1069,10 @@ export class ThreeStage {
   }
 
   _clearModels({ keepArena = false } = {}) {
+    this.battlePreparationLease?.dispose();
+    this.battlePreparationLease = null;
     if (!keepArena) {
+      this.cancelBattleWarmup();
       this.streetAtmosphere?.dispose();
       this.streetAtmosphere = null;
       this.championshipAtmosphere?.dispose();
@@ -1387,6 +1392,7 @@ export class ThreeStage {
   }
 
   showArena(arena) {
+    if (this.battleWarmup?.arenaId !== arena.id) this.cancelBattleWarmup();
     const keepArena = this.mountedArenaId === arena.id;
     this.preparationToken++;
     this.scenePeriod = resolveSceneTime(this.sceneTime);
@@ -1414,6 +1420,12 @@ export class ThreeStage {
     playerCustomizations = {},
     enemyIdentity = { colors: { ring: "#ec5b45", core: "#dfe9e7" }, customizations: {} },
   ) {
+    const key = this._battleVisualKey(arena, playerSelection, enemySelection,
+      playerColors, playerCustomizations, enemyIdentity);
+    const warmed = this.battleWarmup?.key === key && this.battleWarmup.ready
+      ? this.battleWarmup : null;
+    if (warmed) this.battleWarmup = null;
+    else this.cancelBattleWarmup();
     const keepArena = this.mountedArenaId === arena.id;
     this.preparationToken++;
     this.mode = "battle";
@@ -1432,15 +1444,18 @@ export class ThreeStage {
     if (!keepArena) disposeGroup(this.arenaRoot);
     disposeGroup(this.launcherRoot);
     this._mountArena(arena);
-    this.launcherRoot.add(createLauncherModel());
+    this.launcherRoot.add(warmed?.launcher ?? createLauncherModel());
     this.launcherRoot.visible = true;
     this.launchVectorRoot.visible = true;
-    this.playerTop = createTopModel(
+    this.playerTop = warmed?.player ?? createTopModel(
       playerSelection,
       playerColors,
       playerCustomizations,
     );
-    this.enemyTop = createTopModel(enemySelection, enemyIdentity.colors, enemyIdentity.customizations);
+    this.enemyTop = warmed?.enemy ?? createTopModel(enemySelection, enemyIdentity.colors, enemyIdentity.customizations);
+    // Keep speculative shader references until the first live battle draw.
+    this.battlePreparationLease?.dispose();
+    this.battlePreparationLease = warmed?.lease;
     this.playerTop.scale.setScalar(0.92);
     this.enemyTop.scale.setScalar(0.92);
     this.playerTop.position.set(0, this._topHeight(this.playerTop, 0, 4.45), 4.45);
@@ -1450,6 +1465,96 @@ export class ThreeStage {
     this.camera.updateProjectionMatrix();
     this._frameBattle();
     this.updateLauncherPreview(this.launcherParams);
+  }
+
+  _battleVisualKey(arena, player, enemy, colors, customizations, identity) {
+    return `${arena.id}:${resolveSceneTime(this.sceneTime)}:${
+      loadoutVisualKey({ build: player, colors, customizations })}:${
+      loadoutVisualKey({ build: enemy, colors: identity.colors, customizations: identity.customizations })}`;
+  }
+
+  queueBattleWarmup(arena, player, enemy, colors, customizations, identity) {
+    const key = this._battleVisualKey(arena, player, enemy, colors, customizations, identity);
+    if (this.battleWarmup?.key === key) return;
+    this.cancelBattleWarmup();
+    this.battleWarmup = {
+      key, arenaId: arena.id,
+      selection: structuredClone({ player, enemy, colors, customizations, identity }),
+    };
+    this._scheduleBattleWarmup();
+  }
+
+  cancelBattleWarmup() {
+    const job = this.battleWarmup;
+    this.battleWarmup = null;
+    if (!job) return;
+    clearTimeout(job.timer);
+    if (job.idle != null) window.cancelIdleCallback?.(job.idle);
+    // Running compilation owns these objects until its final poll. It observes
+    // cancellation before every subsequent batch or resource upload.
+    if (!job.task) this._disposeBattleWarmup(job);
+  }
+
+  _disposeBattleWarmup(job) {
+    job.lease?.dispose();
+    if (job.player) disposeTopModel(job.player);
+    if (job.enemy) disposeTopModel(job.enemy);
+    if (job.launcher) disposeGroup(job.launcher);
+  }
+
+  _scheduleBattleWarmup() {
+    const job = this.battleWarmup;
+    if (!job || job.task || job.timer || job.idle != null || job.ready || !this.arenaReady || this.mode !== "map") return;
+    // Wait for the carousel and the first preview frame. Speculation is optional
+    // on renderers without parallel compilation.
+    if (!this.renderer.extensions.has("KHR_parallel_shader_compile")) return;
+    job.timer = window.setTimeout(() => {
+      job.timer = null;
+      const start = () => {
+        job.idle = null;
+        if (document.hidden || this.battleWarmup !== job || this.mode !== "map") return;
+        const task = this._warmBattle(job).catch(error => {
+          console.warn("Next battle preparation skipped", error);
+          if (this.battleWarmup === job) this.battleWarmup = null;
+        }).finally(() => {
+          if (!job.ready && this.battleWarmup === job) this.battleWarmup = null;
+          if (this.battleWarmup !== job) this._disposeBattleWarmup(job);
+          this.preparations.delete(task);
+          job.task = null;
+        });
+        job.task = task;
+        this.preparations.add(task);
+      };
+      if (window.requestIdleCallback) job.idle = window.requestIdleCallback(start, { timeout: 1200 });
+      else start();
+    }, 600);
+  }
+
+  async _warmBattle(job) {
+    const current = () => this.battleWarmup === job && this.mode === "map" &&
+      this.arenaReady && !document.hidden;
+    // Serialize with a canceled predecessor; rapid selection retains at most
+    // one live set of speculative models and one pending request.
+    await Promise.allSettled([...this.preparations]);
+    if (!current()) return;
+    const { player, enemy, colors, customizations, identity } = job.selection;
+    job.player = await prepareTopModel(player, colors, customizations, current);
+    if (!current()) return;
+    job.enemy = await prepareTopModel(enemy, identity.colors, identity.customizations, current);
+    if (!current()) return;
+    job.launcher = createLauncherModel();
+    const objects = [job.player, job.enemy, job.launcher];
+    // Ordinary maps switch from direct rendering to the composer's linear
+    // target for battle. Compile their arena variants during reading time too.
+    if (!this.bloom.enabled) objects.push(this.arenaRoot);
+    const controls = this.launchVectorRoot.clone(true);
+    controls.visible = true;
+    objects.push(controls);
+    job.lease = await prepareScene(this.renderer, this.scene, this.camera, {
+      objects, target: this.composer.readBuffer, current, retain: true,
+    });
+    if (current() && job.lease) job.ready = true;
+    else if (this.battleWarmup === job) this.battleWarmup = null;
   }
 
   _mountArena(arena) {
@@ -1534,6 +1639,7 @@ export class ThreeStage {
     if (this.mode === "map" && this.preparedMapPeriod === this.scenePeriod) {
       this.arenaReady = true;
       status("ready");
+      this._scheduleBattleWarmup();
       return;
     }
     this.arenaReady = false;
@@ -1542,15 +1648,22 @@ export class ThreeStage {
     // compiling, and allow the loading indicator to paint.
     const task = new Promise(resolve => requestAnimationFrame(resolve)).then(async () => {
       if (!current()) return;
-      await prepareScene(this.renderer, this.scene, this.camera, {
-        target: this.bloom.enabled ? this.composer.readBuffer : null,
-        current,
-        draw: () => this._renderFrame(0),
-      });
+      if (this.mode === "battle" && this.battlePreparationLease) {
+        this._renderFrame(0);
+      } else {
+        await prepareScene(this.renderer, this.scene, this.camera, {
+          target: this.bloom.enabled ? this.composer.readBuffer : null,
+          current,
+          draw: () => this._renderFrame(0),
+        });
+      }
       if (!current()) return;
       this.arenaReady = true;
+      this.battlePreparationLease?.dispose();
+      this.battlePreparationLease = null;
       if (this.mode === "map") this.preparedMapPeriod = this.scenePeriod;
       status("ready");
+      this._scheduleBattleWarmup();
     }).catch(error => {
       if (!current()) return;
       this.mountedArenaId = null;
@@ -1561,6 +1674,7 @@ export class ThreeStage {
   }
 
   setSceneTime(value) {
+    this.cancelBattleWarmup();
     this.sceneTime = normalizeSceneTime(value);
     // Re-resolve on scene entry; an automatic clock never changes mid-match.
     if (this.mode !== "map") return;
@@ -2164,6 +2278,8 @@ export class ThreeStage {
   destroy() {
     this.arenaLoadToken++;
     this.preparationToken++;
+    this.cancelBattleWarmup();
+    this.battlePreparationLease?.dispose();
     window.clearTimeout(this.impactClassTimer);
     this.resizeObserver.disconnect();
     this._clearModels();

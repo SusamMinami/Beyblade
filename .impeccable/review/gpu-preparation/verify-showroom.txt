@@ -1,0 +1,5 @@
+
+> beyblade-web-prototype@0.1.0 verify:showroom
+> node tools/verify-showroom.mjs
+
+PASS: 25 showroom and wind checks. Captures: C:\Users\Admin\Downloads\战斗陀螺\.impeccable\review\showroom

@@ -1,0 +1,6 @@
+
+> beyblade-web-prototype@0.1.0 verify:flow
+> node tools/verify-flow.mjs
+
+Preparation, refresh, lock, pause and abandonment checks passed; waiting for real solver result.
+PASS: 41 flow checks. Captures: C:\Users\Admin\Downloads\战斗陀螺\.impeccable\review\flow

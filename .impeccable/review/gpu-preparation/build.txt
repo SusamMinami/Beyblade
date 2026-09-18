@@ -1,0 +1,27 @@
+
+> beyblade-web-prototype@0.1.0 build
+> vite build
+
+[36mvite v7.3.6 [32mbuilding client environment for production...[36m[39m
+transforming...
+[32m✓[39m 1037 modules transformed.
+rendering chunks...
+computing gzip size...
+[2mdist/[22m[32mindex.html                          [39m[1m[2m    0.82 kB[22m[1m[22m[2m │ gzip:   0.47 kB[22m
+[2mdist/[22m[32massets/childhood_lab-CKRM9Doh.glb   [39m[1m[2m  912.24 kB[22m[1m[22m
+[2mdist/[22m[32massets/floating_ruins-CH3Lao7Q.glb  [39m[1m[2m1,748.08 kB[22m[1m[22m
+[2mdist/[22m[32massets/holo-C0oHKXmu.glb            [39m[1m[2m1,756.34 kB[22m[1m[22m
+[2mdist/[22m[32massets/test_lab-GV3Yj-A3.glb        [39m[1m[2m2,262.06 kB[22m[1m[22m
+[2mdist/[22m[32massets/arena-DWBAyRtb.glb           [39m[1m[2m2,468.47 kB[22m[1m[22m
+[2mdist/[22m[32massets/championship-qY2xO6X1.glb    [39m[1m[2m6,657.52 kB[22m[1m[22m
+[2mdist/[22m[32massets/street-PgMVw33L.glb          [39m[1m[2m7,934.43 kB[22m[1m[22m
+[2mdist/[22m[35massets/index-CFKGBvj4.css           [39m[1m[2m   93.92 kB[22m[1m[22m[2m │ gzip:  18.88 kB[22m
+[2mdist/[22m[36massets/tone-CZXAaMHY.js             [39m[1m[2m  245.95 kB[22m[1m[22m[2m │ gzip:  62.41 kB[22m
+[2mdist/[22m[36massets/index-_7iYH9Y-.js            [39m[1m[2m  279.62 kB[22m[1m[22m[2m │ gzip:  90.31 kB[22m
+[2mdist/[22m[36massets/three-CykKegy1.js            [39m[1m[33m  890.16 kB[39m[22m[2m │ gzip: 267.21 kB[22m
+
+(!) Some chunks are larger than 500 kB after minification. Consider:
+- Using dynamic import() to code-split the application
+- Use build.rollupOptions.output.manualChunks to improve chunking: https://rollupjs.org/configuration-options/#output-manualchunks
+- Adjust chunk size limit for this warning via build.chunkSizeWarningLimit.
+[32m✓ built in 6.18s[39m

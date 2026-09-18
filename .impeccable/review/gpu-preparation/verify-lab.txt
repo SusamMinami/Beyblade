@@ -1,0 +1,5 @@
+
+> beyblade-web-prototype@0.1.0 verify:lab
+> node tools/verify-lab.mjs
+
+PASS: 27 lab integration checks; screenshots in C:\Users\Admin\Downloads\战斗陀螺\.impeccable\review\web

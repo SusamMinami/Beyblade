@@ -55,6 +55,7 @@ npm run dev
 | 战斗场景、障碍碰撞、近景交互 | `npm run verify:worlds` |
 | 冠军场模型、移动灯光、日夜与资源释放 | `npm run verify:championship` |
 | 场景加载、缓存与异步切换 | `npm run verify:loading`、`npm run measure:loading -- <记录名>` |
+| 下一场材质预热与首次 GPU 准备 | `npm run verify:gpu`、`npm run measure:gpu -- <记录名>` |
 | 街头比例、日夜、积水反射与环境资源 | `node tools/verify-street.mjs` |
 | 故事任务、过关结算、战历与远征入口 | `npm run verify:campaign` |
 | 跨页面约战准备、暂停退出与结算建议 | `npm run verify:flow` |

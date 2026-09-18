@@ -14,6 +14,8 @@
     "verify:championship": "node tools/verify-championship.mjs",
     "verify:loading": "node tools/verify-loading.mjs",
     "measure:loading": "node tools/measure-scene-loading.mjs",
+    "verify:gpu": "node tools/verify-gpu-preparation.mjs",
+    "measure:gpu": "node tools/measure-gpu-preparation.mjs",
     "verify:campaign": "node tools/verify-campaign.mjs",
     "verify:flow": "node tools/verify-flow.mjs",
     "verify:growth": "node tools/verify-growth.mjs",

@@ -1,0 +1,23 @@
+PASS: 33 street checks {
+  changed: 539956,
+  animated: true,
+  paused: true,
+  reduced: true,
+  released: true,
+  standardLights: true,
+  stableMemory: true,
+  submittedTriangles: 878000,
+  drawCalls: 155,
+  reflectionSize: 768,
+  topWidth: 1.9896773624420168,
+  doorRatio: 34.41764041379631,
+  wheelRatio: 10.936446486626865,
+  scaleCorrect: true,
+  bowlUnchanged: true,
+  automaticTime: true,
+  dayMaterials: true,
+  dayEnvironment: true,
+  allMapPeriods: true,
+  battlePeriodFixed: true,
+  releasedEnvironments: true
+}

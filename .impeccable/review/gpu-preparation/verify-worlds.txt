@@ -1,0 +1,5 @@
+
+> beyblade-web-prototype@0.1.0 verify:worlds
+> node tools/verify-worlds.mjs
+
+PASS: 31 world, inspection and collision checks; C:\Users\Admin\Downloads\战斗陀螺\.impeccable\review\worlds
