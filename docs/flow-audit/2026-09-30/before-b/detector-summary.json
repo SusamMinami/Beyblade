@@ -1,0 +1,83 @@
+{
+  "cli": {
+    "target": "web-prototype/src/main.js",
+    "findings": 0,
+    "rules": [],
+    "filesWithFindings": []
+  },
+  "browser": [
+    {
+      "page": "overlay-assembly",
+      "headline": "%c[impeccable] 98 anti-patterns found color: oklch(84% 0.19 80.46); font-weight: bold",
+      "elementGroups": 98,
+      "ruleOccurrences": 109,
+      "rules": {
+        "clipped-overflow-container": 4,
+        "low-contrast": 5,
+        "undersized-ui-text": 72,
+        "dark-glow": 5,
+        "layout-transition": 3,
+        "radial-spotlight-glow": 1,
+        "gpt-thin-border-wide-shadow": 5,
+        "text-overflow": 3,
+        "tiny-text": 2,
+        "wide-tracking": 1,
+        "ai-color-palette": 2,
+        "kicker-above-heading": 1,
+        "side-tab": 1,
+        "radial-halo": 1,
+        "repeating-stripes-gradient": 1,
+        "codex-grid-background": 1,
+        "text-occlusion": 1
+      }
+    },
+    {
+      "page": "overlay-journey",
+      "headline": "%c[impeccable] 75 anti-patterns found color: oklch(84% 0.19 80.46); font-weight: bold",
+      "elementGroups": 75,
+      "ruleOccurrences": 86,
+      "rules": {
+        "clipped-overflow-container": 4,
+        "low-contrast": 5,
+        "undersized-ui-text": 55,
+        "dark-glow": 5,
+        "layout-transition": 3,
+        "radial-spotlight-glow": 1,
+        "gpt-thin-border-wide-shadow": 3,
+        "text-overflow": 3,
+        "tiny-text": 1,
+        "wide-tracking": 1,
+        "kicker-above-heading": 1,
+        "side-tab": 1,
+        "radial-halo": 1,
+        "codex-grid-background": 1,
+        "text-occlusion": 1
+      }
+    },
+    {
+      "page": "overlay-lab",
+      "headline": "%c[impeccable] 113 anti-patterns found color: oklch(84% 0.19 80.46); font-weight: bold",
+      "elementGroups": 113,
+      "ruleOccurrences": 140,
+      "rules": {
+        "clipped-overflow-container": 3,
+        "dark-glow": 7,
+        "undersized-ui-text": 78,
+        "ai-color-palette": 27,
+        "layout-transition": 3,
+        "gpt-thin-border-wide-shadow": 4,
+        "tiny-text": 2,
+        "wide-tracking": 1,
+        "low-contrast": 7,
+        "text-occlusion": 1,
+        "kicker-above-heading": 1,
+        "side-tab": 1,
+        "radial-halo": 1,
+        "codex-grid-background": 1,
+        "nested-cards": 3
+      }
+    }
+  ],
+  "countsExplanation": "detect.js printSummary counts element groups in its headline, then logs each finding in each group. Counts are not unique UX defects.",
+  "headlineSource": "detect.js lines 3487-3502"
+}

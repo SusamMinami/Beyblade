@@ -81,7 +81,7 @@
 }
 .maintenance-focus button { flex: 1; padding-inline: 3px; font-size: 12px; min-height: 32px; }
 .maintenance-console {
-  position: absolute; bottom: 64px; left: 16px; right: 16px;
+  position: absolute; bottom: 110px; left: 16px; right: 16px;
   max-height: 36%; overflow-y: auto; overscroll-behavior: contain;
   padding: 10px 1px; background: #fffdf7;
   scrollbar-width: thin; scrollbar-color: #b2bbb9 #fffdf7;
@@ -125,10 +125,11 @@
 .maintenance-trial th:first-child { text-align: left; }
 .maintenance-footer {
   position: absolute; bottom: 12px; left: 16px; right: 16px;
-  display: flex; gap: 10px; align-items: center; justify-content: space-between;
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 6px 10px;
   background: #fffdf7; padding: 4px 8px;
 }
-.maintenance-draft { color: #4d555d; font-size: 11px; }
+.maintenance-draft { grid-column: 1 / -1; color: #4d555d; font-size: 12px; }
+.maintenance-footer button { min-height: 44px; }
 .maintenance-view .maintenance-save { background: #238cff; color: #12151a; border: 2px solid #12151a; min-width: 100px; }
 .maintenance-overlays { position: absolute; inset: 0; pointer-events: none; }
 .maintenance-loading { position: absolute; top: 34%; left: 16px; right: 16px; padding: 12px; text-align: center; background: #fffdf7; color: #12151a; }

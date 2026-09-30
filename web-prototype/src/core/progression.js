@@ -34,6 +34,21 @@ export function createTutorialState() {
   };
 }
 
+// A purchase/preview alone is not an upgrade: an owned paid part must be equipped.
+export function tutorialAfterEquip(tutorial, ownedPartIds, build, launcher) {
+  if (tutorial.completed || tutorial.stage !== TUTORIAL_STAGE.BUY_FIRST_PART) return tutorial;
+  const topUpgrade = Object.entries(build ?? {}).some(([slot, id]) => {
+    const part = getPart(id);
+    return part?.type === slot && part.price > 0 && ownedPartIds.includes(id);
+  });
+  const launcherUpgrade = Object.entries(launcher?.build ?? {}).some(([slot, id]) => {
+    const part = getLauncherPart(id);
+    return part?.slot === slot && part.price > 0 && ownedPartIds.includes(id);
+  });
+  return topUpgrade || launcherUpgrade
+    ? { ...tutorial, stage: TUTORIAL_STAGE.SECOND_BATTLE } : tutorial;
+}
+
 export function migrateProgression(saved = {}) {
   const ownedPartIds = new Set(INITIAL_OWNED_PART_IDS);
   const ownedMaterialIds = new Set(INITIAL_OWNED_MATERIAL_IDS);
@@ -85,7 +100,8 @@ export function migrateProgression(saved = {}) {
     coins: Math.max(0, Math.floor(Number(saved.coins) || 0)),
     ownedPartIds: [...ownedPartIds],
     ownedMaterialIds: [...ownedMaterialIds],
-    tutorial,
+    tutorial: tutorialAfterEquip(tutorial, [...ownedPartIds],
+      saved.loadouts?.[saved.activeLoadoutIndex ?? 0]?.build ?? saved.build, saved.launcher),
   };
 }
 

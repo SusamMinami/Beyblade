@@ -4,8 +4,9 @@ Scope: retained **Godot precision-lab scene and shared asset**.
 Documentation scope checked on 2026-09-16; the verification below is the original
 delivery record, not a new run. Current Web work starts at
 [Web README](../../web-prototype/README.md) and
-[battle worlds](../battle_worlds.md). The Web lab now defaults to the childhood
-desk and uses a 5.2-second explicit test; the 2.4-second scan below is Godot-only.
+[battle worlds](../battle_worlds.md). The Web lab starts in the shared minimal
+room and can grow into childhood/precision rooms; it uses a 5.2-second explicit
+test. The 2.4-second scan below is Godot-only. Entry correction: 2026-09-30.
 
 ## Entry Points
 

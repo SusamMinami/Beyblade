@@ -54,6 +54,12 @@ Godot JSON 输出需保留双精度：`JSON.stringify(state, "", true, true)`。
 
 ## Godot 的实现分层
 
+正式对战结算始终由共享求解器负责。`BeybladeBody` 及
+`tests/battle/collision_damage_test.gd`、`spin_mobility_test.gd`
+保留用于 Godot/Jolt 实体碰撞、部件脱落、动态质心与手感实验。
+实验体碰撞回调不反写正式胜负、伤害或联网状态；其参数不是正式求解器的调参入口。
+规则修改先在 Web 验证，再迁移下列原生实现并更新跨端金标。
+
 | 文件 | 职责 |
 | --- | --- |
 | `scripts/battle/v6_data.gd` | 正式资源／DIY 计算桥接、共享场地与发射器数据、向量工具 |

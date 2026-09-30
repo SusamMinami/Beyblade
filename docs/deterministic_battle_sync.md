@@ -91,7 +91,7 @@ Godot `world.y` 由共享地面高度（下落时为冻结支点高度减下落�
 - Godot `BattleSession` 自动记录本地回放；Web `battle-replay.js` 提供相同 JSON
   记录／播放工具。跨端恢复与固定输入验算已通过，未提供玩家回放库或联机权威服务。
 - Godot 战斗页使用 `BattleSession`；Web 主游戏使用 `BattleSimulation` 配合固定时钟。
-  PVP 架构提案不代表联网功能已交付，见 [混合 PVP 架构](hybrid_pvp_architecture.md)。
+  PVP 架构提案不代表联网功能已交付，见 [PVP 架构与接入缺口](network_pvp_architecture.md)。
 
 规则改动先在 Web 实现并验证，记录版本和未迁移范围。移植 Godot 或启用跨端联机前，
 同步参数、规则、地图数据与金标，重新验证相同输入及快照恢复。

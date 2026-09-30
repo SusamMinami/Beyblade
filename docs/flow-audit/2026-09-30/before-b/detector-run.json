@@ -1,0 +1,8 @@
+{
+  "command": "C:\\Users\\Admin\\.trae-cn\\skills\\impeccable\\scripts\\impeccable.cmd detect --json web-prototype/src/main.js",
+  "cwd": "C:\\Users\\Admin\\Downloads\\战斗陀螺",
+  "exitCode": 0,
+  "stderr": "",
+  "targetSha256": "59d026247f62d84ad88fc9525bb6161a4c97f38325cbe9f33ec6dbc71bea07ac",
+  "capturedAt": "2026-09-30T14:01:12.641Z"
+}

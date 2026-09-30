@@ -1,0 +1,66 @@
+{
+  "url": "http://127.0.0.1:5173/#battle",
+  "title": "SPIN/CORE · 战斗陀螺 Web 原型",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "documentSize": {
+    "width": 390,
+    "height": 844
+  },
+  "shell": {
+    "x": 0,
+    "y": 0,
+    "width": 390,
+    "height": 844,
+    "right": 390,
+    "bottom": 844
+  },
+  "text": "YOU\n0 转速\n结构 100%\n0.0\n返回\n阿砾\n0 转速\n结构 100%\nA 区供能 7s · 进入亮区补转\n\n阿砾 / 石子号 · 完成一场对战，胜负均可。追逐亮起的 A/B/C 加速区；撞开对手独享补转，破损不会修复。\n\nDIRECT LAUNCH\n拖模型调倾角 · 拖箭头末端圆点调方向与力度\n力度 86%\n方向 0°\n倾角 0°\n确认发射\nLIVE PHYSICS 等待发射参数 发射后显示实时施力方向 标准地面 · 抓地",
+  "controls": [
+    {
+      "selector": "button#pause-battle.battle-clock",
+      "text": "0.0\n返回",
+      "data": {},
+      "ariaLabel": "返回准备",
+      "rect": {
+        "x": 165.2498779296875,
+        "y": 6.141941547393799,
+        "width": 59.500244140625,
+        "height": 45.99736785888672,
+        "right": 224.7501220703125,
+        "bottom": 52.13930940628052
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "16px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button#launch-button.launch-button",
+      "text": "确认发射",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 15.779926300048828,
+        "y": 773.43896484375,
+        "width": 358.44012451171875,
+        "height": 55.1220703125,
+        "right": 374.2200508117676,
+        "bottom": 828.56103515625
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "18px",
+      "tabIndex": 0
+    }
+  ],
+  "scrollContainers": []
+}

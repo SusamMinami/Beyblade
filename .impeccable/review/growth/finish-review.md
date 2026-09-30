@@ -8,7 +8,7 @@ Independent general-agent finish review, 2026-09-17; specialized impeccable revi
 
 ## 2. Direction-Contract Assessment
 
-The implementation follows [the approved contract](../../../docs/game_flow_round2.md): confirmation after input, visible build tradeoffs, and a narrative reason to continue. This is a code-led extension, not a comp-matching exercise.
+The implementation follows the contract now retained in [the consolidated flow document](../../../docs/game_flow_optimization.md): confirmation after input, visible build tradeoffs, and a narrative reason to continue. This is a code-led extension, not a comp-matching exercise. Link updated on 2026-09-30; the review verdict and evidence remain dated 2026-09-17.
 
 - **Incremental training:** one existing paper guidance surface progresses from launch to steering, active-zone pursuit, then harvested-spin confirmation. Launch remains directly actionable, skip remains exposed, and the lesson disappears at results. `trainingCue()` uses actual state rather than a timed success claim; `_tick()` records steering input passed into the solver.
 - **Purchase and comparison:** the explicit first-part action enters the existing part selector and purchase confirmation. Comparisons use the current slot's completed-battle snapshot, canonical calculation model, and normalized DIY. The five signed score deltas describe tradeoffs, not guaranteed victory. Missing history is explained rather than invented.

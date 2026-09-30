@@ -8,7 +8,7 @@ import { completeLabTest, normalizeLabState, measureBuild, labLevel } from "../s
 
 const origin = process.env.LAB_TEST_URL ?? "http://127.0.0.1:5173";
 const storageKey = "spin-core-web-prototype-v2";
-const output = resolve("../.impeccable/review/web");
+const output = resolve(process.env.QA_OUTPUT_DIR ?? "../.impeccable/review/web");
 await mkdir(output, { recursive: true });
 const browser = await chromium.launch({
   executablePath: process.env.CHROME_PATH ?? "C:/Program Files/Google/Chrome/Application/chrome.exe",
@@ -30,7 +30,13 @@ const button = (action) => page.locator(`.lab-view [data-lab="${action}"]`).firs
 const close = async () => { await button("close").click(); };
 const finishTest = async () => {
   await button("test").click();
-  await page.waitForFunction(() => document.querySelector(".lab-start b")?.textContent === "再次测试", { timeout: 15000 });
+  try {
+    await page.waitForFunction(() => document.querySelector(".lab-start b")?.textContent === "再次测试", null, { timeout: 15000 });
+  } catch (error) {
+    await page.screenshot({ path: `${output}/test-failure.png` });
+    console.error("Test did not complete", await page.locator(".lab-view").innerText(), errors);
+    throw error;
+  }
 };
 
 try {

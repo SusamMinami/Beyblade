@@ -1,0 +1,6 @@
+
+> beyblade-web-prototype@0.1.0 verify:launcher-outfit
+> node tools/verify-launcher-performance.mjs && node tools/verify-launcher-outfit.mjs
+
+PASS: 4 launcher performance contracts, 27 combinations
+PASS: 24 launcher outfit/browser contracts

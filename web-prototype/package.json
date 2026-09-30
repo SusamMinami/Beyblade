@@ -24,6 +24,7 @@
     "measure:gpu": "node tools/measure-gpu-preparation.mjs",
     "verify:campaign": "node tools/verify-campaign.mjs",
     "verify:flow": "node tools/verify-flow.mjs",
+    "verify:continuity": "node tools/verify-flow-continuity.mjs",
     "verify:growth": "node tools/verify-growth.mjs",
     "verify:structure": "node tools/verify-structure.mjs",
     "verify:physics": "node tools/verify-physics-v5.mjs",

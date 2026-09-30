@@ -1,8 +1,9 @@
 # Beyblade Battle Server (Cloudflare Worker)
 
 基于 Cloudflare Workers + Durable Objects 的帧同步中继与 R2 回放上传原型。
-文档与源码静态核对：2026-09-16；本次没有部署或公网联调。
-Web / Godot / Worker 的协议声明相同，但求解器版本已有差异，不能据此宣称跨端对战已兼容。
+文档与源码静态核对：2026-09-30；本次没有部署或公网联调。
+Web / Godot 本地求解器已对齐共享 v6；Worker 仍是旧协议中继。
+客户端网络 Provider 明确拒绝 v6，不能直接接此 Worker 宣称跨端对战兼容。
 见 [版本边界](../../../docs/deterministic_battle_sync.md)。
 
 ## 架构概览
@@ -206,8 +207,9 @@ transport.connect();
 ```
 
 Godot 的会话脚本没有 `class_name BattleSession`，调用方需先 preload 该脚本。
-两端示例只说明当前签名；还需要处理握手、slot、ready、发射、轮询与断开。
-当前 Web 求解器、Godot 求解器和网络标识未统一，不把此示例视为跨端验收结果。
+两端示例只说明 API 签名；还需要处理握手、slot、ready、发射、轮询与断开。
+共享 v6 本地模拟不等于网络协议升级：当前 Provider 会拒绝 v6，
+上述示例不能作为当前版本可联网的运行指南或验收结果。
 
 ## 反作弊说明
 

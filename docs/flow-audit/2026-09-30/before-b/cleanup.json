@@ -1,0 +1,23 @@
+{
+  "liveServer": {
+    "pid": 11044,
+    "port": 8400,
+    "startCommand": "impeccable.cmd live-server --background",
+    "stopCommand": "impeccable.cmd live-server stop --keep-inject",
+    "cwd": "docs/flow-audit/2026-09-30/before-b/",
+    "ownedPidRunning": false
+  },
+  "ports": [
+    {
+      "port": 5173,
+      "status": 200
+    },
+    {
+      "port": 8400,
+      "error": "ECONNREFUSED"
+    }
+  ],
+  "sourceSha256": "59d026247f62d84ad88fc9525bb6161a4c97f38325cbe9f33ec6dbc71bea07ac",
+  "mainJsUnchanged": true,
+  "checkedAt": "2026-09-30T14:06:10.936Z"
+}

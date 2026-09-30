@@ -20,6 +20,7 @@ import {
   migrateProgression,
   purchaseMaterial,
   purchasePart,
+  tutorialAfterEquip,
   TUTORIAL_STAGE,
 } from "./core/progression.js";
 import { ARENA_LIST, getArena } from "./data/arenas.js";
@@ -49,13 +50,20 @@ import { chapterMoment } from "./data/chapter-moments.js";
 import "./ui/growth-flow.css";
 import { MaintenanceScreen } from "./ui/maintenance-screen.js";
 import { normalizeMaintenance, maintenanceForLoadout } from "./core/maintenance-state.js";
-import { normalizeLauncher } from "./core/launcher-state.js";
+import { normalizeLauncher, getLauncherPart } from "./core/launcher-state.js";
 import { homeScreen, syncHomeProgression } from "./core/home-progression.js";
 import { FixedBattleClock, FIXED_DT } from "./core/battle-replay.js";
+import { unlockRecordingProfile } from "./core/recording-profile.js";
 
-const STORAGE_KEY = "spin-core-web-prototype-v2";
-const PREPARATION_KEY = "spin-core-preparing-mission";
+const RECORDING_MODE = import.meta.env.DEV &&
+  new URLSearchParams(location.search).get("recording") === "1";
+const NORMAL_STORAGE_KEY = "spin-core-web-prototype-v2";
+const STORAGE_KEY = RECORDING_MODE
+  ? "spin-core-web-recording-v2" : NORMAL_STORAGE_KEY;
+const PREPARATION_KEY = RECORDING_MODE
+  ? "spin-core-recording-preparing-mission" : "spin-core-preparing-mission";
 const LEGACY_STORAGE_KEY = "spin-core-web-prototype-v1";
+if (RECORDING_MODE) document.title = "战斗陀螺 · 全解锁录屏版";
 const RESULT_LABELS = {
   [BATTLE_RESULT.SPIN_OUT]: "停转胜利",
   [BATTLE_RESULT.RING_OUT]: "撞飞胜利",
@@ -109,16 +117,18 @@ function loadState() {
     },
   };
   try {
-    const saved = JSON.parse(
+    let saved = JSON.parse(
       localStorage.getItem(STORAGE_KEY) ??
+        (RECORDING_MODE ? localStorage.getItem(NORMAL_STORAGE_KEY) : null) ??
         localStorage.getItem(LEGACY_STORAGE_KEY) ??
         "null",
     );
+    if (RECORDING_MODE) saved = unlockRecordingProfile(saved);
     const progression = migrateProgression(saved ?? {});
     const loadoutState = migrateLoadouts(saved ?? {});
     const activeLoadout =
       loadoutState.loadouts[loadoutState.activeLoadoutIndex];
-    return {
+    const state = {
       ...fallback,
       ...saved,
       ...progression,
@@ -135,6 +145,8 @@ function loadState() {
       sceneTime: normalizeSceneTime(saved?.sceneTime),
       tuning: { ...fallback.tuning, ...saved?.tuning },
     };
+    if (RECORDING_MODE) localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+    return state;
   } catch {
     const loadoutState = migrateLoadouts();
     return {
@@ -230,11 +242,11 @@ class BeybladeApp {
             <span><b>SPIN/CORE</b><small>PHYSICS LAB</small></span>
           </button>
           <nav class="phase-nav" aria-label="游戏进度">
-            <button class="phase is-active" data-go="assembly"><i></i><span>组装</span></button>
-            <button class="phase" data-go="map"><i></i><span>场地</span></button>
-            <button class="phase" data-go="lab"><i></i><span>测试室</span></button>
-            <button class="phase" data-go="collection"><i></i><span>陀螺库</span></button>
-            <button class="phase" data-phase-only="battle"><i></i><span>对战</span></button>
+            <button class="phase is-active" data-go="assembly" aria-label="组装"><i></i><span>组装</span></button>
+            <button class="phase" data-go="map" aria-label="自由对战场地"><i></i><span>场地</span></button>
+            <button class="phase" data-go="lab" aria-label="测试室"><i></i><span>测试室</span></button>
+            <button class="phase" data-go="collection" aria-label="陀螺库"><i></i><span>陀螺库</span></button>
+            <button class="phase" data-phase-only="battle" aria-label="返回约战或训练"><i></i><span>对战</span></button>
           </nav>
           <div class="top-actions">
             <span class="wallet"><small>赏金</small><b id="coin-count">0</b></span>
@@ -675,13 +687,8 @@ class BeybladeApp {
         .querySelector(`#${id}`)
         .addEventListener("click", () => this._setPurchaseDialog(false));
     }
-    this.root.querySelector("#go-map").addEventListener("click", () => {
-      if (!this.state.tutorial.completed && this.state.tutorial.stage !== TUTORIAL_STAGE.BUY_FIRST_PART) {
-        this.goTo("battle");
-        return;
-      }
-      this.goTo(this.preparingMission || this.state.tutorial.completed ? "journey" : "map");
-    });
+    this.root.querySelector("#go-map").addEventListener("click", () => this.continuePreparation());
+    this.root.querySelector('[data-phase-only="battle"]').addEventListener("click", () => this.continuePreparation());
     this.root.querySelector(".journey-modes").addEventListener("click", (event) => {
       const mode = event.target.closest("button")?.dataset.mapMode;
       if (mode) this._setMapMode(mode);
@@ -1429,9 +1436,8 @@ class BeybladeApp {
     this.state.ownedPartIds = result.progression.ownedPartIds;
     this.state.build[part.type] = part.id;
     this.activeSlot = part.type;
-    if (this.state.tutorial.stage === TUTORIAL_STAGE.BUY_FIRST_PART) {
-      this.state.tutorial.stage = TUTORIAL_STAGE.SECOND_BATTLE;
-    }
+    this.state.tutorial = tutorialAfterEquip(this.state.tutorial, this.state.ownedPartIds,
+      this.state.build, this.state.launcher);
     this._setPurchaseDialog(false);
     this._renderPersistentState();
     this._commitBuild({ animatePart: true });
@@ -1489,6 +1495,7 @@ class BeybladeApp {
   }
 
   _renderTutorial() {
+    this.root.querySelector("#go-map").textContent = `${this.preparationLabel} →`;
     const card = this.root.querySelector("#tutorial-card");
     const { stage, completed } = this.state.tutorial;
     const visibleOnScreen =
@@ -1503,6 +1510,7 @@ class BeybladeApp {
       : stage;
     if (hidden) return;
 
+    const launcherUpgrades = Object.values(this.state.launcher.build).map(getLauncherPart).filter(p => p.price > 0);
     const content = {
       [TUTORIAL_STAGE.FIRST_BATTLE]: {
         progress: "新手训练 · 1/3",
@@ -1520,8 +1528,10 @@ class BeybladeApp {
       [TUTORIAL_STAGE.SECOND_BATTLE]: {
         progress: "新手训练 · 3/3",
         title: "验证你的第一次改装",
-        copy: `${buildChangeSummary(this.state.battleNotes[this.state.loadouts[this.state.activeLoadoutIndex].id],
-          this.state.loadouts[this.state.activeLoadoutIndex])}。这是理论评分变化，再打一场观察实际表现。`,
+        copy: launcherUpgrades.length
+          ? `发射器已装入 ${launcherUpgrades.map(p => `${p.code} ${p.name}`).join("、")}。再打一场，比较抽拉负担、转速和释放表现。`
+          : `${buildChangeSummary(this.state.battleNotes[this.state.loadouts[this.state.activeLoadoutIndex].id],
+            this.state.loadouts[this.state.activeLoadoutIndex])}。这是理论评分变化，再打一场观察实际表现。`,
         action: "使用新零件出战",
       },
     }[stage];
@@ -1650,6 +1660,21 @@ class BeybladeApp {
       ? getMission(this.preparingMissionId) : null;
   }
 
+  get preparationLabel() {
+    if (this.preparingMission) return `返回约战 · ${this.preparingMission.opponent}`;
+    if (!this.state.tutorial.completed) return this.state.tutorial.stage === TUTORIAL_STAGE.BUY_FIRST_PART
+      ? "继续改装教学" : "返回训练场";
+    return "故事远征 / 对战";
+  }
+
+  continuePreparation() {
+    if (!this.state.tutorial.completed) {
+      this.goTo(this.state.tutorial.stage === TUTORIAL_STAGE.BUY_FIRST_PART ? "assembly" : "battle");
+      return;
+    }
+    this.goTo("journey");
+  }
+
   _setPreparation(id) {
     this.preparingMissionId = this.state.tutorial.completed && canPlayMission(this.state.campaign, id) ? id : null;
     try {
@@ -1716,9 +1741,7 @@ class BeybladeApp {
     if (screen === "assembly") this.setWorkshopMode(workshopMode);
     if (screen === "lab") this.labScreen.enter();
     if (screen === "collection") this.showroomScreen.enter();
-    this.root.querySelector("#go-map").textContent = this.preparingMission
-      ? `返回约战 · ${this.preparingMission.opponent} →` : !this.state.tutorial.completed &&
-        this.state.tutorial.stage !== TUTORIAL_STAGE.BUY_FIRST_PART ? "返回训练场 →" : "故事远征 / 对战 →";
+    this.root.querySelector("#go-map").textContent = `${this.preparationLabel} →`;
     const route = home ? "home" : journey ? "journey" : screen;
     if (location.hash !== `#${route}`) history.replaceState(null, "", `#${route}`);
     shell.dataset.arena = this.selectedArena.id;

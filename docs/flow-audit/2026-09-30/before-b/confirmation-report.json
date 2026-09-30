@@ -1,0 +1,1085 @@
+{
+  "purpose": "One bounded confirmation pass; no detector or app injection",
+  "checks": [
+    {
+      "size": "mobile",
+      "name": "header-battle-action",
+      "before": {
+        "url": "http://127.0.0.1:5173/#assembly",
+        "screen": "assembly"
+      },
+      "after": {
+        "url": "http://127.0.0.1:5173/#assembly",
+        "screen": "assembly"
+      },
+      "phaseButtons": [
+        {
+          "selector": ".phase-nav",
+          "text": "组装\n            场地\n            测试室\n            陀螺库\n            对战",
+          "innerText": "",
+          "ariaLabel": "游戏进度",
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 115,
+            "y": 16.5,
+            "width": 160,
+            "height": 22,
+            "bottom": 38.5,
+            "right": 275
+          },
+          "color": "rgb(18, 21, 26)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "centerHit": {
+            "tag": "I",
+            "id": "",
+            "data": {},
+            "text": ""
+          }
+        },
+        {
+          "selector": ".phase[data-go=\"assembly\"]",
+          "text": "组装",
+          "innerText": "",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 115,
+            "y": 16.5,
+            "width": 32,
+            "height": 22,
+            "bottom": 38.5,
+            "right": 147
+          },
+          "color": "rgb(35, 140, 255)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10px",
+          "centerHit": {
+            "tag": "I",
+            "id": "",
+            "data": {},
+            "text": ""
+          }
+        },
+        {
+          "selector": ".phase[data-go=\"map\"]",
+          "text": "场地",
+          "innerText": "",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 147,
+            "y": 16.5,
+            "width": 32,
+            "height": 22,
+            "bottom": 38.5,
+            "right": 179
+          },
+          "color": "rgb(138, 144, 149)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10px",
+          "centerHit": {
+            "tag": "I",
+            "id": "",
+            "data": {},
+            "text": ""
+          }
+        },
+        {
+          "selector": ".phase[data-go=\"lab\"]",
+          "text": "测试室",
+          "innerText": "",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 179,
+            "y": 16.5,
+            "width": 32,
+            "height": 22,
+            "bottom": 38.5,
+            "right": 211
+          },
+          "color": "rgb(138, 144, 149)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10px",
+          "centerHit": {
+            "tag": "I",
+            "id": "",
+            "data": {},
+            "text": ""
+          }
+        },
+        {
+          "selector": ".phase[data-go=\"collection\"]",
+          "text": "陀螺库",
+          "innerText": "",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 211,
+            "y": 16.5,
+            "width": 32,
+            "height": 22,
+            "bottom": 38.5,
+            "right": 243
+          },
+          "color": "rgb(138, 144, 149)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10px",
+          "centerHit": {
+            "tag": "I",
+            "id": "",
+            "data": {},
+            "text": ""
+          }
+        },
+        {
+          "selector": "[data-phase-only=\"battle\"]",
+          "text": "对战",
+          "innerText": "",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 243,
+            "y": 16.5,
+            "width": 32,
+            "height": 22,
+            "bottom": 38.5,
+            "right": 275
+          },
+          "color": "rgb(138, 144, 149)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10px",
+          "centerHit": {
+            "tag": "I",
+            "id": "",
+            "data": {},
+            "text": ""
+          }
+        }
+      ],
+      "aria": "- navigation \"游戏进度\":\n  - button\n  - button\n  - button\n  - button\n  - button"
+    },
+    {
+      "size": "mobile",
+      "name": "journey-clipping-is-scrollable",
+      "logOpen": true,
+      "scrollTop": 185
+    },
+    {
+      "size": "mobile",
+      "name": "lab-help-overlap",
+      "geometry": [
+        {
+          "selector": "[data-lab=\"help\"]",
+          "text": "帮助",
+          "innerText": "帮助",
+          "ariaLabel": "帮助",
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 343.21875,
+            "y": 306.6953125,
+            "width": 33.53125,
+            "height": 42,
+            "bottom": 348.6953125,
+            "right": 376.75
+          },
+          "color": "rgb(246, 250, 248)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "centerHit": {
+            "tag": "BUTTON",
+            "id": "",
+            "data": {
+              "lab": "wind"
+            },
+            "text": "风场 0.0 m/s · 0°"
+          }
+        },
+        {
+          "selector": "[data-lab=\"help\"] small",
+          "text": "帮助",
+          "innerText": "帮助",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 352.5625,
+            "y": 337.6953125,
+            "width": 14.828125,
+            "height": 11,
+            "bottom": 348.6953125,
+            "right": 367.390625
+          },
+          "color": "rgb(246, 250, 248)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "7.41px",
+          "centerHit": {
+            "tag": "BUTTON",
+            "id": "",
+            "data": {
+              "lab": "wind"
+            },
+            "text": "风场 0.0 m/s · 0°"
+          }
+        },
+        {
+          "selector": "[data-lab=\"wind\"]",
+          "text": "风场 0.0 m/s · 0°",
+          "innerText": "风场 0.0 m/s · 0°",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 289.890625,
+            "y": 322.1484375,
+            "width": 84.515625,
+            "height": 29.25,
+            "bottom": 351.3984375,
+            "right": 374.40625
+          },
+          "color": "rgb(215, 246, 238)",
+          "backgroundColor": "rgba(29, 66, 72, 0.933)",
+          "fontSize": "9.36px",
+          "centerHit": {
+            "tag": "SPAN",
+            "id": "",
+            "data": {},
+            "text": "0.0 m/s · 0°"
+          }
+        },
+        {
+          "selector": ".lab-title h1",
+          "text": "陀螺测试实验室",
+          "innerText": "陀螺测试实验室",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 12.859375,
+            "y": 89.8828125,
+            "width": 193.0625,
+            "height": 21.296875,
+            "bottom": 111.1796875,
+            "right": 205.921875
+          },
+          "color": "rgb(255, 255, 255)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "17.745px",
+          "centerHit": {
+            "tag": "CANVAS",
+            "id": "",
+            "data": {
+              "engine": "three.js r178"
+            },
+            "text": ""
+          }
+        },
+        {
+          "selector": ".lab-title p",
+          "text": "TOP TEST LAB",
+          "innerText": "TOP TEST LAB",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 12.859375,
+            "y": 113.8984375,
+            "width": 193.0625,
+            "height": 12,
+            "bottom": 125.8984375,
+            "right": 205.921875
+          },
+          "color": "rgb(240, 248, 247)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10.14px",
+          "centerHit": {
+            "tag": "CANVAS",
+            "id": "",
+            "data": {
+              "engine": "three.js r178"
+            },
+            "text": ""
+          }
+        },
+        {
+          "selector": ".lab-level small",
+          "text": "0 / 120",
+          "innerText": "0 / 120",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 115.09375,
+            "y": 158.0234375,
+            "width": 22.5625,
+            "height": 10.546875,
+            "bottom": 168.5703125,
+            "right": 137.65625
+          },
+          "color": "rgb(239, 250, 248)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "7.41px",
+          "centerHit": {
+            "tag": "SMALL",
+            "id": "lab-xp",
+            "data": {},
+            "text": "0 / 120"
+          }
+        },
+        {
+          "selector": "[data-lab=\"records\"] small",
+          "text": "测试记录",
+          "innerText": "测试记录",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 345.15625,
+            "y": 241.2265625,
+            "width": 29.640625,
+            "height": 11,
+            "bottom": 252.2265625,
+            "right": 374.796875
+          },
+          "color": "rgb(246, 250, 248)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "7.41px",
+          "centerHit": {
+            "tag": "SMALL",
+            "id": "",
+            "data": {},
+            "text": "测试记录"
+          }
+        }
+      ],
+      "centerEffect": {
+        "dialogOpen": false,
+        "windOpen": true,
+        "windAriaExpanded": "true"
+      },
+      "defaultClick": {
+        "succeeded": false,
+        "error": "locator.click: Timeout 1600ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-lab=\"help\"]')\u001b[22m\n\u001b[2m    - locator resolved to <button data-lab=\"help\" aria-label=\"帮助\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button data-lab=\"wind\" aria-expanded=\"true\">…</button> from <div role=\"group\" aria-label=\"观察视角\" class=\"lab-inspect-toolbar\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button data-lab=\"wind\" aria-expanded=\"true\">…</button> from <div role=\"group\" aria-label=\"观察视角\" class=\"lab-inspect-toolbar\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    3 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button data-lab=\"wind\" aria-expanded=\"true\">…</button> from <div role=\"group\" aria-label=\"观察视角\" class=\"lab-inspect-toolbar\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n"
+      },
+      "keyboardEffect": {
+        "open": true,
+        "title": "测试室使用指南"
+      }
+    },
+    {
+      "size": "mobile",
+      "name": "minimal-room-readout",
+      "front": [
+        {
+          "selector": ".lab-overhead-values",
+          "text": "总质量1.22平衡单位转动惯量0.890惯量单位",
+          "innerText": "总质量1.22平衡单位转动惯量0.890惯量单位",
+          "ariaLabel": null,
+          "title": "",
+          "visible": false,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "right": 0
+          },
+          "color": "rgb(221, 255, 244)",
+          "backgroundColor": "rgba(21, 58, 65, 0.925)",
+          "fontSize": "16px",
+          "centerHit": {
+            "tag": "DIV",
+            "id": "app",
+            "data": {},
+            "text": "陀螺测试实验室\n\nTOP TEST LAB\n\n700\n0\n实验室等级\nLV.1\n30 / 120\n改装保养\n测试记录\n实验室设置\n帮助\n近景\n俯视\n风场 0.0 m/s · 0°\n演示转速 0 RPM\n倾斜 0.0°\n偏移 0.000\n主力\n配置估算 · 游戏单位\n再次测试\nSTART TEST\n校准设备\n重量测试\nWEIGHT\n质心测试\nC.G. TEST\n平衡测试\nBALANCE\n01\n已选中\n主力\n02\n突击\n03\n续航\n陀螺库\nCOLLECTION\n改装台\nCUSTOMIZE\n测试室\nLAB\n返回约战\n罗彻\n商店\nSHOP\n重量测试：总质量 1.22 平衡单位，转动惯量 0.890 惯量单位。测试完成 · 报告已保存"
+          }
+        },
+        {
+          "selector": ".lab-accessible-readout",
+          "text": "重量测试：总质量 1.22 平衡单位，转动惯量 0.890 惯量单位。测试完成 · 报告已保存",
+          "innerText": "重量测试：总质量 1.22 平衡单位，转动惯量 0.890 惯量单位。测试完成 · 报告已保存",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 0,
+            "y": 75.3359375,
+            "width": 1,
+            "height": 1,
+            "bottom": 76.3359375,
+            "right": 1
+          },
+          "color": "rgb(85, 218, 192)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "centerHit": {
+            "tag": "CANVAS",
+            "id": "",
+            "data": {
+              "engine": "three.js r178"
+            },
+            "text": ""
+          }
+        },
+        {
+          "selector": ".lab-notice",
+          "text": "报告已保存 · 实验室经验 +30",
+          "innerText": "报告已保存 · 实验室经验 +30",
+          "ariaLabel": null,
+          "title": "",
+          "visible": false,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "right": 0
+          },
+          "color": "rgb(219, 255, 241)",
+          "backgroundColor": "rgba(21, 61, 65, 0.95)",
+          "fontSize": "8.97px",
+          "centerHit": {
+            "tag": "DIV",
+            "id": "app",
+            "data": {},
+            "text": "陀螺测试实验室\n\nTOP TEST LAB\n\n700\n0\n实验室等级\nLV.1\n30 / 120\n改装保养\n测试记录\n实验室设置\n帮助\n近景\n俯视\n风场 0.0 m/s · 0°\n演示转速 0 RPM\n倾斜 0.0°\n偏移 0.000\n主力\n配置估算 · 游戏单位\n再次测试\nSTART TEST\n校准设备\n重量测试\nWEIGHT\n质心测试\nC.G. TEST\n平衡测试\nBALANCE\n01\n已选中\n主力\n02\n突击\n03\n续航\n陀螺库\nCOLLECTION\n改装台\nCUSTOMIZE\n测试室\nLAB\n返回约战\n罗彻\n商店\nSHOP\n重量测试：总质量 1.22 平衡单位，转动惯量 0.890 惯量单位。测试完成 · 报告已保存"
+          }
+        }
+      ],
+      "overhead": [
+        {
+          "selector": ".lab-overhead-values",
+          "text": "总质量1.22平衡单位转动惯量0.890惯量单位",
+          "innerText": "总质量\n1.22\n平衡单位\n转动惯量\n0.890\n惯量单位",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 78,
+            "y": 255.5859375,
+            "width": 234,
+            "height": 63.375,
+            "bottom": 318.9609375,
+            "right": 312
+          },
+          "color": "rgb(221, 255, 244)",
+          "backgroundColor": "rgba(21, 58, 65, 0.925)",
+          "fontSize": "16px",
+          "centerHit": {
+            "tag": "DIV",
+            "id": "",
+            "data": {},
+            "text": "总质量\n1.22\n平衡单位\n转动惯量\n0.890\n惯量单位"
+          }
+        }
+      ],
+      "saved": {
+        "room": "minimal",
+        "xp": 30,
+        "records": [
+          {
+            "id": "1790777070447-0",
+            "timestamp": 1790777070447,
+            "name": "主力",
+            "mode": "mass",
+            "metrics": [
+              {
+                "label": "总质量",
+                "value": 1.2199999999999998,
+                "unit": "平衡单位",
+                "decimals": 2
+              },
+              {
+                "label": "转动惯量",
+                "value": 0.89,
+                "unit": "惯量单位",
+                "decimals": 3
+              }
+            ],
+            "wind": "无风",
+            "windSpeed": 0,
+            "windDirection": 0,
+            "terrain": "标准地面",
+            "selection": {
+              "attackRing": "attack_ring.balance_six",
+              "coreLock": "core_lock.standard",
+              "weightDisc": "weight_disc.standard",
+              "driverShaft": "driver_shaft.standard",
+              "tip": "tip.rubber_balance"
+            }
+          }
+        ]
+      }
+    },
+    {
+      "size": "desktop",
+      "name": "header-battle-action",
+      "before": {
+        "url": "http://127.0.0.1:5173/#assembly",
+        "screen": "assembly"
+      },
+      "after": {
+        "url": "http://127.0.0.1:5173/#assembly",
+        "screen": "assembly"
+      },
+      "phaseButtons": [
+        {
+          "selector": ".phase-nav",
+          "text": "组装\n            场地\n            测试室\n            陀螺库\n            对战",
+          "innerText": "组装\n场地\n测试室\n陀螺库\n对战",
+          "ariaLabel": "游戏进度",
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 577,
+            "y": 17,
+            "width": 286,
+            "height": 29,
+            "bottom": 46,
+            "right": 863
+          },
+          "color": "rgb(18, 21, 26)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "centerHit": {
+            "tag": "SPAN",
+            "id": "",
+            "data": {},
+            "text": "测试室"
+          }
+        },
+        {
+          "selector": ".phase[data-go=\"assembly\"]",
+          "text": "组装",
+          "innerText": "组装",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 577,
+            "y": 17,
+            "width": 54,
+            "height": 29,
+            "bottom": 46,
+            "right": 631
+          },
+          "color": "rgb(35, 140, 255)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10px",
+          "centerHit": {
+            "tag": "SPAN",
+            "id": "",
+            "data": {},
+            "text": "组装"
+          }
+        },
+        {
+          "selector": ".phase[data-go=\"map\"]",
+          "text": "场地",
+          "innerText": "场地",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 631,
+            "y": 17,
+            "width": 54,
+            "height": 29,
+            "bottom": 46,
+            "right": 685
+          },
+          "color": "rgb(138, 144, 149)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10px",
+          "centerHit": {
+            "tag": "SPAN",
+            "id": "",
+            "data": {},
+            "text": "场地"
+          }
+        },
+        {
+          "selector": ".phase[data-go=\"lab\"]",
+          "text": "测试室",
+          "innerText": "测试室",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 685,
+            "y": 17,
+            "width": 62,
+            "height": 29,
+            "bottom": 46,
+            "right": 747
+          },
+          "color": "rgb(138, 144, 149)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10px",
+          "centerHit": {
+            "tag": "SPAN",
+            "id": "",
+            "data": {},
+            "text": "测试室"
+          }
+        },
+        {
+          "selector": ".phase[data-go=\"collection\"]",
+          "text": "陀螺库",
+          "innerText": "陀螺库",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 747,
+            "y": 17,
+            "width": 62,
+            "height": 29,
+            "bottom": 46,
+            "right": 809
+          },
+          "color": "rgb(138, 144, 149)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10px",
+          "centerHit": {
+            "tag": "SPAN",
+            "id": "",
+            "data": {},
+            "text": "陀螺库"
+          }
+        },
+        {
+          "selector": "[data-phase-only=\"battle\"]",
+          "text": "对战",
+          "innerText": "对战",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 809,
+            "y": 17,
+            "width": 54,
+            "height": 29,
+            "bottom": 46,
+            "right": 863
+          },
+          "color": "rgb(138, 144, 149)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10px",
+          "centerHit": {
+            "tag": "SPAN",
+            "id": "",
+            "data": {},
+            "text": "对战"
+          }
+        }
+      ],
+      "aria": "- navigation \"游戏进度\":\n  - button \"组装\"\n  - button \"场地\"\n  - button \"测试室\"\n  - button \"陀螺库\"\n  - button \"对战\""
+    },
+    {
+      "size": "desktop",
+      "name": "journey-clipping-is-scrollable",
+      "logOpen": true,
+      "scrollTop": 74
+    },
+    {
+      "size": "desktop",
+      "name": "lab-help-overlap",
+      "geometry": [
+        {
+          "selector": "[data-lab=\"help\"]",
+          "text": "帮助",
+          "innerText": "帮助",
+          "ariaLabel": "帮助",
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 933.75,
+            "y": 328.15625,
+            "width": 48.375,
+            "height": 58.71875,
+            "bottom": 386.875,
+            "right": 982.125
+          },
+          "color": "rgb(246, 250, 248)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "centerHit": {
+            "tag": "BUTTON",
+            "id": "",
+            "data": {
+              "lab": "wind"
+            },
+            "text": "风场 0.0 m/s · 0°"
+          }
+        },
+        {
+          "selector": "[data-lab=\"help\"] small",
+          "text": "帮助",
+          "innerText": "帮助",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 947.25,
+            "y": 372.875,
+            "width": 21.375,
+            "height": 14,
+            "bottom": 386.875,
+            "right": 968.625
+          },
+          "color": "rgb(246, 250, 248)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10.6875px",
+          "centerHit": {
+            "tag": "SPAN",
+            "id": "",
+            "data": {},
+            "text": "0.0 m/s · 0°"
+          }
+        },
+        {
+          "selector": "[data-lab=\"wind\"]",
+          "text": "风场 0.0 m/s · 0°",
+          "innerText": "风场 0.0 m/s · 0°",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 857.6875,
+            "y": 356,
+            "width": 121.0625,
+            "height": 42.1875,
+            "bottom": 398.1875,
+            "right": 978.75
+          },
+          "color": "rgb(215, 246, 238)",
+          "backgroundColor": "rgba(29, 66, 72, 0.933)",
+          "fontSize": "13.5px",
+          "centerHit": {
+            "tag": "SPAN",
+            "id": "",
+            "data": {},
+            "text": "0.0 m/s · 0°"
+          }
+        },
+        {
+          "selector": ".lab-title h1",
+          "text": "陀螺测试实验室",
+          "innerText": "陀螺测试实验室",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 457.3125,
+            "y": 21,
+            "width": 278.4375,
+            "height": 30.703125,
+            "bottom": 51.703125,
+            "right": 735.75
+          },
+          "color": "rgb(255, 255, 255)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "25.5938px",
+          "centerHit": {
+            "tag": "CANVAS",
+            "id": "",
+            "data": {
+              "engine": "three.js r178"
+            },
+            "text": ""
+          }
+        },
+        {
+          "selector": ".lab-title p",
+          "text": "TOP TEST LAB",
+          "innerText": "TOP TEST LAB",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 457.3125,
+            "y": 55.640625,
+            "width": 278.4375,
+            "height": 18,
+            "bottom": 73.640625,
+            "right": 735.75
+          },
+          "color": "rgb(240, 248, 247)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "14.625px",
+          "centerHit": {
+            "tag": "CANVAS",
+            "id": "",
+            "data": {
+              "engine": "three.js r178"
+            },
+            "text": ""
+          }
+        },
+        {
+          "selector": ".lab-level small",
+          "text": "0 / 120",
+          "innerText": "0 / 120",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 604.796875,
+            "y": 118.25,
+            "width": 32.515625,
+            "height": 14.25,
+            "bottom": 132.5,
+            "right": 637.3125
+          },
+          "color": "rgb(239, 250, 248)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10.6875px",
+          "centerHit": {
+            "tag": "SMALL",
+            "id": "lab-xp",
+            "data": {},
+            "text": "0 / 120"
+          }
+        },
+        {
+          "selector": "[data-lab=\"records\"] small",
+          "text": "测试记录",
+          "innerText": "测试记录",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 936.5625,
+            "y": 237.4375,
+            "width": 42.734375,
+            "height": 14,
+            "bottom": 251.4375,
+            "right": 979.296875
+          },
+          "color": "rgb(246, 250, 248)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "10.6875px",
+          "centerHit": {
+            "tag": "SMALL",
+            "id": "",
+            "data": {},
+            "text": "测试记录"
+          }
+        }
+      ],
+      "centerEffect": {
+        "dialogOpen": false,
+        "windOpen": true,
+        "windAriaExpanded": "true"
+      },
+      "defaultClick": {
+        "succeeded": false,
+        "error": "locator.click: Timeout 1600ms exceeded.\nCall log:\n\u001b[2m  - waiting for locator('[data-lab=\"help\"]')\u001b[22m\n\u001b[2m    - locator resolved to <button data-lab=\"help\" aria-label=\"帮助\">…</button>\u001b[22m\n\u001b[2m  - attempting click action\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button data-lab=\"wind\" aria-expanded=\"true\">…</button> from <div role=\"group\" aria-label=\"观察视角\" class=\"lab-inspect-toolbar\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m    - waiting 20ms\u001b[22m\n\u001b[2m    2 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button data-lab=\"wind\" aria-expanded=\"true\">…</button> from <div role=\"group\" aria-label=\"观察视角\" class=\"lab-inspect-toolbar\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 100ms\u001b[22m\n\u001b[2m    3 × waiting for element to be visible, enabled and stable\u001b[22m\n\u001b[2m      - element is visible, enabled and stable\u001b[22m\n\u001b[2m      - scrolling into view if needed\u001b[22m\n\u001b[2m      - done scrolling\u001b[22m\n\u001b[2m      - <button data-lab=\"wind\" aria-expanded=\"true\">…</button> from <div role=\"group\" aria-label=\"观察视角\" class=\"lab-inspect-toolbar\">…</div> subtree intercepts pointer events\u001b[22m\n\u001b[2m    - retrying click action\u001b[22m\n\u001b[2m      - waiting 500ms\u001b[22m\n"
+      },
+      "keyboardEffect": {
+        "open": true,
+        "title": "测试室使用指南"
+      }
+    },
+    {
+      "size": "desktop",
+      "name": "minimal-room-readout",
+      "front": [
+        {
+          "selector": ".lab-overhead-values",
+          "text": "总质量1.22平衡单位转动惯量0.890惯量单位",
+          "innerText": "总质量1.22平衡单位转动惯量0.890惯量单位",
+          "ariaLabel": null,
+          "title": "",
+          "visible": false,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "right": 0
+          },
+          "color": "rgb(221, 255, 244)",
+          "backgroundColor": "rgba(21, 58, 65, 0.925)",
+          "fontSize": "16px",
+          "centerHit": {
+            "tag": "DIV",
+            "id": "app",
+            "data": {},
+            "text": "陀螺测试实验室\n\nTOP TEST LAB\n\n700\n0\n实验室等级\nLV.1\n30 / 120\n改装保养\n测试记录\n实验室设置\n帮助\n近景\n俯视\n风场 0.0 m/s · 0°\n演示转速 0 RPM\n倾斜 0.0°\n偏移 0.000\n主力\n配置估算 · 游戏单位\n再次测试\nSTART TEST\n校准设备\n重量测试\nWEIGHT\n质心测试\nC.G. TEST\n平衡测试\nBALANCE\n01\n已选中\n主力\n02\n突击\n03\n续航\n陀螺库\nCOLLECTION\n改装台\nCUSTOMIZE\n测试室\nLAB\n返回约战\n罗彻\n商店\nSHOP\n重量测试：总质量 1.22 平衡单位，转动惯量 0.890 惯量单位。测试完成 · 报告已保存"
+          }
+        },
+        {
+          "selector": ".lab-accessible-readout",
+          "text": "重量测试：总质量 1.22 平衡单位，转动惯量 0.890 惯量单位。测试完成 · 报告已保存",
+          "innerText": "重量测试：总质量 1.22 平衡单位，转动惯量 0.890 惯量单位。测试完成 · 报告已保存",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 438.75,
+            "y": 0,
+            "width": 1,
+            "height": 1,
+            "bottom": 1,
+            "right": 439.75
+          },
+          "color": "rgb(85, 218, 192)",
+          "backgroundColor": "rgba(0, 0, 0, 0)",
+          "fontSize": "16px",
+          "centerHit": {
+            "tag": "CANVAS",
+            "id": "",
+            "data": {
+              "engine": "three.js r178"
+            },
+            "text": ""
+          }
+        },
+        {
+          "selector": ".lab-notice",
+          "text": "报告已保存 · 实验室经验 +30",
+          "innerText": "报告已保存 · 实验室经验 +30",
+          "ariaLabel": null,
+          "title": "",
+          "visible": false,
+          "rect": {
+            "x": 0,
+            "y": 0,
+            "width": 0,
+            "height": 0,
+            "bottom": 0,
+            "right": 0
+          },
+          "color": "rgb(219, 255, 241)",
+          "backgroundColor": "rgba(21, 61, 65, 0.95)",
+          "fontSize": "12.9375px",
+          "centerHit": {
+            "tag": "DIV",
+            "id": "app",
+            "data": {},
+            "text": "陀螺测试实验室\n\nTOP TEST LAB\n\n700\n0\n实验室等级\nLV.1\n30 / 120\n改装保养\n测试记录\n实验室设置\n帮助\n近景\n俯视\n风场 0.0 m/s · 0°\n演示转速 0 RPM\n倾斜 0.0°\n偏移 0.000\n主力\n配置估算 · 游戏单位\n再次测试\nSTART TEST\n校准设备\n重量测试\nWEIGHT\n质心测试\nC.G. TEST\n平衡测试\nBALANCE\n01\n已选中\n主力\n02\n突击\n03\n续航\n陀螺库\nCOLLECTION\n改装台\nCUSTOMIZE\n测试室\nLAB\n返回约战\n罗彻\n商店\nSHOP\n重量测试：总质量 1.22 平衡单位，转动惯量 0.890 惯量单位。测试完成 · 报告已保存"
+          }
+        }
+      ],
+      "overhead": [
+        {
+          "selector": ".lab-overhead-values",
+          "text": "总质量1.22平衡单位转动惯量0.890惯量单位",
+          "innerText": "总质量\n1.22\n平衡单位\n转动惯量\n0.890\n惯量单位",
+          "ariaLabel": null,
+          "title": "",
+          "visible": true,
+          "rect": {
+            "x": 551.25,
+            "y": 260,
+            "width": 337.5,
+            "height": 91.75,
+            "bottom": 351.75,
+            "right": 888.75
+          },
+          "color": "rgb(221, 255, 244)",
+          "backgroundColor": "rgba(21, 58, 65, 0.925)",
+          "fontSize": "16px",
+          "centerHit": {
+            "tag": "DIV",
+            "id": "",
+            "data": {},
+            "text": "总质量\n1.22\n平衡单位\n转动惯量\n0.890\n惯量单位"
+          }
+        }
+      ],
+      "saved": {
+        "room": "minimal",
+        "xp": 30,
+        "records": [
+          {
+            "id": "1790777085358-0",
+            "timestamp": 1790777085358,
+            "name": "主力",
+            "mode": "mass",
+            "metrics": [
+              {
+                "label": "总质量",
+                "value": 1.2199999999999998,
+                "unit": "平衡单位",
+                "decimals": 2
+              },
+              {
+                "label": "转动惯量",
+                "value": 0.89,
+                "unit": "惯量单位",
+                "decimals": 3
+              }
+            ],
+            "wind": "无风",
+            "windSpeed": 0,
+            "windDirection": 0,
+            "terrain": "标准地面",
+            "selection": {
+              "attackRing": "attack_ring.balance_six",
+              "coreLock": "core_lock.standard",
+              "weightDisc": "weight_disc.standard",
+              "driverShaft": "driver_shaft.standard",
+              "tip": "tip.rubber_balance"
+            }
+          }
+        ]
+      }
+    }
+  ],
+  "events": [
+    {
+      "size": "mobile",
+      "type": "warning",
+      "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio"
+    },
+    {
+      "size": "mobile",
+      "type": "warning",
+      "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio"
+    },
+    {
+      "size": "mobile",
+      "type": "warning",
+      "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20"
+    },
+    {
+      "size": "mobile",
+      "type": "warning",
+      "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20"
+    },
+    {
+      "size": "desktop",
+      "type": "warning",
+      "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio"
+    },
+    {
+      "size": "desktop",
+      "type": "warning",
+      "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio"
+    },
+    {
+      "size": "desktop",
+      "type": "warning",
+      "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20"
+    },
+    {
+      "size": "desktop",
+      "type": "warning",
+      "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20"
+    }
+  ]
+}

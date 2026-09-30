@@ -1,0 +1,614 @@
+{
+  "url": "http://127.0.0.1:5173/#assembly",
+  "title": "SPIN/CORE · 战斗陀螺 Web 原型",
+  "viewport": {
+    "width": 1440,
+    "height": 1000
+  },
+  "documentSize": {
+    "width": 1440,
+    "height": 1000
+  },
+  "shell": {
+    "x": 438.75,
+    "y": 0,
+    "width": 562.5,
+    "height": 1000,
+    "right": 1001.25,
+    "bottom": 1000
+  },
+  "text": "S/C\nSPIN/CORE\nPHYSICS LAB\n组装\n场地\n测试室\n陀螺库\n对战\n赏金\n0700\n静\nLIVE PHYSICS 正在计算碰撞与转速 标准地面\n陀螺\n发射器\n保养\n极简空间\n01 / 03\n主力\n发射器保养\n撤回未保存修改\n全貌\n传动\n齿条\n连接头\n握柄\n滴油\n擦拭\n环绕\n撤销\n擦净当前\n出油量\n适中\n\n零件自动展开。涂油看变化，也可以随时擦掉。\n\n传动效率\n72%\n握柄 / 拉柄油膜\n0% / 0%\n轴尖抓地\n100%\n对照试拉\n\n抽拉输入 86% · 竖直抽拉 · 滑行 3 秒\n游戏平衡单位，试验不计奖励\n\n操作与数值说明\n与已保存一致\n保存保养",
+  "controls": [
+    {
+      "selector": "button.brand",
+      "text": "S/C\nSPIN/CORE\nPHYSICS LAB",
+      "data": {
+        "go": "home"
+      },
+      "ariaLabel": "返回主页",
+      "rect": {
+        "x": 457.75,
+        "y": 15.5,
+        "width": 115.125,
+        "height": 32,
+        "right": 572.875,
+        "bottom": 47.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "16px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase.is-active",
+      "text": "组装",
+      "data": {
+        "go": "assembly"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 577,
+        "y": 17,
+        "width": 54,
+        "height": 29,
+        "right": 631,
+        "bottom": 46
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase",
+      "text": "场地",
+      "data": {
+        "go": "map"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 631,
+        "y": 17,
+        "width": 54,
+        "height": 29,
+        "right": 685,
+        "bottom": 46
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase",
+      "text": "测试室",
+      "data": {
+        "go": "lab"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 685,
+        "y": 17,
+        "width": 62,
+        "height": 29,
+        "right": 747,
+        "bottom": 46
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase",
+      "text": "陀螺库",
+      "data": {
+        "go": "collection"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 747,
+        "y": 17,
+        "width": 62,
+        "height": 29,
+        "right": 809,
+        "bottom": 46
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase",
+      "text": "对战",
+      "data": {
+        "phaseOnly": "battle"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 809,
+        "y": 17,
+        "width": 54,
+        "height": 29,
+        "right": 863,
+        "bottom": 46
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button#sound-toggle.icon-button.is-off",
+      "text": "静",
+      "data": {},
+      "ariaLabel": "切换声音",
+      "rect": {
+        "x": 948.25,
+        "y": 14.5,
+        "width": 34,
+        "height": 34,
+        "right": 982.25,
+        "bottom": 48.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "11px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "陀螺",
+      "data": {
+        "workshop": "top"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 455.75,
+        "y": 149,
+        "width": 44,
+        "height": 38,
+        "right": 499.75,
+        "bottom": 187
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "发射器",
+      "data": {
+        "workshop": "outfit"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 503.75,
+        "y": 149,
+        "width": 56,
+        "height": 38,
+        "right": 559.75,
+        "bottom": 187
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "保养",
+      "data": {
+        "workshop": "care"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 563.75,
+        "y": 149,
+        "width": 44,
+        "height": 38,
+        "right": 607.75,
+        "bottom": 187
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "summary",
+      "text": "极简空间",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 903.546875,
+        "y": 149,
+        "width": 80.703125,
+        "height": 38,
+        "right": 984.25,
+        "bottom": 187
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "撤回未保存修改",
+      "data": {
+        "maintenance": "cancel"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 887.25,
+        "y": 202,
+        "width": 97,
+        "height": 36,
+        "right": 984.25,
+        "bottom": 238
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "11px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "全貌",
+      "data": {
+        "focus": ""
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 455.75,
+        "y": 248,
+        "width": 102.5,
+        "height": 32,
+        "right": 558.25,
+        "bottom": 280
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "传动",
+      "data": {
+        "focus": "transmission"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 562.25,
+        "y": 248,
+        "width": 102.5,
+        "height": 32,
+        "right": 664.75,
+        "bottom": 280
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "齿条",
+      "data": {
+        "focus": "rack"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 668.75,
+        "y": 248,
+        "width": 102.5,
+        "height": 32,
+        "right": 771.25,
+        "bottom": 280
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "连接头",
+      "data": {
+        "focus": "coupler"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 775.25,
+        "y": 248,
+        "width": 102.5,
+        "height": 32,
+        "right": 877.75,
+        "bottom": 280
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "握柄",
+      "data": {
+        "focus": "grip"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 881.75,
+        "y": 248,
+        "width": 102.5,
+        "height": 32,
+        "right": 984.25,
+        "bottom": 280
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "滴油",
+      "data": {
+        "tool": "oil"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 466.75,
+        "y": 676.5,
+        "width": 98.09375,
+        "height": 36,
+        "right": 564.84375,
+        "bottom": 712.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "擦拭",
+      "data": {
+        "tool": "wipe"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 568.84375,
+        "y": 676.5,
+        "width": 98.109375,
+        "height": 36,
+        "right": 666.953125,
+        "bottom": 712.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "环绕",
+      "data": {
+        "tool": "orbit"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 670.953125,
+        "y": 676.5,
+        "width": 98.09375,
+        "height": 36,
+        "right": 769.046875,
+        "bottom": 712.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "撤销",
+      "data": {
+        "maintenance": "undo"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 773.046875,
+        "y": 676.5,
+        "width": 98.109375,
+        "height": 36,
+        "right": 871.15625,
+        "bottom": 712.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": true,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "擦净当前",
+      "data": {
+        "maintenance": "clean"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 875.15625,
+        "y": 676.5,
+        "width": 98.09375,
+        "height": 36,
+        "right": 973.25,
+        "bottom": 712.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "input",
+      "text": "每次出油量",
+      "data": {},
+      "ariaLabel": "每次出油量",
+      "rect": {
+        "x": 517.75,
+        "y": 730.75,
+        "width": 415.5,
+        "height": 3,
+        "right": 933.25,
+        "bottom": 733.75
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "13px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "对照试拉",
+      "data": {
+        "maintenance": "trial"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 466.75,
+        "y": 847.5,
+        "width": 72,
+        "height": 36,
+        "right": 538.75,
+        "bottom": 883.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "13px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "summary",
+      "text": "操作与数值说明",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 466.75,
+        "y": 893.5,
+        "width": 506.5,
+        "height": 32.5,
+        "right": 973.25,
+        "bottom": 926
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "11px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.maintenance-save",
+      "text": "保存保养",
+      "data": {
+        "maintenance": "save"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 876.25,
+        "y": 948,
+        "width": 100,
+        "height": 36,
+        "right": 976.25,
+        "bottom": 984
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "13px",
+      "tabIndex": 0
+    }
+  ],
+  "scrollContainers": []
+}

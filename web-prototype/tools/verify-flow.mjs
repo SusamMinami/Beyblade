@@ -19,7 +19,7 @@ damaged.structure.imbalance = .3;
 check(battleCoach({ winner: "player", weakestPart: "attackRing" }, damaged).slot === "tip", "Winning advice reads own damage, not losing opponent");
 check(battleCoach({ winner: "enemy", reason: "spin_out", time: 30 }, sim.player).text.includes("占区"), "Low supply participation gets tactical advice");
 
-const out = resolve("../.impeccable/review/flow");
+const out = resolve(process.env.QA_OUTPUT_DIR ?? "../.impeccable/review/flow");
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? "C:/Program Files/Google/Chrome/Application/chrome.exe", headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: "reduce" });

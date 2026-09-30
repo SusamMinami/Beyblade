@@ -1,0 +1,607 @@
+{
+  "url": "http://127.0.0.1:5173/#journey",
+  "title": "SPIN/CORE · 战斗陀螺 Web 原型",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "documentSize": {
+    "width": 438,
+    "height": 846
+  },
+  "shell": {
+    "x": 0,
+    "y": 0,
+    "width": 390,
+    "height": 844,
+    "right": 390,
+    "bottom": 844
+  },
+  "text": "S/C\nSPIN/CORE\n赏金\n0700\n静\nARENA / 02\n街头对决\nLIVE PHYSICS 正在计算碰撞与转速 标准地面\n故事远征\n自由对战\n随本地时间\n白天\n夜晚\n回声远征\n1 / 10 旅途纪念\n旅程\n1. 它还会转 · 已完成\n2. 罗彻的最后通牒 · 可挑战\n3. 修理铺的试盘 · 未开放\n4. 一块地面，两种答案 · 未开放\n5. 没有厂牌的参赛者 · 未开放\n6. 他也换了零件 · 未开放\n7. 断柱之间 · 未开放\n8. 摘下徽章的一局 · 未开放\n9. 把旧赛册摊开 · 未开放\n10. 回声，对阵黑曜 · 未开放\n\n第 1 章 · 放学后，别散场 / 街头对决\n\n罗彻的最后通牒\n罗彻\n黑曜·试作 · 宿敌 · 极轴新人\n本局目标\n击败罗彻\n出战：主力\n改装\n测试\n换陀螺\n\n选做挑战：获胜且剩余耐久至少 50%（不阻塞主线）\n\n约战缘由 · 罗彻\n对手情报与改装建议\n这次配置与上次出战相比\n同行人的回信 · 0 / 5\n旅途纪念与战历 · 0 场记录\n挑战罗彻 →\nPOSITIONED CHILD CLIPPED BY OVERFLOW CONTAINER\n‹\n›\nLOW CONTRAST TEXT\nUNDERSIZED FUNCTIONAL TEXT\n✦ GLOWING SHADOW ACCENTS\n‹\n›\nLOW CONTRAST TEXT\nLOW CONTRAST TEXT\n✦ DECORATIVE RADIAL SPOTLIGHT GLOW\nUNDERSIZED FUNCTIONAL TEXT\nPOSITIONED CHILD CLIPPED BY OVERFLOW CONTAINER\nLOW CONTRAST TEXT\nKICKER / EYEBROW LABEL ABOVE HEADING\nkicker \"BATTLE COMPLETE\" above h2 \"对战结束\"\nSIDE-TAB ACCENT BORDER\n.arena-card::before — absolute 3px pseudo-element stripe (left: 0)\nLAYOUT PROPERTY ANIMATION\ntransition: width\nGLOWING SHADOW ACCENTS\nZero-offset box-shadow glow (#55dac0)\nRADIAL-GRADIENT BACKGROUND HALO\nradial-gradient halo (#19312d → transparent) on dark page\nDECORATIVE GRID-LINE BACKGROUND\ntwo-axis grid-line gradient background\n◉\n×",
+  "controls": [
+    {
+      "selector": "button.brand",
+      "text": "S/C\nSPIN/CORE",
+      "data": {
+        "go": "home"
+      },
+      "ariaLabel": "返回主页",
+      "rect": {
+        "x": 10,
+        "y": 17,
+        "width": 96.765625,
+        "height": 29,
+        "right": 106.765625,
+        "bottom": 46
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": "div.impeccable-overlay.impeccable-banner",
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "16px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase",
+      "text": "",
+      "data": {
+        "go": "assembly"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 115,
+        "y": 20.5,
+        "width": 32,
+        "height": 22,
+        "right": 147,
+        "bottom": 42.5
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": "div.impeccable-overlay.impeccable-banner",
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase.is-active",
+      "text": "",
+      "data": {
+        "go": "map"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 147,
+        "y": 20.5,
+        "width": 32,
+        "height": 22,
+        "right": 179,
+        "bottom": 42.5
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": "div.impeccable-overlay.impeccable-banner",
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase",
+      "text": "",
+      "data": {
+        "go": "lab"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 179,
+        "y": 20.5,
+        "width": 32,
+        "height": 22,
+        "right": 211,
+        "bottom": 42.5
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": "div.impeccable-overlay.impeccable-banner",
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase",
+      "text": "",
+      "data": {
+        "go": "collection"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 211,
+        "y": 20.5,
+        "width": 32,
+        "height": 22,
+        "right": 243,
+        "bottom": 42.5
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": "div.impeccable-overlay.impeccable-banner",
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase",
+      "text": "",
+      "data": {
+        "phaseOnly": "battle"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 243,
+        "y": 20.5,
+        "width": 32,
+        "height": 22,
+        "right": 275,
+        "bottom": 42.5
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": "div.impeccable-overlay.impeccable-banner",
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button#sound-toggle.icon-button.is-off",
+      "text": "静",
+      "data": {},
+      "ariaLabel": "切换声音",
+      "rect": {
+        "x": 349,
+        "y": 16,
+        "width": 31,
+        "height": 31,
+        "right": 380,
+        "bottom": 47
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": "div.impeccable-overlay.impeccable-banner",
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "11px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "故事远征",
+      "data": {
+        "mapMode": "story"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 16,
+        "y": 74,
+        "width": 119,
+        "height": 44,
+        "right": 135,
+        "bottom": 118
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "14px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "自由对战",
+      "data": {
+        "mapMode": "free"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 141,
+        "y": 74,
+        "width": 119,
+        "height": 44,
+        "right": 260,
+        "bottom": 118
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "14px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "select#scene-time",
+      "text": "随本地时间\n白天\n夜晚",
+      "data": {},
+      "ariaLabel": "比赛场景时段",
+      "rect": {
+        "x": 271,
+        "y": 76,
+        "width": 98,
+        "height": 40,
+        "right": 369,
+        "bottom": 116
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "select#mission-select",
+      "text": "1. 它还会转 · 已完成\n2. 罗彻的最后通牒 · 可挑战\n3. 修理铺的试盘 · 未开放\n4. 一块地面，两种答案 · 未开放\n5. 没有厂牌的参赛者 · 未开放\n6. 他也换了零件 · 未开放\n7. 断柱之间 · 未开放\n8. 摘下徽章的一局 · 未开放\n9. 把旧赛册摊开 · 未开放\n10. 回声，对阵黑曜 · 未开放",
+      "data": {},
+      "ariaLabel": "选择远征任务",
+      "rect": {
+        "x": 72,
+        "y": 360,
+        "width": 284,
+        "height": 40,
+        "right": 356,
+        "bottom": 400
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "13px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.journey-link",
+      "text": "改装",
+      "data": {
+        "go": "assembly"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 183,
+        "y": 578.859375,
+        "width": 48,
+        "height": 40,
+        "right": 231,
+        "bottom": 618.859375
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "13px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.journey-link",
+      "text": "测试",
+      "data": {
+        "go": "lab"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 239,
+        "y": 578.859375,
+        "width": 48,
+        "height": 40,
+        "right": 287,
+        "bottom": 618.859375
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "13px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.journey-link",
+      "text": "换陀螺",
+      "data": {
+        "go": "collection"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 295,
+        "y": 578.859375,
+        "width": 61,
+        "height": 40,
+        "right": 356,
+        "bottom": 618.859375
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "13px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "summary",
+      "text": "约战缘由 · 罗彻",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 34,
+        "y": 661.046875,
+        "width": 322,
+        "height": 42.390625,
+        "right": 356,
+        "bottom": 703.4375
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "14px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "summary",
+      "text": "对手情报与改装建议",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 34,
+        "y": 716.4375,
+        "width": 322,
+        "height": 42.390625,
+        "right": 356,
+        "bottom": 758.828125
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "14px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "summary",
+      "text": "这次配置与上次出战相比",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 34,
+        "y": 771.828125,
+        "width": 322,
+        "height": 40,
+        "right": 356,
+        "bottom": 811.828125
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": "button#start-battle.button.primary",
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "13px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "summary",
+      "text": "同行人的回信 · 0 / 5",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 34,
+        "y": 824.828125,
+        "width": 322,
+        "height": 42.390625,
+        "right": 356,
+        "bottom": 867.21875
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "14px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "summary",
+      "text": "旅途纪念与战历 · 0 场记录",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 34,
+        "y": 880.21875,
+        "width": 322,
+        "height": 42.390625,
+        "right": 356,
+        "bottom": 922.609375
+      },
+      "inViewport": false,
+      "hitAtCenter": false,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "14px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button#start-battle.button.primary",
+      "text": "挑战罗彻 →",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 16,
+        "y": 774,
+        "width": 358,
+        "height": 54,
+        "right": 374,
+        "bottom": 828
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "11px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "‹",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 4.78125,
+        "y": -6.21875,
+        "width": 16.0625,
+        "height": 20,
+        "right": 20.84375,
+        "bottom": 13.78125
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": "div.impeccable-overlay.impeccable-banner",
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "11px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "›",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 20.84375,
+        "y": -6.21875,
+        "width": 12.0625,
+        "height": 20,
+        "right": 32.90625,
+        "bottom": 13.78125
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": "div.impeccable-overlay.impeccable-banner",
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "11px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "‹",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 294,
+        "y": -3,
+        "width": 16.0625,
+        "height": 20,
+        "right": 310.0625,
+        "bottom": 17
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": "div.impeccable-overlay.impeccable-banner",
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "11px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "›",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 310.0625,
+        "y": -3,
+        "width": 12.0625,
+        "height": 20,
+        "right": 322.125,
+        "bottom": 17
+      },
+      "inViewport": true,
+      "hitAtCenter": false,
+      "centerCoveredBy": "div.impeccable-overlay.impeccable-banner",
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "11px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "◉",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 337.640625,
+        "y": 6.5,
+        "width": 21,
+        "height": 22,
+        "right": 358.640625,
+        "bottom": 28.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "16px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "×",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 360.640625,
+        "y": 6,
+        "width": 21.359375,
+        "height": 23,
+        "right": 382,
+        "bottom": 29
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "18px",
+      "tabIndex": 0
+    }
+  ],
+  "scrollContainers": [
+    {
+      "selector": "section#campaign-panel.journey-panel",
+      "rect": {
+        "x": 16,
+        "y": 291.609375,
+        "width": 358,
+        "height": 464.390625,
+        "right": 374,
+        "bottom": 756
+      },
+      "scrollTop": 0,
+      "clientHeight": 460,
+      "scrollHeight": 645
+    }
+  ]
+}

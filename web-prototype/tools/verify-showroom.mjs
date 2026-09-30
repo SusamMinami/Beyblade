@@ -4,7 +4,7 @@ import { mkdir } from "node:fs/promises";
 import { resolve } from "node:path";
 import { normalizeShowroom, equipDisplayStage } from "../src/core/showroom-state.js";
 import { windParameters } from "../src/core/lab-state.js";
-const out = resolve("../.impeccable/review/showroom");
+const out = resolve(process.env.QA_OUTPUT_DIR ?? "../.impeccable/review/showroom");
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? "C:/Program Files/Google/Chrome/Application/chrome.exe", headless: true });
 const context = await browser.newContext({ viewport: { width: 1440, height: 1000 }, reducedMotion: "no-preference" });

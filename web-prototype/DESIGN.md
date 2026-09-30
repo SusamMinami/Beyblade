@@ -192,8 +192,11 @@ available for direct pointer interaction.
 **The Visible Save Rule.** Scroll only the lower tool console; keep Save outside
 it in the fixed footer. Tool and room changes stay on the assembly page.
 
-The tool console is inset 16px, 64px above the bottom, with a 36% maximum height;
-the footer sits 12px above the bottom. At viewport heights up to 740px, tool modes
+The tool console is inset 16px, 110px above the bottom, with a 36% maximum height;
+the footer sits 12px above the bottom. Its full-width draft status explains
+discard-on-leave; the next row holds return-to-preparation and Save, both at least
+44px high. Top mode places its two footer actions side by side below the three
+part cards. At viewport heights up to 740px, tool modes
 hide the loadout title, move the toolbar/header/focus controls to 12px/58px/104px
 and reduce the console to 32% maximum height. Top assembly retains its header.
 At widths up to 360px, toolbar insets contract to 10px and button horizontal
@@ -201,9 +204,20 @@ padding to 7px. Scrolling reveals trial/help without moving Save offscreen.
 
 The lab keeps a 9:16 composition centered within the available viewport.
 Controls scale in container units. Title, currencies and experience occupy the
-top; utility controls follow the right edge. The active specimen and readout
+top; utility controls form a two-by-two group at the upper right, separate from
+the wind toolbar. The minimal room has no physical monitor, so real measured
+values remain visible in HTML in both front and overhead views. Leave at least
+136px at the right of the values for utility labels on short screens.
+Minimal-room title, utility and XP text use dark ink; utility and XP labels have
+a 12px floor. The active specimen and readout
 remain central, with testing, three configurations and five navigation entries
 at the bottom.
+
+Header navigation keeps visible Chinese labels and accessible names, with
+44px targets even in the narrow portrait shell. At shell widths up to 360px,
+the brand yields its space to these controls. The Battle action returns to the
+current story preparation or active training step instead of being an inert
+phase indicator. This does not start a battle without its launch preparation.
 
 Collection uses the same centered 9:16 shell. Its close-inspection toolbar wraps
 above the loadout/details area on narrow screens; part buttons and the return
@@ -806,7 +820,7 @@ documentation-only merge.
 
 ### Staged training, build comparison and chapter replies
 Implemented in Web on 2026-09-17 within the existing aesthetic; see the
-[second-round flow scope](../docs/game_flow_round2.md). These components extend
+[consolidated flow scope](../docs/game_flow_optimization.md). These components extend
 the incumbent paper guidance, assembly and campaign reports, with no new raster,
 world palette, physics, economy or progression authority.
 

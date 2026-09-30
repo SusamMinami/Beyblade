@@ -5,7 +5,7 @@ import { runMaintenanceTrial } from "../core/maintenance-trial.js";
 import { LAUNCHER_PARTS, LAUNCHER_SLOTS, normalizeLauncher, getLauncherPart,
   launcherKey } from "../core/launcher-state.js";
 import { launcherLaunchState } from "../core/launcher-physics.js";
-import { getPartAccess, purchasePart } from "../core/progression.js";
+import { getPartAccess, purchasePart, tutorialAfterEquip } from "../core/progression.js";
 import { paintLauncher } from "../render/launcher-model.js";
 import "./maintenance.css";
 
@@ -64,6 +64,7 @@ export class MaintenanceScreen {
       </div>
         <footer class="maintenance-footer">
           <span class="maintenance-draft">尚未保存</span>
+          <button data-maintenance="continue"></button>
           <button class="maintenance-save" data-maintenance="save">保存保养</button>
         </footer>`;
     this.sceneTools = document.createElement("div");
@@ -293,7 +294,9 @@ export class MaintenanceScreen {
     if (launcherKey(this.launcherDraft) !== launcherKey(this.launcherInitial)) changes.push("装备未保存");
     if (JSON.stringify(this.initial) !== JSON.stringify(this.draft)) changes.push("保养未保存");
     if (launcherKey(this.preview) !== launcherKey(this.launcherDraft)) changes.push("仅预览 · 未装入");
-    this.root.querySelector(".maintenance-draft").textContent = changes.join("；") || "与已保存一致";
+    this.root.querySelector(".maintenance-draft").textContent = changes.length
+      ? `${changes.join("；")} · 离开组装将放弃` : "与已保存一致";
+    this.root.querySelector('[data-maintenance="continue"]').textContent = this.app.preparationLabel;
     if (this.trialDraft && this.trialDraft !== JSON.stringify([this.draft, this.preview]))
       this.root.querySelector(".maintenance-trial").hidden = true;
     if (this.outfit) this.refreshOutfit();
@@ -302,6 +305,7 @@ export class MaintenanceScreen {
   feedback(text) { this.root.querySelector(".maintenance-feedback").textContent = text; }
 
   action(action) {
+    if (action === "continue") return this.app.continuePreparation();
     if (action === "retry") return this.selectTarget(this.outfit ? "outfit" : this.kind);
     if (action === "red") {
       this.launcherDraft.colors = { shell: "#34393d", accent: "#b83722", grip: "#202733" };
@@ -372,12 +376,16 @@ export class MaintenanceScreen {
       this.stage.cancelGesture(false);
       const old = this.app.state.maintenance;
       const oldLauncher = this.app.state.launcher;
+      const oldTutorial = this.app.state.tutorial;
       this.app.state.maintenance = normalizeMaintenance(this.draft);
       this.app.state.launcher = normalizeLauncher(this.launcherDraft, this.app.state.ownedPartIds);
+      this.app.state.tutorial = tutorialAfterEquip(oldTutorial, this.app.state.ownedPartIds,
+        this.app.state.build, this.app.state.launcher);
       try { this.app._save(); }
       catch {
         this.app.state.maintenance = old;
         this.app.state.launcher = oldLauncher;
+        this.app.state.tutorial = oldTutorial;
         this.feedback("保存失败，草稿仍在。请检查浏览器存储空间后重试。");
         return;
       }
@@ -385,6 +393,7 @@ export class MaintenanceScreen {
       this.launcherInitial = structuredClone(this.launcherDraft);
       this.feedback("已保存，下次发射生效。");
       this.app._renderPersistentState();
+      this.app._renderTutorial();
       this.refresh();
     }
   }

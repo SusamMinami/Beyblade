@@ -1,0 +1,25 @@
+{
+  "checks": [
+    "New players start in the incumbent minimal space",
+    "Chapter one recommends the authored childhood desk",
+    "Chapter two recommends precision",
+    "Original assembly uses the same laboratory scene and renderer",
+    "Original top remains directly selectable",
+    "Original three-part picker is retained",
+    "Original DIY editor still opens from equipped part",
+    "Existing loadout carousel still commits its real loadout",
+    "Internal top/launcher switches retain drafts without committing",
+    "Advanced lab is locked below existing LV.2",
+    "Room changes retain equipment drafts and set a manual preference",
+    "Failed save retains the draft and rolls back live equipment",
+    "Save commits in the original assembly without navigation",
+    "Room and equipment preferences survive reload",
+    "Story upgrade reaches the unified assembly through the existing XP floor",
+    "A veteran can return to minimal and keep that choice",
+    "Save remains reachable at 320 by 568",
+    "Rapid navigation returns canvas, scene and interaction ownership to assembly",
+    "Testing restores laboratory origin and specimen after assembly",
+    "No browser/shader errors: "
+  ],
+  "errors": []
+}

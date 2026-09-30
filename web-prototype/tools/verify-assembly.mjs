@@ -4,7 +4,7 @@ import { mkdir, writeFile } from "node:fs/promises";
 import { syncHomeProgression } from "../src/core/home-progression.js";
 import { CAMPAIGN_MISSIONS } from "../src/data/campaign.js";
 
-const out = "../.impeccable/review/assembly-merge";
+const out = process.env.QA_OUTPUT_DIR ?? "../.impeccable/review/assembly-merge";
 await mkdir(out, { recursive: true });
 const checks = [], errors = [];
 const check = (value, label) => { assert.ok(value, label); checks.push(label); };

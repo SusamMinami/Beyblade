@@ -1,0 +1,4413 @@
+{
+  "assessment": "B",
+  "mode": "overlay",
+  "base": "http://127.0.0.1:5173",
+  "capturedAt": "2026-09-30T14:02:08.626Z",
+  "browser": "154.0.8037.59",
+  "headless": true,
+  "userProfileUsed": false,
+  "sourceIntercepted": false,
+  "targetSha256Before": "59d026247f62d84ad88fc9525bb6161a4c97f38325cbe9f33ec6dbc71bea07ac",
+  "seed": {
+    "version": 2,
+    "coins": 700,
+    "sound": false,
+    "arenaId": "standard",
+    "tutorial": {
+      "completed": true,
+      "stage": "complete",
+      "firstRewardClaimed": true
+    },
+    "campaign": {
+      "completed": [
+        "first-echo"
+      ],
+      "mastered": [],
+      "journal": []
+    }
+  },
+  "pages": [
+    {
+      "name": "overlay-assembly",
+      "events": [
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "startGroup",
+          "text": "%c[impeccable] 98 anti-patterns found color: oklch(84% 0.19 80.46); font-weight: bold",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3491,
+            "column": 12,
+            "lineNumber": 3491,
+            "columnNumber": 12
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cclipped-overflow-container%c div.game-shell clips a positioned child color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 3.4:1 (need 4.5:1) — text #ffffff on #238cff color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"S/C\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"SPIN/CORE\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#238cff) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 3.2:1 (need 4.5:1) — text #8a9095 on #fffcf6 color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"赏金\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 3.2:1 (need 4.5:1) — text #f45b2a on #fffcf6 color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"YOU\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clayout-transition%c transition: width color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"待发射\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"暂停\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"AI\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clayout-transition%c transition: width color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"待发射\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"质量\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"惯量\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"对称延展\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"左右\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"3 边\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"4 边\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"6 边\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cradial-spotlight-glow%c radial-gradient spotlight glow \"stage-vignette\" (#238cff a0.12 → transparent) on 390x785 surface color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"ASSEMBLY / 01\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"DIRECT LAUNCH\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"拖模型调倾角 · 拖箭头末端圆点调方向与力度\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"力度\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"86%\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"方向\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"0°\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"倾角\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"0°\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cgpt-thin-border-wide-shadow%c 1px border + 28px shadow blur color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"方向微调\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#238cff) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#55dac0) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cgpt-thin-border-wide-shadow%c 1px border + 18px shadow blur color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 6px functional text \"控制影响\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctext-overflow%c span overflows its container by 99px color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 1.1:1 (need 4.5:1) — text #12151a on #090d0f color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctext-overflow%c b overflows its container by 247px color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctext-overflow%c span overflows its container by 315px color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cgpt-thin-border-wide-shadow%c 1px border + 60px shadow blur color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"BATTLE COMPLETE\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"本局赏金\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"金币已到账\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cclipped-overflow-container%c section.workspace clips a positioned child color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"01 / 03\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cclipped-overflow-container%c label clips a positioned child color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cclipped-overflow-container%c label clips a positioned child color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"实时性能谱\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"质量 1.22（平衡单位）\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctiny-text%c 9px body text color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cwide-tracking%c letter-spacing: 0.08em on body text color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 3.4:1 (need 4.5:1) — text #ffffff on #238cff color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"均衡 · 标准地面\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"中等摩擦与柔和回中心力，适合验证基础移动、碰撞和停转。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#f1b84b) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"高速 · 低摩擦金属\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"低摩擦、高回弹、长续航，碰撞后滑移与撞飞风险明显。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"策略 · 低摩擦金属\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"中央金属、外圈橡胶与边缘减速带组合，验证路线选择。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"童年 · 标准地面\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"雨后亮着暖灯的小店、湿润街道与放学后的玩具盘。沿用标准碗的均衡材料与回中心力。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"障碍 · 标准地面\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"方形石台与四座实体石墩。绕开障碍抢占路线，越过边缘将出界。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cgpt-thin-border-wide-shadow%c 1px border + 16px shadow blur color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"PART UNLOCK\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"解锁后余额\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"大小\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"高度\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"轮廓\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"拖动模型手柄直接塑形\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"材料\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"原装材料\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10.14px functional text \"TOP TEST LAB\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Purple/violet neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Purple/violet neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"实验室等级\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.41px functional text \"0 / 120\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.41px functional text \"改装保养\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.41px functional text \"测试记录\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.41px functional text \"实验室设置\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.41px functional text \"帮助\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"载入仪器与当前陀螺\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"近景\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"俯视\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"风场\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"风速\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8.19px functional text \"0.0 m/s\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"流向\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8.19px functional text \"0°\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctiny-text%c 7.41px body text color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"演示转速 RPM\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"倾斜 °\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"0.0\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"偏移\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"0.000\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"主力\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 6.825px functional text \"配置估算 · 游戏单位\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cgpt-thin-border-wide-shadow%c 1px border + 48px shadow blur color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ckicker-above-heading%c kicker \"BATTLE COMPLETE\" above h2 \"对战结束\" color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cside-tab%c .arena-card::before — absolute 3px pseudo-element stripe (left: 0) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clayout-transition%c transition: width color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#55dac0) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cradial-halo%c radial-gradient halo (#19312d → transparent) on dark page color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%crepeating-stripes-gradient%c repeating-gradient decorative stripes color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ccodex-grid-background%c two-axis grid-line gradient background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctext-occlusion%c label \"当前场景\" is 100% covered by overlapping text (summary) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "endGroup",
+          "text": "console.groupEnd",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3501,
+            "column": 12,
+            "lineNumber": 3501,
+            "columnNumber": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "overlay-journey",
+      "events": [
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "startGroup",
+          "text": "%c[impeccable] 75 anti-patterns found color: oklch(84% 0.19 80.46); font-weight: bold",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3491,
+            "column": 12,
+            "lineNumber": 3491,
+            "columnNumber": 12
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cclipped-overflow-container%c div.game-shell clips a positioned child color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 3.4:1 (need 4.5:1) — text #ffffff on #238cff color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"S/C\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"SPIN/CORE\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#238cff) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 3.2:1 (need 4.5:1) — text #8a9095 on #fffcf6 color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"赏金\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 3.2:1 (need 4.5:1) — text #f45b2a on #fffcf6 color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"YOU\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clayout-transition%c transition: width color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"待发射\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"暂停\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"AI\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clayout-transition%c transition: width color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"待发射\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"质量\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"惯量\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"对称延展\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"左右\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"3 边\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"4 边\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"6 边\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cradial-spotlight-glow%c radial-gradient spotlight glow \"stage-vignette\" (#238cff a0.12 → transparent) on 390x777 surface color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"ARENA / 02\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"DIRECT LAUNCH\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"拖模型调倾角 · 拖箭头末端圆点调方向与力度\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"力度\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"86%\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"方向\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"0°\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"倾角\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"0°\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cgpt-thin-border-wide-shadow%c 1px border + 28px shadow blur color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"方向微调\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#238cff) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#55dac0) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cgpt-thin-border-wide-shadow%c 1px border + 18px shadow blur color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 6px functional text \"控制影响\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctext-overflow%c span overflows its container by 99px color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 1.1:1 (need 4.5:1) — text #12151a on #090d0f color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctext-overflow%c b overflows its container by 247px color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctext-overflow%c span overflows its container by 315px color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cgpt-thin-border-wide-shadow%c 1px border + 60px shadow blur color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"BATTLE COMPLETE\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"本局赏金\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"金币已到账\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cclipped-overflow-container%c section.workspace clips a positioned child color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"01 / 03\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cclipped-overflow-container%c label clips a positioned child color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cclipped-overflow-container%c label clips a positioned child color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"实时性能谱\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"质量 1.22（平衡单位）\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctiny-text%c 9px body text color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cwide-tracking%c letter-spacing: 0.08em on body text color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"均衡 · 标准地面\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"中等摩擦与柔和回中心力，适合验证基础移动、碰撞和停转。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#f1b84b) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"左右滑动\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"高速 · 低摩擦金属\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"低摩擦、高回弹、长续航，碰撞后滑移与撞飞风险明显。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"左右滑动\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"策略 · 低摩擦金属\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"中央金属、外圈橡胶与边缘减速带组合，验证路线选择。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"左右滑动\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"童年 · 标准地面\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"雨后亮着暖灯的小店、湿润街道与放学后的玩具盘。沿用标准碗的均衡材料与回中心力。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"左右滑动\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"障碍 · 标准地面\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"方形石台与四座实体石墩。绕开障碍抢占路线，越过边缘将出界。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"左右滑动\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 3.4:1 (need 4.5:1) — text #ffffff on #238cff color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"PART UNLOCK\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"解锁后余额\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"大小\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"高度\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"轮廓\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"拖动模型手柄直接塑形\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"材料\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"原装材料\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ckicker-above-heading%c kicker \"BATTLE COMPLETE\" above h2 \"对战结束\" color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cside-tab%c .arena-card::before — absolute 3px pseudo-element stripe (left: 0) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clayout-transition%c transition: width color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#55dac0) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cradial-halo%c radial-gradient halo (#19312d → transparent) on dark page color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ccodex-grid-background%c two-axis grid-line gradient background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctext-occlusion%c p \"极轴联队要用统一规格赛替代街区自制赛。先让大家相\" is 100% covered by overlapping text (summary) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "endGroup",
+          "text": "console.groupEnd",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3501,
+            "column": 12,
+            "lineNumber": 3501,
+            "columnNumber": 12
+          }
+        }
+      ]
+    },
+    {
+      "name": "overlay-lab",
+      "events": [
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "startGroup",
+          "text": "%c[impeccable] 113 anti-patterns found color: oklch(84% 0.19 80.46); font-weight: bold",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3491,
+            "column": 12,
+            "lineNumber": 3491,
+            "columnNumber": 12
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cclipped-overflow-container%c div.game-shell clips a positioned child color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#55dac0) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"S/C\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"SPIN/CORE\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#55dac0) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"赏金\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"YOU\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clayout-transition%c transition: width color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"待发射\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"暂停\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"AI\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clayout-transition%c transition: width color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"待发射\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"质量\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"惯量\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"对称延展\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"左右\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"3 边\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"4 边\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"6 边\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"TOP TEST LAB\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"DIRECT LAUNCH\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"拖模型调倾角 · 拖箭头末端圆点调方向与力度\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"力度\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"86%\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"方向\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"0°\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"倾角\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"0°\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cgpt-thin-border-wide-shadow%c 1px border + 28px shadow blur color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"方向微调\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#55dac0) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#55dac0) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cgpt-thin-border-wide-shadow%c 1px border + 18px shadow blur color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 6px functional text \"控制影响\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cgpt-thin-border-wide-shadow%c 1px border + 60px shadow blur color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"BATTLE COMPLETE\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"本局赏金\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"金币已到账\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan gradient background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"01 / 03\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cclipped-overflow-container%c label clips a positioned child color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cclipped-overflow-container%c label clips a positioned child color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"实时性能谱\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"质量 1.22（平衡单位）\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctiny-text%c 9px body text color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cwide-tracking%c letter-spacing: 0.08em on body text color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"均衡 · 标准地面\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"中等摩擦与柔和回中心力，适合验证基础移动、碰撞和停转。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#f1b84b) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"高速 · 低摩擦金属\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"低摩擦、高回弹、长续航，碰撞后滑移与撞飞风险明显。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"策略 · 低摩擦金属\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"中央金属、外圈橡胶与边缘减速带组合，验证路线选择。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"童年 · 标准地面\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"雨后亮着暖灯的小店、湿润街道与放学后的玩具盘。沿用标准碗的均衡材料与回中心力。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Purple/violet neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"障碍 · 标准地面\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9px functional text \"方形石台与四座实体石墩。绕开障碍抢占路线，越过边缘将出界。\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"PART UNLOCK\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10px functional text \"解锁后余额\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"大小\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"高度\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"轮廓\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7px functional text \"拖动模型手柄直接塑形\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"材料\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8px functional text \"原装材料\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 2.2:1 (need 4.5:1) — text #ffffff on #a2b1b2 color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 2.1:1 (need 4.5:1) — text #f0f8f7 on #a2b1b2 color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 10.14px functional text \"TOP TEST LAB\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"700\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Purple/violet neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Purple/violet neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"实验室等级\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 2.1:1 (need 4.5:1) — text #effaf8 on #a2b1b2 color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.41px functional text \"0 / 120\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 2.1:1 (need 4.5:1) — text #f6faf8 on #a2b1b2 color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.41px functional text \"改装保养\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 2.1:1 (need 4.5:1) — text #f6faf8 on #a2b1b2 color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.41px functional text \"测试记录\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 2.1:1 (need 4.5:1) — text #f6faf8 on #a2b1b2 color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.41px functional text \"实验室设置\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clow-contrast%c 2.1:1 (need 4.5:1) — text #f6faf8 on #a2b1b2 color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.41px functional text \"帮助\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctext-occlusion%c small \"帮助\" is 100% covered by an opaque element (button) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"载入仪器与当前陀螺\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"近景\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"俯视\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"风场\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"0.0 m/s · 0°\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"风速\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8.19px functional text \"0.0 m/s\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"流向\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cai-color-palette%c Cyan neon text on dark background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8.19px functional text \"0°\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ctiny-text%c 7.41px body text color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8.19px functional text \"总质量\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 6.63px functional text \"平衡单位\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 8.19px functional text \"转动惯量\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 6.63px functional text \"惯量单位\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"演示转速 RPM\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"倾斜 °\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"0.0\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"偏移\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 9.36px functional text \"0.000\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 7.8px functional text \"主力\" (below 11px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cundersized-ui-text%c 6.825px functional text \"配置估算 · 游戏单位\" (below 10px floor) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#60f0d5) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cgpt-thin-border-wide-shadow%c 1px border + 48px shadow blur color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ckicker-above-heading%c kicker \"BATTLE COMPLETE\" above h2 \"对战结束\" color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cside-tab%c .arena-card::before — absolute 3px pseudo-element stripe (left: 0) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%clayout-transition%c transition: width color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cdark-glow%c Zero-offset box-shadow glow (#55dac0) color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cradial-halo%c radial-gradient halo (#19312d → transparent) on dark page color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%ccodex-grid-background%c two-axis grid-line gradient background color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cnested-cards%c Card inside card color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cnested-cards%c Card inside card color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%cnested-cards%c Card inside card color: oklch(84% 0.19 80.46); font-weight: bold color: inherit JSHandle@node",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3497,
+            "column": 16,
+            "lineNumber": 3497,
+            "columnNumber": 16
+          }
+        },
+        {
+          "kind": "console",
+          "type": "endGroup",
+          "text": "console.groupEnd",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3501,
+            "column": 12,
+            "lineNumber": 3501,
+            "columnNumber": 12
+          }
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "route": "assembly",
+      "scriptInjected": true,
+      "scripts": [
+        "http://localhost:8400/detect.js"
+      ],
+      "detectorConsole": [
+        {
+          "kind": "console",
+          "type": "startGroup",
+          "text": "%c[impeccable] 98 anti-patterns found color: oklch(84% 0.19 80.46); font-weight: bold",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3491,
+            "column": 12,
+            "lineNumber": 3491,
+            "columnNumber": 12
+          }
+        }
+      ]
+    },
+    {
+      "route": "journey",
+      "scriptInjected": true,
+      "scripts": [
+        "http://localhost:8400/detect.js"
+      ],
+      "detectorConsole": [
+        {
+          "kind": "console",
+          "type": "startGroup",
+          "text": "%c[impeccable] 75 anti-patterns found color: oklch(84% 0.19 80.46); font-weight: bold",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3491,
+            "column": 12,
+            "lineNumber": 3491,
+            "columnNumber": 12
+          }
+        }
+      ]
+    },
+    {
+      "route": "lab",
+      "scriptInjected": true,
+      "scripts": [
+        "http://localhost:8400/detect.js"
+      ],
+      "detectorConsole": [
+        {
+          "kind": "console",
+          "type": "startGroup",
+          "text": "%c[impeccable] 113 anti-patterns found color: oklch(84% 0.19 80.46); font-weight: bold",
+          "location": {
+            "url": "http://localhost:8400/detect.js",
+            "line": 3491,
+            "column": 12,
+            "lineNumber": 3491,
+            "columnNumber": 12
+          }
+        }
+      ]
+    }
+  ],
+  "errors": [],
+  "liveServerPort": 8400,
+  "humanVisibleTab": false,
+  "presentationReason": "Headless isolated Chrome, no browser presentation tool exposed",
+  "targetSha256After": "59d026247f62d84ad88fc9525bb6161a4c97f38325cbe9f33ec6dbc71bea07ac",
+  "appSourceUnchanged": true
+}

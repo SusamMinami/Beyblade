@@ -1,0 +1,282 @@
+{
+  "checks": [
+    {
+      "label": "390,844: entire card center reaches its own control",
+      "pass": true
+    },
+    {
+      "label": "390,844: card label is not intercepted by footer",
+      "pass": true
+    },
+    {
+      "label": "390,844: entire card center reaches its own control",
+      "pass": true
+    },
+    {
+      "label": "390,844: card label is not intercepted by footer",
+      "pass": true
+    },
+    {
+      "label": "390,844: entire card center reaches its own control",
+      "pass": true
+    },
+    {
+      "label": "390,844: card label is not intercepted by footer",
+      "pass": true
+    },
+    {
+      "label": "390,844: preparation button reachable",
+      "pass": true
+    },
+    {
+      "label": "390,844: all navigation items have visible names and 44px targets",
+      "pass": true
+    },
+    {
+      "label": "320,568: entire card center reaches its own control",
+      "pass": true
+    },
+    {
+      "label": "320,568: card label is not intercepted by footer",
+      "pass": true
+    },
+    {
+      "label": "320,568: entire card center reaches its own control",
+      "pass": true
+    },
+    {
+      "label": "320,568: card label is not intercepted by footer",
+      "pass": true
+    },
+    {
+      "label": "320,568: entire card center reaches its own control",
+      "pass": true
+    },
+    {
+      "label": "320,568: card label is not intercepted by footer",
+      "pass": true
+    },
+    {
+      "label": "320,568: preparation button reachable",
+      "pass": true
+    },
+    {
+      "label": "320,568: all navigation items have visible names and 44px targets",
+      "pass": true
+    },
+    {
+      "label": "1440,1000: entire card center reaches its own control",
+      "pass": true
+    },
+    {
+      "label": "1440,1000: card label is not intercepted by footer",
+      "pass": true
+    },
+    {
+      "label": "1440,1000: entire card center reaches its own control",
+      "pass": true
+    },
+    {
+      "label": "1440,1000: card label is not intercepted by footer",
+      "pass": true
+    },
+    {
+      "label": "1440,1000: entire card center reaches its own control",
+      "pass": true
+    },
+    {
+      "label": "1440,1000: card label is not intercepted by footer",
+      "pass": true
+    },
+    {
+      "label": "1440,1000: preparation button reachable",
+      "pass": true
+    },
+    {
+      "label": "1440,1000: all navigation items have visible names and 44px targets",
+      "pass": true
+    },
+    {
+      "label": "Saving an unowned preview never advances teaching",
+      "pass": true
+    },
+    {
+      "label": "Failed purchase keeps balance and draft equipment",
+      "pass": true
+    },
+    {
+      "label": "180-coin purchase owns R03 but does not advance before Save",
+      "pass": true
+    },
+    {
+      "label": "Cancel retains ownership without claiming an equipped upgrade",
+      "pass": true
+    },
+    {
+      "label": "Failed Save rolls back teaching and live equipment, retaining draft",
+      "pass": true
+    },
+    {
+      "label": "Successful Save advances zero-balance trainee",
+      "pass": true
+    },
+    {
+      "label": "Saved tool offers the next training directly",
+      "pass": true
+    },
+    {
+      "label": "Tool returns directly to second training",
+      "pass": true
+    },
+    {
+      "label": "Training explains the actual launcher upgrade",
+      "pass": true
+    },
+    {
+      "label": "Launcher training copy survives reload",
+      "pass": true
+    },
+    {
+      "label": "Existing equipped-but-stuck save is recovered",
+      "pass": true
+    },
+    {
+      "label": "outfit/390,844: Save reachable",
+      "pass": true
+    },
+    {
+      "label": "outfit/390,844: return reachable",
+      "pass": true
+    },
+    {
+      "label": "outfit/320,568: Save reachable",
+      "pass": true
+    },
+    {
+      "label": "outfit/320,568: return reachable",
+      "pass": true
+    },
+    {
+      "label": "outfit/1440,1000: Save reachable",
+      "pass": true
+    },
+    {
+      "label": "outfit/1440,1000: return reachable",
+      "pass": true
+    },
+    {
+      "label": "Unsaved draft explains leaving behavior",
+      "pass": true
+    },
+    {
+      "label": "outfit: correct replay target retained",
+      "pass": true
+    },
+    {
+      "label": "care/390,844: Save reachable",
+      "pass": true
+    },
+    {
+      "label": "care/390,844: return reachable",
+      "pass": true
+    },
+    {
+      "label": "care/320,568: Save reachable",
+      "pass": true
+    },
+    {
+      "label": "care/320,568: return reachable",
+      "pass": true
+    },
+    {
+      "label": "care/1440,1000: Save reachable",
+      "pass": true
+    },
+    {
+      "label": "care/1440,1000: return reachable",
+      "pass": true
+    },
+    {
+      "label": "care: correct replay target retained",
+      "pass": true
+    },
+    {
+      "label": "Returning without Save discards color draft",
+      "pass": true
+    },
+    {
+      "label": "Header battle action returns to the same preparation target",
+      "pass": true
+    },
+    {
+      "label": "390,844: measured values do not overlap utility labels",
+      "pass": true
+    },
+    {
+      "label": "390,844: Help is not covered by Wind",
+      "pass": true
+    },
+    {
+      "label": "390,844: Help opens by pointer",
+      "pass": true
+    },
+    {
+      "label": "390,844: front view exposes real values",
+      "pass": true
+    },
+    {
+      "label": "320,568: measured values do not overlap utility labels",
+      "pass": true
+    },
+    {
+      "label": "320,568: Help is not covered by Wind",
+      "pass": true
+    },
+    {
+      "label": "320,568: Help opens by pointer",
+      "pass": true
+    },
+    {
+      "label": "320,568: front view exposes real values",
+      "pass": true
+    },
+    {
+      "label": "1440,1000: measured values do not overlap utility labels",
+      "pass": true
+    },
+    {
+      "label": "1440,1000: Help is not covered by Wind",
+      "pass": true
+    },
+    {
+      "label": "1440,1000: Help opens by pointer",
+      "pass": true
+    },
+    {
+      "label": "1440,1000: front view exposes real values",
+      "pass": true
+    },
+    {
+      "label": "Test values remain visible after notice expires",
+      "pass": true
+    },
+    {
+      "label": "Readout changes preserve canonical report and XP",
+      "pass": true
+    },
+    {
+      "label": "Returning camera to front retains minimal-room values",
+      "pass": true
+    },
+    {
+      "label": "Testing returns to same replay",
+      "pass": true
+    },
+    {
+      "label": "No browser exceptions: ",
+      "pass": true
+    }
+  ],
+  "errors": [],
+  "status": "PASS"
+}

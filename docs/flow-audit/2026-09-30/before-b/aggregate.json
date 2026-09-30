@@ -1,0 +1,36 @@
+{
+  "cliFindings": 0,
+  "browserElementGroups": 286,
+  "browserRuleOccurrences": 335,
+  "rules": {
+    "clipped-overflow-container": 11,
+    "low-contrast": 17,
+    "undersized-ui-text": 205,
+    "dark-glow": 17,
+    "layout-transition": 9,
+    "radial-spotlight-glow": 2,
+    "gpt-thin-border-wide-shadow": 12,
+    "text-overflow": 6,
+    "tiny-text": 5,
+    "wide-tracking": 3,
+    "ai-color-palette": 29,
+    "kicker-above-heading": 3,
+    "side-tab": 3,
+    "radial-halo": 3,
+    "repeating-stripes-gradient": 1,
+    "codex-grid-background": 3,
+    "text-occlusion": 3,
+    "nested-cards": 3
+  },
+  "browserErrors": {
+    "pageError": 0,
+    "consoleError": 0,
+    "httpError": 0,
+    "requestFailed": 0
+  },
+  "warnings": {
+    "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio": 26,
+    "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20": 18
+  },
+  "screenshots": 39
+}

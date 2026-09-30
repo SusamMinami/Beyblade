@@ -1,8 +1,10 @@
 # Working order
 
-- Start with `docs/README.md` for task-specific documentation. Dated July
-  handoffs and `.impeccable/review/` reports are historical evidence, not the
-  current backlog. Keep implementation status separate from design proposals.
+- Start with `docs/README.md` for task-specific documentation.
+  `docs/game_flow_optimization.md` tracks current flow work; `.impeccable/review/`
+  reports are scoped historical evidence, not the current backlog. Superseded
+  handoffs have been consolidated and deleted; see `docs/documentation_audit.md`.
+  Keep implementation status separate from design proposals.
 - User-confirmed on 2026-09-15: implement and validate gameplay, interface, and
   scene-art changes in `web-prototype/` first. Port accepted work to Godot later.
 - The more complete Web prototype is the active development target. Existing

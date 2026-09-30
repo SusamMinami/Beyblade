@@ -2,7 +2,7 @@ import { LabStage } from "../render/lab-stage.js";
 import { calculateBuild } from "../core/assembly-calculator.js";
 import { completeLabTest, LAB_MODES, labLevel, measureBuild, TERRAIN_OPTIONS, WIND_OPTIONS, WIND_PRESETS, windParameters } from "../core/lab-state.js";
 import { PARTS, PART_TYPE_META, getPart } from "../data/parts.js";
-import { getPartAccess, purchasePart } from "../core/progression.js";
+import { getPartAccess, purchasePart, tutorialAfterEquip } from "../core/progression.js";
 import { homeProgressLabel } from "../core/home-progression.js";
 import "./lab.css";
 
@@ -336,6 +336,7 @@ export class LabScreen {
 
   draw() {
     if (!this.stage || !this.build) return;
+    this.updateReadoutVisibility();
     const mode = LAB_MODES.find((item) => item.id === this.mode);
     const metrics = measureBuild(this.build, this.mode, this.lab.settings);
     this.root.querySelector(".lab-overhead-values").innerHTML = metrics.map((m) =>
@@ -446,7 +447,12 @@ export class LabScreen {
     this.root.querySelectorAll("[data-view]").forEach((button) => {
       if (button.tagName === "BUTTON") button.setAttribute("aria-pressed", String(button.dataset.view === view));
     });
-    this.root.querySelector(".lab-overhead-values").hidden = view !== "top";
+    this.updateReadoutVisibility();
+  }
+
+  updateReadoutVisibility() {
+    this.root.querySelector(".lab-overhead-values").hidden =
+      this.root.dataset.view !== "top" && this.lab.settings.room !== "minimal";
   }
 
   updateWindControls() {
@@ -501,7 +507,8 @@ export class LabScreen {
     const loadout = this.app.state.loadouts[this.app.state.activeLoadoutIndex];
     loadout.build[part.type] = part.id;
     this.app.state.build = loadout.build;
-    if (this.app.state.tutorial.stage === "buy_first_part") this.app.state.tutorial.stage = "second_battle";
+    this.app.state.tutorial = tutorialAfterEquip(this.app.state.tutorial, this.app.state.ownedPartIds,
+      this.app.state.build, this.app.state.launcher);
     try { this.app._save(); }
     catch {
       this.app.state = previous;

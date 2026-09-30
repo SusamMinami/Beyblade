@@ -1,0 +1,16 @@
+{
+  "date": "2026-09-30",
+  "markdown_files": 68,
+  "local_links": 496,
+  "findings": [],
+  "excluded": [
+    ".git",
+    ".godot",
+    ".trae",
+    ".venv",
+    "__pycache__",
+    "addons",
+    "dist",
+    "node_modules"
+  ]
+}

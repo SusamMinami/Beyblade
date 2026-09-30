@@ -1,0 +1,401 @@
+{
+  "url": "http://127.0.0.1:5173/#assembly",
+  "title": "SPIN/CORE · 战斗陀螺 Web 原型",
+  "viewport": {
+    "width": 390,
+    "height": 844
+  },
+  "documentSize": {
+    "width": 390,
+    "height": 844
+  },
+  "shell": {
+    "x": 0,
+    "y": 0,
+    "width": 390,
+    "height": 844,
+    "right": 390,
+    "bottom": 844
+  },
+  "text": "S/C\nSPIN/CORE\n赏金\n0700\n静\nLIVE PHYSICS 正在计算碰撞与转速 标准地面\n陀螺\n发射器\n保养\n极简空间\n‹\n01 / 03\n主力\n›\n性能实测与出战对比\n\n自由转时 17.0s · 等载荷局部损伤 38.4%\n\n评分依据与实测条件\n\n还没有这枚陀螺的出战记录。完成一场比赛后，这里会留下改装前后的参照。\n\n拖动环绕 · 轻点部件改装 · 横扫切换陀螺\n测试室\n故事远征 / 对战 →",
+  "controls": [
+    {
+      "selector": "button.brand",
+      "text": "S/C\nSPIN/CORE",
+      "data": {
+        "go": "home"
+      },
+      "ariaLabel": "返回主页",
+      "rect": {
+        "x": 10,
+        "y": 13,
+        "width": 96.765625,
+        "height": 29,
+        "right": 106.765625,
+        "bottom": 42
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "16px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase.is-active",
+      "text": "",
+      "data": {
+        "go": "assembly"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 115,
+        "y": 16.5,
+        "width": 32,
+        "height": 22,
+        "right": 147,
+        "bottom": 38.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase",
+      "text": "",
+      "data": {
+        "go": "map"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 147,
+        "y": 16.5,
+        "width": 32,
+        "height": 22,
+        "right": 179,
+        "bottom": 38.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase",
+      "text": "",
+      "data": {
+        "go": "lab"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 179,
+        "y": 16.5,
+        "width": 32,
+        "height": 22,
+        "right": 211,
+        "bottom": 38.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase",
+      "text": "",
+      "data": {
+        "go": "collection"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 211,
+        "y": 16.5,
+        "width": 32,
+        "height": 22,
+        "right": 243,
+        "bottom": 38.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.phase",
+      "text": "",
+      "data": {
+        "phaseOnly": "battle"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 243,
+        "y": 16.5,
+        "width": 32,
+        "height": 22,
+        "right": 275,
+        "bottom": 38.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "10px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button#sound-toggle.icon-button.is-off",
+      "text": "静",
+      "data": {},
+      "ariaLabel": "切换声音",
+      "rect": {
+        "x": 349,
+        "y": 12,
+        "width": 31,
+        "height": 31,
+        "right": 380,
+        "bottom": 43
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "11px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "陀螺",
+      "data": {
+        "workshop": "top"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 16,
+        "y": 141,
+        "width": 44,
+        "height": 38,
+        "right": 60,
+        "bottom": 179
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "发射器",
+      "data": {
+        "workshop": "outfit"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 64,
+        "y": 141,
+        "width": 56,
+        "height": 38,
+        "right": 120,
+        "bottom": 179
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button",
+      "text": "保养",
+      "data": {
+        "workshop": "care"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 124,
+        "y": 141,
+        "width": 44,
+        "height": 38,
+        "right": 168,
+        "bottom": 179
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "summary",
+      "text": "极简空间",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 293.296875,
+        "y": 141,
+        "width": 80.703125,
+        "height": 38,
+        "right": 374,
+        "bottom": 179
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button#previous-loadout",
+      "text": "‹",
+      "data": {},
+      "ariaLabel": "上一个陀螺",
+      "rect": {
+        "x": 91,
+        "y": 85,
+        "width": 44,
+        "height": 44,
+        "right": 135,
+        "bottom": 129
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "28px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button#next-loadout",
+      "text": "›",
+      "data": {},
+      "ariaLabel": "下一个陀螺",
+      "rect": {
+        "x": 255,
+        "y": 85,
+        "width": 44,
+        "height": 44,
+        "right": 299,
+        "bottom": 129
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "28px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "summary",
+      "text": "性能实测与出战对比",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 27,
+        "y": 187,
+        "width": 336,
+        "height": 40,
+        "right": 363,
+        "bottom": 227
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "13px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "summary",
+      "text": "评分依据与实测条件",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 27,
+        "y": 262.5,
+        "width": 336,
+        "height": 28,
+        "right": 363,
+        "bottom": 290.5
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "12px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button.button.ghost.open-lab-button",
+      "text": "测试室",
+      "data": {
+        "go": "lab"
+      },
+      "ariaLabel": null,
+      "rect": {
+        "x": 210.203125,
+        "y": 732,
+        "width": 163.796875,
+        "height": 44,
+        "right": 374,
+        "bottom": 776
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "11px",
+      "tabIndex": 0
+    },
+    {
+      "selector": "button#go-map.button.primary",
+      "text": "故事远征 / 对战 →",
+      "data": {},
+      "ariaLabel": null,
+      "rect": {
+        "x": 210.203125,
+        "y": 784,
+        "width": 163.796875,
+        "height": 44,
+        "right": 374,
+        "bottom": 828
+      },
+      "inViewport": true,
+      "hitAtCenter": true,
+      "centerCoveredBy": null,
+      "disabled": false,
+      "pointerEvents": "auto",
+      "fontSize": "11px",
+      "tabIndex": 0
+    }
+  ],
+  "scrollContainers": []
+}

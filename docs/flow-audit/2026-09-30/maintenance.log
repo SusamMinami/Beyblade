@@ -1,0 +1,132 @@
+
+> beyblade-web-prototype@0.1.0 verify:maintenance
+> node tools/verify-maintenance-physics.mjs && node tools/verify-maintenance.mjs
+
+{
+  "checks": [
+    "Useful lubrication recovers finite loss; excess adds drag",
+    "Exterior oil cannot improve the drive",
+    "Grip effects start at a force threshold and lose pull work",
+    "Wiping one face preserves oil on the opposite face",
+    "Save normalization bounds sample count",
+    "Nonfinite stored amounts are rejected",
+    "Oil belongs to the actual loadout and equipped part",
+    "Empty maintenance is deterministic and neutral",
+    "Normal launch uses lubrication",
+    "Explicit launch uses lubrication",
+    "Drive oil changes axial work without multiplying forward speed or opponent state",
+    "Oily tip reduces the solver's braking/traction and increases measured coast distance",
+    "Bench uses finite dynamics"
+  ],
+  "baseline": {
+    "initialSpin": 55.019575,
+    "finalSpin": 42.83338233941653,
+    "distance": 3.753376981945995,
+    "deviation": 0,
+    "launcher": {
+      "version": "launcher-v1",
+      "ratio": 1,
+      "effort": 0.86,
+      "inputBudget": 2209.2191855253177,
+      "inputWork": 2209.2191855253177,
+      "kinetic": 1347.0833667653783,
+      "residualEnergy": 211.90075432264382,
+      "springEnergy": 15.906378135782289,
+      "releaseLoss": 15.747314354424464,
+      "unusedEnergy": 0,
+      "transmissionLoss": 618.5813719470891,
+      "releaseMs": 160,
+      "initialSpin": 55.019575,
+      "tilt": 0,
+      "deviation": 0,
+      "limiting": "energy"
+    },
+    "traction": 1,
+    "efficiency": 0.72
+  },
+  "contact": {
+    "initialSpin": 55.019575,
+    "finalSpin": 43.51640762087421,
+    "distance": 7.221687999751177,
+    "deviation": 0,
+    "launcher": {
+      "version": "launcher-v1",
+      "ratio": 1,
+      "effort": 0.86,
+      "inputBudget": 2209.2191855253177,
+      "inputWork": 2209.2191855253177,
+      "kinetic": 1347.0833667653783,
+      "residualEnergy": 211.90075432264382,
+      "springEnergy": 15.906378135782289,
+      "releaseLoss": 15.747314354424464,
+      "unusedEnergy": 0,
+      "transmissionLoss": 618.5813719470891,
+      "releaseMs": 160,
+      "initialSpin": 55.019575,
+      "tilt": 0,
+      "deviation": 0,
+      "limiting": "energy"
+    },
+    "traction": 0.5287915066665925,
+    "efficiency": 0.72
+  },
+  "drive": {
+    "transmission": 6,
+    "efficiency": 0.8695364154832224,
+    "excess": 0,
+    "support": 0,
+    "pull": 0,
+    "contact": 0,
+    "traction": 1,
+    "groundSpin": 1
+  },
+  "excess": {
+    "transmission": 25,
+    "efficiency": 0.6599981423862563,
+    "excess": 1,
+    "support": 0,
+    "pull": 0,
+    "contact": 0,
+    "traction": 1,
+    "groundSpin": 1
+  }
+}
+{
+  "checks": [
+    "Visible transmission surface is directly reachable",
+    "Model strokes create oil at actual contact positions",
+    "Draft strokes do not mutate saved state",
+    "Actual wipe pointer removes local oil",
+    "Undo restores the preceding stroke",
+    "Visible transmission surface is directly reachable",
+    "Controlled trial shows solver measurements",
+    "Visible support surface is directly reachable",
+    "Visible tip surface is directly reachable",
+    "Saving returns to assembly",
+    "Save preserves spatial oil",
+    "Saved oil survives reload",
+    "Next battle uses drive and tip maintenance",
+    "Discarding a clean does not change saved oil",
+    "Care stays inside original assembly",
+    "Repeated entry releases maintenance GPU resources",
+    "Mobile has no horizontal overflow",
+    "Touch can reach exposed drive",
+    "Touch cancellation rolls back an interrupted stroke",
+    "Pinch/orbit does not accidentally paint",
+    "No browser or shader errors: "
+  ],
+  "memory": [
+    {
+      "geometries": 60,
+      "textures": 4
+    },
+    {
+      "geometries": 60,
+      "textures": 4
+    },
+    {
+      "geometries": 60,
+      "textures": 4
+    }
+  ]
+}

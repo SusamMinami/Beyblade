@@ -1,0 +1,1102 @@
+{
+  "assessment": "B",
+  "mode": "survey",
+  "base": "http://127.0.0.1:5173",
+  "capturedAt": "2026-09-30T14:01:12.780Z",
+  "browser": "154.0.8037.59",
+  "headless": true,
+  "userProfileUsed": false,
+  "sourceIntercepted": false,
+  "targetSha256Before": "59d026247f62d84ad88fc9525bb6161a4c97f38325cbe9f33ec6dbc71bea07ac",
+  "seed": {
+    "version": 2,
+    "coins": 700,
+    "sound": false,
+    "arenaId": "standard",
+    "tutorial": {
+      "completed": true,
+      "stage": "complete",
+      "firstRewardClaimed": true
+    },
+    "campaign": {
+      "completed": [
+        "first-echo"
+      ],
+      "mastered": [],
+      "journal": []
+    }
+  },
+  "pages": [
+    {
+      "name": "assembly-mobile",
+      "events": [
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        }
+      ]
+    },
+    {
+      "name": "journey-mobile",
+      "events": [
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        }
+      ]
+    },
+    {
+      "name": "lab-mobile",
+      "events": [
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        }
+      ]
+    },
+    {
+      "name": "assembly-desktop",
+      "events": [
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        }
+      ]
+    },
+    {
+      "name": "journey-desktop",
+      "events": [
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "sigmaRadians, 0.05, is too large and will clip, as it requested 25 samples when the maximum is set to 20",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/chunk-PBYUDW6A.js?v=778ac831",
+            "line": 32982,
+            "column": 14,
+            "lineNumber": 32982,
+            "columnNumber": 14
+          }
+        }
+      ]
+    },
+    {
+      "name": "lab-desktop",
+      "events": [
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connecting...",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 732,
+            "column": 8,
+            "lineNumber": 732,
+            "columnNumber": 8
+          }
+        },
+        {
+          "kind": "console",
+          "type": "debug",
+          "text": "[vite] connected.",
+          "location": {
+            "url": "http://127.0.0.1:5173/@vite/client",
+            "line": 826,
+            "column": 11,
+            "lineNumber": 826,
+            "columnNumber": 11
+          }
+        },
+        {
+          "kind": "console",
+          "type": "log",
+          "text": "%c * Tone.js v15.1.22 *  background: #000; color: #fff",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 9690,
+            "column": 10,
+            "lineNumber": 9690,
+            "columnNumber": 10
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 7610,
+            "column": 0,
+            "lineNumber": 7610,
+            "columnNumber": 0
+          }
+        },
+        {
+          "kind": "console",
+          "type": "warning",
+          "text": "The AudioContext was not allowed to start. It must be resumed (or created) after a user gesture on the page. https://developer.chrome.com/blog/autoplay/#web_audio",
+          "location": {
+            "url": "http://127.0.0.1:5173/node_modules/.vite/deps/tone.js?v=778ac831",
+            "line": 2867,
+            "column": 0,
+            "lineNumber": 2867,
+            "columnNumber": 0
+          }
+        }
+      ]
+    }
+  ],
+  "actions": [
+    {
+      "label": "mobile: assembly comparison opens",
+      "beforeUrl": "http://127.0.0.1:5173/#assembly",
+      "afterUrl": "http://127.0.0.1:5173/#assembly",
+      "status": "completed",
+      "result": true
+    },
+    {
+      "label": "mobile: assembly comparison closes",
+      "beforeUrl": "http://127.0.0.1:5173/#assembly",
+      "afterUrl": "http://127.0.0.1:5173/#assembly",
+      "status": "completed"
+    },
+    {
+      "label": "mobile: assembly outfit and save reachable",
+      "beforeUrl": "http://127.0.0.1:5173/#assembly",
+      "afterUrl": "http://127.0.0.1:5173/#assembly",
+      "status": "completed",
+      "result": {
+        "url": "http://127.0.0.1:5173/#assembly",
+        "saveText": "保存换装"
+      }
+    },
+    {
+      "label": "mobile: assembly care and save reachable",
+      "beforeUrl": "http://127.0.0.1:5173/#assembly",
+      "afterUrl": "http://127.0.0.1:5173/#assembly",
+      "status": "completed",
+      "result": {
+        "url": "http://127.0.0.1:5173/#assembly",
+        "saveText": "保存保养"
+      }
+    },
+    {
+      "label": "mobile: return top assembly",
+      "beforeUrl": "http://127.0.0.1:5173/#assembly",
+      "afterUrl": "http://127.0.0.1:5173/#assembly",
+      "status": "completed"
+    },
+    {
+      "label": "mobile: assembly CTA opens journey",
+      "beforeUrl": "http://127.0.0.1:5173/#assembly",
+      "afterUrl": "http://127.0.0.1:5173/#journey",
+      "status": "completed",
+      "result": {
+        "url": "http://127.0.0.1:5173/#journey",
+        "mission": "rival-arrives"
+      }
+    },
+    {
+      "label": "mobile: replay preparation to assembly and back after reload",
+      "beforeUrl": "http://127.0.0.1:5173/#journey",
+      "afterUrl": "http://127.0.0.1:5173/#journey",
+      "status": "completed",
+      "result": {
+        "returnLabel": "返回约战 · 阿砾 →",
+        "missionAfterReturn": "first-echo",
+        "expectedMission": "first-echo"
+      }
+    },
+    {
+      "label": "mobile: replay preparation to lab and back after reload",
+      "beforeUrl": "http://127.0.0.1:5173/#journey",
+      "afterUrl": "http://127.0.0.1:5173/#journey",
+      "status": "completed",
+      "result": {
+        "returnLabel": "返回约战\n阿砾",
+        "missionAfterReturn": "first-echo",
+        "expectedMission": "first-echo"
+      }
+    },
+    {
+      "label": "mobile: journey launch preparation and cancel",
+      "beforeUrl": "http://127.0.0.1:5173/#journey",
+      "afterUrl": "http://127.0.0.1:5173/#journey",
+      "status": "completed",
+      "result": {
+        "returnedTo": "http://127.0.0.1:5173/#journey",
+        "mission": "first-echo"
+      }
+    },
+    {
+      "label": "mobile: locked mission preview",
+      "beforeUrl": "http://127.0.0.1:5173/#journey",
+      "afterUrl": "http://127.0.0.1:5173/#journey",
+      "status": "completed",
+      "result": {
+        "startDisabled": true,
+        "lockText": "先完成「把旧赛册摊开」才能出战。现在仅预览。"
+      }
+    },
+    {
+      "label": "mobile: complete real lab test",
+      "beforeUrl": "http://127.0.0.1:5173/#lab",
+      "afterUrl": "http://127.0.0.1:5173/#lab",
+      "status": "completed",
+      "result": {
+        "records": 1,
+        "xp": 30
+      }
+    },
+    {
+      "label": "mobile: lab records open and Escape closes",
+      "beforeUrl": "http://127.0.0.1:5173/#lab",
+      "afterUrl": "http://127.0.0.1:5173/#lab",
+      "status": "completed",
+      "result": {
+        "dialogStillOpen": false
+      }
+    },
+    {
+      "label": "mobile: lab battle navigation",
+      "beforeUrl": "http://127.0.0.1:5173/#lab",
+      "afterUrl": "http://127.0.0.1:5173/#map",
+      "status": "completed",
+      "result": {
+        "url": "http://127.0.0.1:5173/#map"
+      }
+    },
+    {
+      "label": "desktop: assembly comparison opens",
+      "beforeUrl": "http://127.0.0.1:5173/#assembly",
+      "afterUrl": "http://127.0.0.1:5173/#assembly",
+      "status": "completed",
+      "result": true
+    },
+    {
+      "label": "desktop: assembly comparison closes",
+      "beforeUrl": "http://127.0.0.1:5173/#assembly",
+      "afterUrl": "http://127.0.0.1:5173/#assembly",
+      "status": "completed"
+    },
+    {
+      "label": "desktop: assembly outfit and save reachable",
+      "beforeUrl": "http://127.0.0.1:5173/#assembly",
+      "afterUrl": "http://127.0.0.1:5173/#assembly",
+      "status": "completed",
+      "result": {
+        "url": "http://127.0.0.1:5173/#assembly",
+        "saveText": "保存换装"
+      }
+    },
+    {
+      "label": "desktop: assembly care and save reachable",
+      "beforeUrl": "http://127.0.0.1:5173/#assembly",
+      "afterUrl": "http://127.0.0.1:5173/#assembly",
+      "status": "completed",
+      "result": {
+        "url": "http://127.0.0.1:5173/#assembly",
+        "saveText": "保存保养"
+      }
+    },
+    {
+      "label": "desktop: return top assembly",
+      "beforeUrl": "http://127.0.0.1:5173/#assembly",
+      "afterUrl": "http://127.0.0.1:5173/#assembly",
+      "status": "completed"
+    },
+    {
+      "label": "desktop: assembly CTA opens journey",
+      "beforeUrl": "http://127.0.0.1:5173/#assembly",
+      "afterUrl": "http://127.0.0.1:5173/#journey",
+      "status": "completed",
+      "result": {
+        "url": "http://127.0.0.1:5173/#journey",
+        "mission": "rival-arrives"
+      }
+    },
+    {
+      "label": "desktop: replay preparation to assembly and back after reload",
+      "beforeUrl": "http://127.0.0.1:5173/#journey",
+      "afterUrl": "http://127.0.0.1:5173/#journey",
+      "status": "completed",
+      "result": {
+        "returnLabel": "返回约战 · 阿砾 →",
+        "missionAfterReturn": "first-echo",
+        "expectedMission": "first-echo"
+      }
+    },
+    {
+      "label": "desktop: replay preparation to lab and back after reload",
+      "beforeUrl": "http://127.0.0.1:5173/#journey",
+      "afterUrl": "http://127.0.0.1:5173/#journey",
+      "status": "completed",
+      "result": {
+        "returnLabel": "返回约战\n阿砾",
+        "missionAfterReturn": "first-echo",
+        "expectedMission": "first-echo"
+      }
+    },
+    {
+      "label": "desktop: journey launch preparation and cancel",
+      "beforeUrl": "http://127.0.0.1:5173/#journey",
+      "afterUrl": "http://127.0.0.1:5173/#journey",
+      "status": "completed",
+      "result": {
+        "returnedTo": "http://127.0.0.1:5173/#journey",
+        "mission": "first-echo"
+      }
+    },
+    {
+      "label": "desktop: locked mission preview",
+      "beforeUrl": "http://127.0.0.1:5173/#journey",
+      "afterUrl": "http://127.0.0.1:5173/#journey",
+      "status": "completed",
+      "result": {
+        "startDisabled": true,
+        "lockText": "先完成「把旧赛册摊开」才能出战。现在仅预览。"
+      }
+    },
+    {
+      "label": "desktop: complete real lab test",
+      "beforeUrl": "http://127.0.0.1:5173/#lab",
+      "afterUrl": "http://127.0.0.1:5173/#lab",
+      "status": "completed",
+      "result": {
+        "records": 1,
+        "xp": 30
+      }
+    },
+    {
+      "label": "desktop: lab records open and Escape closes",
+      "beforeUrl": "http://127.0.0.1:5173/#lab",
+      "afterUrl": "http://127.0.0.1:5173/#lab",
+      "status": "completed",
+      "result": {
+        "dialogStillOpen": false
+      }
+    },
+    {
+      "label": "desktop: lab battle navigation",
+      "beforeUrl": "http://127.0.0.1:5173/#lab",
+      "afterUrl": "http://127.0.0.1:5173/#map",
+      "status": "completed",
+      "result": {
+        "url": "http://127.0.0.1:5173/#map"
+      }
+    }
+  ],
+  "errors": [],
+  "preflight": {
+    "titleMutation": true,
+    "scriptPresent": true,
+    "scriptExecuted": true,
+    "originalTitle": "SPIN/CORE · 战斗陀螺 Web 原型"
+  },
+  "targetSha256After": "59d026247f62d84ad88fc9525bb6161a4c97f38325cbe9f33ec6dbc71bea07ac",
+  "appSourceUnchanged": true
+}

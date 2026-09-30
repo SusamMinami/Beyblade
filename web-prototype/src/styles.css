@@ -1918,7 +1918,7 @@ input[type="range"] {
 
 .game-shell[data-screen="assembly"] .button.primary,
 .game-shell[data-screen="map"] .button.primary {
-  color: white;
+  color: #12151a;
   background: #238cff;
 }
 
@@ -2875,15 +2875,33 @@ input[type="range"] {
 }
 
 .game-shell[data-screen="assembly"] .action-row {
-  grid-template-columns: 1fr;
-  left: auto;
-  width: min(42%, 168px);
+  grid-template-columns: minmax(0, .7fr) minmax(0, 1.3fr);
+  left: 16px;
+  width: auto;
 }
 
 .game-shell[data-screen="assembly"] .action-row .button {
   width: 100%;
   min-height: 44px;
   padding-inline: 12px;
+  font-size: 12px;
+}
+
+@container game (max-width: 600px) {
+  .topbar { grid-template-columns: auto minmax(0, 1fr) auto; gap: 4px; padding-inline: 8px; }
+  .topbar .brand > span:not(.brand-mark), .topbar .wallet small { display: none; }
+  .topbar .phase-nav { width: 100%; }
+  .topbar .phase { flex: 1; min-width: 44px; min-height: 44px; padding: 4px 2px; justify-content: center; font-size: 12px; }
+  .topbar .phase span { display: inline; white-space: nowrap; }
+  .topbar .phase i, .topbar .phase::after { display: none; }
+  .topbar .phase.is-active { color: #12151a; background: #bfe4ff; border-radius: 3px; }
+  .topbar .phase:focus-visible { outline: 2px solid #145888; outline-offset: -2px; }
+  .topbar .top-actions { gap: 4px; }
+  .topbar .wallet { min-width: 32px; }
+}
+@container game (max-width: 360px) {
+  .topbar > .brand { display: none; }
+  .topbar { grid-template-columns: minmax(0, 1fr) auto; }
 }
 
 .game-shell[data-screen="map"] {
