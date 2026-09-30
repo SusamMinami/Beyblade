@@ -19,7 +19,7 @@ func connect_to_room(url: String = "", ticket: Dictionary = {}) -> void:
 	emit_signal("connected")
 
 
-func disconnect() -> void:
+func close_connection() -> void:
 	_connected = false
 	if _peer_transport and _peer_transport._connected:
 		_peer_transport._disconnect_peer()
@@ -31,7 +31,7 @@ func _disconnect_peer() -> void:
 	emit_signal("disconnected")
 
 
-func is_connected() -> bool:
+func is_room_connected() -> bool:
 	return _connected
 
 
@@ -43,5 +43,5 @@ func send_message(msg: Dictionary) -> void:
 
 func poll() -> void:
 	while _queue.size() > 0:
-		var msg := _queue.pop_front()
+		var msg: Dictionary = _queue.pop_front()
 		emit_signal("message_received", msg)

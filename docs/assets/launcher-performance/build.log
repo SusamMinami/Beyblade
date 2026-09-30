@@ -1,0 +1,301 @@
+00:01.407  blend            | Read blend: "C:\Users\Admin\Downloads\战斗陀螺\tools\art_source\launcher.blend"
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+Info: Applied modifier was not first, result may not be as expected
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+03:39:11 | INFO: Starting glTF 2.0 export
+03:39:11 | INFO: Extracting primitive: Cube.247
+03:39:11 | INFO: Primitives created: 1
+03:39:11 | INFO: Extracting primitive: Cube.249
+03:39:11 | INFO: Primitives created: 1
+03:39:11 | INFO: Extracting primitive: Cube.248
+03:39:11 | INFO: Primitives created: 1
+03:39:11 | INFO: Extracting primitive: Cube.250
+03:39:11 | INFO: Primitives created: 1
+03:39:11 | INFO: Extracting primitive: Cylinder.121
+03:39:11 | INFO: Primitives created: 1
+03:39:11 | INFO: Extracting primitive: Cube.255
+03:39:11 | INFO: Primitives created: 1
+03:39:11 | INFO: Finished glTF 2.0 export in 0.054842472076416016 s
+
+03:39:14 | INFO: Starting glTF 2.0 export
+03:39:14 | INFO: Extracting primitive: Cube.256
+03:39:14 | INFO: Primitives created: 1
+03:39:14 | INFO: Extracting primitive: Cube.265
+03:39:14 | INFO: Primitives created: 1
+03:39:14 | INFO: Extracting primitive: Cube.263
+03:39:14 | INFO: Primitives created: 1
+03:39:14 | INFO: Extracting primitive: Cube.282
+03:39:14 | INFO: Primitives created: 1
+03:39:14 | INFO: Extracting primitive: Cylinder.123
+03:39:14 | INFO: Primitives created: 1
+03:39:14 | INFO: Extracting primitive: Cube.287
+03:39:14 | INFO: Primitives created: 1
+03:39:14 | INFO: Finished glTF 2.0 export in 0.020337343215942383 s
+
+03:39:16 | INFO: Starting glTF 2.0 export
+03:39:16 | INFO: Extracting primitive: Cube.288
+03:39:16 | INFO: Primitives created: 1
+03:39:16 | INFO: Extracting primitive: Cube.289
+03:39:16 | INFO: Primitives created: 1
+03:39:16 | INFO: Extracting primitive: Cube.296
+03:39:16 | INFO: Primitives created: 1
+03:39:16 | INFO: Extracting primitive: Cube.295
+03:39:16 | INFO: Primitives created: 1
+03:39:16 | INFO: Extracting primitive: Cube.297
+03:39:16 | INFO: Primitives created: 1
+03:39:16 | INFO: Extracting primitive: Cylinder.131
+03:39:16 | INFO: Primitives created: 1
+03:39:16 | INFO: Extracting primitive: Cube.302
+03:39:16 | INFO: Primitives created: 1
+03:39:16 | INFO: Finished glTF 2.0 export in 0.025507450103759766 s
+
+03:39:18 | INFO: Starting glTF 2.0 export
+03:39:18 | INFO: Extracting primitive: Cylinder.133
+03:39:18 | INFO: Primitives created: 1
+03:39:18 | INFO: Extracting primitive: Cube.303
+03:39:18 | INFO: Primitives created: 1
+03:39:18 | INFO: Extracting primitive: 32T compound drive hub.001
+03:39:18 | INFO: Primitives created: 1
+03:39:18 | INFO: Extracting primitive: 32T compound drive recessed web.001
+03:39:18 | INFO: Primitives created: 1
+03:39:18 | INFO: Extracting primitive: 32T compound drive.001
+03:39:18 | INFO: Primitives created: 1
+03:39:18 | INFO: Extracting primitive: 32T output gear hub.001
+03:39:18 | INFO: Primitives created: 1
+03:39:18 | INFO: Extracting primitive: 32T output gear recessed web.001
+03:39:18 | INFO: Primitives created: 1
+03:39:18 | INFO: Extracting primitive: 32T output gear.001
+03:39:18 | INFO: Primitives created: 1
+03:39:18 | INFO: Extracting primitive: Input return ribbon spring.003
+03:39:18 | INFO: Primitives created: 1
+03:39:18 | INFO: Extracting primitive: Cylinder.142
+03:39:18 | INFO: Primitives created: 1
+03:39:18 | INFO: Extracting primitive: Bearing support tower.006
+03:39:18 | INFO: Primitives created: 1
+03:39:18 | INFO: Extracting primitive: Cylinder.144
+03:39:18 | INFO: Primitives created: 1
+03:39:18 | INFO: Finished glTF 2.0 export in 0.052349090576171875 s
+
+03:39:20 | INFO: Starting glTF 2.0 export
+03:39:20 | INFO: Extracting primitive: Cylinder.146
+03:39:20 | INFO: Primitives created: 1
+03:39:20 | INFO: Extracting primitive: Cube.307
+03:39:20 | INFO: Primitives created: 1
+03:39:20 | INFO: Extracting primitive: 36T common rack pinion hub.004
+03:39:20 | INFO: Primitives created: 1
+03:39:20 | INFO: Extracting primitive: 36T compound drive.001
+03:39:20 | INFO: Primitives created: 1
+03:39:20 | INFO: Extracting primitive: 28T output gear hub.001
+03:39:20 | INFO: Primitives created: 1
+03:39:20 | INFO: Extracting primitive: 28T output gear.001
+03:39:20 | INFO: Primitives created: 1
+03:39:20 | INFO: Extracting primitive: Input return ribbon spring.004
+03:39:20 | INFO: Primitives created: 1
+03:39:20 | INFO: Extracting primitive: Cylinder.155
+03:39:20 | INFO: Primitives created: 1
+03:39:20 | INFO: Extracting primitive: Bearing support tower.008
+03:39:20 | INFO: Primitives created: 1
+03:39:20 | INFO: Extracting primitive: Cylinder.157
+03:39:20 | INFO: Primitives created: 1
+03:39:20 | INFO: Finished glTF 2.0 export in 0.04329681396484375 s
+
+03:39:22 | INFO: Starting glTF 2.0 export
+03:39:22 | INFO: Extracting primitive: Cylinder.159
+03:39:22 | INFO: Primitives created: 1
+03:39:22 | INFO: Extracting primitive: Cube.329
+03:39:22 | INFO: Primitives created: 1
+03:39:22 | INFO: Extracting primitive: 28T compound drive hub.001
+03:39:22 | INFO: Primitives created: 1
+03:39:22 | INFO: Extracting primitive: 28T compound drive recessed web.001
+03:39:22 | INFO: Primitives created: 1
+03:39:22 | INFO: Extracting primitive: 28T compound drive.001
+03:39:22 | INFO: Primitives created: 1
+03:39:22 | INFO: Extracting primitive: 36T output gear hub.001
+03:39:22 | INFO: Primitives created: 1
+03:39:22 | INFO: Extracting primitive: 36T output gear recessed web.001
+03:39:22 | INFO: Primitives created: 1
+03:39:22 | INFO: Extracting primitive: 36T output gear.001
+03:39:22 | INFO: Primitives created: 1
+03:39:22 | INFO: Extracting primitive: Input return ribbon spring.005
+03:39:22 | INFO: Primitives created: 1
+03:39:22 | INFO: Extracting primitive: Cylinder.168
+03:39:22 | INFO: Primitives created: 1
+03:39:22 | INFO: Extracting primitive: Bearing support tower.010
+03:39:22 | INFO: Primitives created: 1
+03:39:22 | INFO: Extracting primitive: Cylinder.170
+03:39:22 | INFO: Primitives created: 1
+03:39:22 | INFO: Finished glTF 2.0 export in 0.04667186737060547 s
+
+03:39:24 | INFO: Starting glTF 2.0 export
+03:39:24 | INFO: Extracting primitive: Female hex drive socket.003
+03:39:24 | INFO: Primitives created: 1
+03:39:24 | INFO: Extracting primitive: Cube.336
+03:39:24 | INFO: Primitives created: 1
+03:39:24 | INFO: Extracting primitive: Coupler machined shoulder.003
+03:39:24 | INFO: Primitives created: 1
+03:39:24 | INFO: Extracting primitive: Cube.339
+03:39:24 | INFO: Primitives created: 1
+03:39:24 | INFO: Extracting primitive: Stationary alignment skirt.003
+03:39:24 | INFO: Primitives created: 1
+03:39:24 | INFO: Finished glTF 2.0 export in 0.02492237091064453 s
+
+03:39:25 | INFO: Starting glTF 2.0 export
+03:39:25 | INFO: Extracting primitive: Female hex drive socket.004
+03:39:25 | INFO: Primitives created: 1
+03:39:25 | INFO: Extracting primitive: Cube.363
+03:39:25 | INFO: Primitives created: 1
+03:39:25 | INFO: Extracting primitive: Coupler machined shoulder.004
+03:39:25 | INFO: Primitives created: 1
+03:39:25 | INFO: Extracting primitive: Cube.366
+03:39:25 | INFO: Primitives created: 1
+03:39:25 | INFO: Finished glTF 2.0 export in 0.027927875518798828 s
+
+03:39:27 | INFO: Starting glTF 2.0 export
+03:39:27 | INFO: Extracting primitive: Extended rotor guide.001
+03:39:27 | INFO: Primitives created: 1
+03:39:27 | INFO: Extracting primitive: Cube.387
+03:39:27 | INFO: Primitives created: 1
+03:39:27 | INFO: Extracting primitive: Coupler machined shoulder.005
+03:39:27 | INFO: Primitives created: 1
+03:39:27 | INFO: Extracting primitive: Cube.390
+03:39:27 | INFO: Primitives created: 1
+03:39:27 | INFO: Extracting primitive: Stationary alignment skirt.005
+03:39:27 | INFO: Primitives created: 1
+03:39:27 | INFO: Finished glTF 2.0 export in 0.030132532119750977 s
+
+03:39:36 | INFO: Starting glTF 2.0 export
+03:39:36 | INFO: Extracting primitive: Cylinder.194
+03:39:36 | INFO: Primitives created: 1
+03:39:36 | INFO: Extracting primitive: Cylinder.190
+03:39:36 | INFO: Primitives created: 1
+03:39:36 | INFO: Extracting primitive: Cube.420
+03:39:36 | INFO: Primitives created: 1
+03:39:36 | INFO: Extracting primitive: Cube.425
+03:39:36 | INFO: Primitives created: 1
+03:39:36 | INFO: Extracting primitive: Cube.418
+03:39:36 | INFO: Primitives created: 1
+03:39:36 | INFO: Extracting primitive: Text.009
+03:39:36 | INFO: Primitives created: 1
+03:39:36 | INFO: Extracting primitive: Cube.456
+03:39:36 | INFO: Primitives created: 1
+03:39:36 | INFO: Extracting primitive: Cube.443
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.431
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Ivory grip rail.002
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Coupler chassis threaded seat.003
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cylinder.184
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Continuous dark parting seam.001
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cobalt nose armour.001
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Ivory upper shell.001
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.458
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.457
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.463
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.465
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.466
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.467
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Female hex drive socket.006
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.486
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Coupler machined shoulder.006
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.489
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Stationary alignment skirt.006
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.470
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.472
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.471
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.473
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cylinder.198
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.478
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cylinder.200
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cube.479
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: 32T compound drive hub.002
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: 32T compound drive recessed web.002
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: 32T compound drive.002
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: 32T output gear hub.002
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: 32T output gear recessed web.002
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: 32T output gear.002
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Input return ribbon spring.006
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cylinder.209
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Bearing support tower.012
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Extracting primitive: Cylinder.211
+03:39:37 | INFO: Primitives created: 1
+03:39:37 | INFO: Finished glTF 2.0 export in 0.26842665672302246 s
+
+Info: Saved as "launcher_performance.blend"
+PERFORMANCE_ASSETS_READY {"parts": ["R01", "T01", "C01"], "file": "launcher-performance.glb", "runtime": {"meshes": 44, "triangles": 62748, "bytes": 1726900}}
+00:48.282  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-performance\R01.png'
+00:50.454  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-performance\R02.png'
+00:52.625  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-performance\R03.png'
+00:55.875  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-performance\T01.png'
+00:59.204  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-performance\T02.png'
+01:02.485  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-performance\T03.png'
+01:04.766  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-performance\C01.png'
+01:07.032  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-performance\C02.png'
+01:09.454  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-performance\C03.png'
+01:23.172  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-performance\exploded.png'
+01:31.313  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-performance\installed-red.png'
+01:43.204  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-performance\transmission-detail.png'
+PERFORMANCE_RENDERS_READY
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

@@ -1,7 +1,10 @@
 # Web 结构损伤与加速区
 
 适用：Web `2026.09.16-web-v4`。以下规则已实现；验收状态见文末。
-Godot Jolt 实验、Worker 和旧二进制协议尚未移植。
+本页保留 v4 实现记录；v5 对方向损伤、耗散、旋转接触和裁决的更新见
+[物理反馈前两轮实现](physics_v5_implementation.md)。
+Godot 正式对战已在 [v6](physics_v6_implementation.md) 移植结构规则，Jolt 实验仍独立；
+Worker 和旧二进制协议未升级。新版验证不沿用本页旧结果。
 
 ## 原实现诊断
 

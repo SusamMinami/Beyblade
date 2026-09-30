@@ -14,10 +14,10 @@ enum PartSlot {
 
 const PART_BASE_POSITIONS: Array[Vector3] = [
 	Vector3(0.0, 0.24, 0.0),
-	Vector3(0.0, 0.38, 0.0),
-	Vector3(0.0, 0.06, 0.0),
-	Vector3(0.0, -0.19, 0.0),
-	Vector3(0.0, -0.54, 0.0)
+	Vector3(0.0, 0.42, 0.0),
+	Vector3(0.0, 0.02, 0.0),
+	Vector3(0.0, -0.22, 0.0),
+	Vector3(0.0, -0.56, 0.0)
 ]
 const BROKEN_PART_OFFSETS: Array[Vector3] = [
 	Vector3(0.22, 0.08, -0.08),
@@ -71,6 +71,31 @@ var broken_overlay_material: StandardMaterial3D
 
 var part_integrities: Array[float] = [1.0, 1.0, 1.0, 1.0, 1.0]
 var broken_parts: Array[bool] = [false, false, false, false, false]
+var structural_mode := false
+var structural_revision := -1
+
+func set_structural_damage(structure: Dictionary) -> void:
+	structural_mode = true
+	if structural_revision == int(structure.revision): return
+	structural_revision = int(structure.revision)
+	var nodes := get_part_nodes()
+	var radii := [.99,.25,.62,.16,.1]
+	var heights := [.15,.12,.09,.02,.025]
+	for i in 5:
+		part_integrities[i] = structure.parts[i].health
+		broken_parts[i] = false
+		for sector in 8:
+			var mark_name := "DamageSector%d" % sector
+			var mark := nodes[i].get_node_or_null(mark_name) as MeshInstance3D
+			if mark == null:
+				var angle := sector/8.0*TAU
+				mark = _add_mesh(nodes[i],mark_name,_create_box_mesh(Vector3(.09,.012,.035)),
+					critical_overlay_material,Vector3(cos(angle)*radii[i],heights[i],sin(angle)*radii[i]),Vector3(0,-angle,0))
+				mark.cast_shadow = GeometryInstance3D.SHADOW_CASTING_SETTING_OFF
+			var damage: float = structure.parts[i].sectors[sector]
+			mark.visible = damage>.02
+			mark.transparency = 1-clampf(damage*2,.2,1)
+	_apply_part_transforms()
 
 func _ready() -> void:
 	_rebuild_model()
@@ -157,6 +182,7 @@ func flash_part_damage(part_index: int) -> void:
 
 
 func _rebuild_model() -> void:
+	structural_revision = -1
 	_build_materials()
 	for part_node in get_part_nodes():
 		_clear_children(part_node)
@@ -404,9 +430,11 @@ func _build_tip() -> void:
 		_add_mesh(
 			tip_root,
 			"ContactPoint",
-			_sphere_mesh(0.065, 0.13, 32),
+			_sphere_mesh(0.075, 0.15, 32),
 			bright_metal_material,
-			Vector3(0.0, -0.105, 0.0)
+			Vector3(0.0, -0.115, 0.0),
+			Vector3.ZERO,
+			Vector3(1.0, 1.35, 1.0)
 		)
 	elif tip_id == TIP_FLAT:
 		_add_mesh(
@@ -434,9 +462,9 @@ func _build_tip() -> void:
 		_add_mesh(
 			tip_root,
 			"RubberContact",
-			_sphere_mesh(0.105, 0.18, 32),
+			_sphere_mesh(0.115, 0.23, 32),
 			rubber_material,
-			Vector3(0.0, -0.115, 0.0),
+			Vector3(0.0, -0.12, 0.0),
 			Vector3.ZERO,
 			Vector3(1.0, 0.72, 1.0)
 		)
@@ -454,7 +482,6 @@ func _apply_part_transforms() -> void:
 			float(customization.height),
 			float(customization.size)
 		)
-		part_node.position.y += (float(customization.height) - 1.0) * 0.08
 		if index == active_part_index:
 			part_node.scale *= 1.035
 		var damage_amount := 1.0 - part_integrities[index]
@@ -466,7 +493,7 @@ func _apply_part_transforms() -> void:
 				22.0 + index * 8.0
 			)
 			part_node.scale *= 0.72
-		elif damage_amount > 0.0:
+		elif damage_amount > 0.0 and not structural_mode:
 			part_node.position += BROKEN_PART_OFFSETS[index] * damage_amount * 0.16
 			part_node.rotation_degrees = Vector3(
 				damage_amount * (index + 1) * 1.2,
@@ -519,6 +546,7 @@ func _apply_part_damage_overlay(
 	is_broken: bool
 ) -> void:
 	for child in part_node.get_children():
+		if String(child.name).begins_with("DamageSector"): continue
 		if child is MeshInstance3D:
 			if is_broken:
 				child.material_overlay = broken_overlay_material

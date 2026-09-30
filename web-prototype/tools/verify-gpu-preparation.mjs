@@ -2,7 +2,7 @@ import { chromium } from "playwright";
 import assert from "node:assert/strict";
 import { mkdir, writeFile } from "node:fs/promises";
 
-const out = "../.impeccable/review/gpu-preparation";
+const out = process.env.QA_OUTPUT_DIR ?? "../.impeccable/review/gpu-preparation";
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({
   executablePath: process.env.CHROME_PATH ?? "C:/Program Files/Google/Chrome/Application/chrome.exe",
@@ -115,7 +115,8 @@ try {
   await warm();
   await page.evaluate(() => {
     window.oldKey = app.stage.battleWarmup.key;
-    app.stage.setSceneTime("day");
+    // Auto may already resolve to day; always change the actual environment.
+    app.stage.setSceneTime(app.stage.scenePeriod === "day" ? "night" : "day");
     app._queueBattleWarmup();
   });
   check(await page.evaluate(() => app.stage.battleWarmup.key !== oldKey && !app.stage.battleWarmup.ready),

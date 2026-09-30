@@ -1,0 +1,40 @@
+{
+  "checks": [
+    "Preview is usable before the optional delayed warmup creates models",
+    "Speculation does not modify save, ownership, loadout or simulation",
+    "Only one actual matchup is held off screen with a retained program lease",
+    "Warmup uses the canonical free battle loadout and opponent appearance",
+    "Starting the matching battle adopts the prepared models",
+    "Warm battle draws directly and releases its lease after the first frame",
+    "Next round constructs pristine models rather than retaining damaged battle tops",
+    "Changed paint invalidates and disposes the old speculative model immediately",
+    "Immediate start during warmup falls back to the normal loading path",
+    "Story preparation uses the selected chapter's arena and opponent identity",
+    "Reading a chapter and warming it does not advance campaign state",
+    "Locked chapters do not allocate a speculative battle",
+    "Day/night changes invalidate the prepared environment variant",
+    "desktop: no horizontal overflow after a warmed battle starts",
+    "mobile: no horizontal overflow after a warmed battle starts",
+    "Leaving during compilation cancels uploads and settles all jobs",
+    "Background preparation cannot replace the shared collection canvas",
+    "Repeated speculative preparation releases all additional geometry and textures",
+    "Renderers without parallel shader compilation skip optional speculation",
+    "Destroy cancels pending delayed work",
+    "No page or WebGL errors: "
+  ],
+  "memories": [
+    {
+      "geometries": 60,
+      "textures": 22
+    },
+    {
+      "geometries": 60,
+      "textures": 22
+    },
+    {
+      "geometries": 60,
+      "textures": 22
+    }
+  ],
+  "errors": []
+}

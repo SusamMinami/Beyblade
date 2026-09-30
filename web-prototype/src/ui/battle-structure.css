@@ -2,6 +2,30 @@
   display: none;
 }
 
+.measurement-details {
+  margin-top: 8px;
+  font-size: 12px;
+  line-height: 1.5;
+  max-height: 120px;
+  overflow: auto;
+}
+.measurement-details summary { cursor: pointer; padding-block: 5px; }
+.measurement-details p { margin: 5px 0; }
+.measurement-link {
+  color: #b1cdcf;
+  background: transparent;
+  border: 0;
+  text-decoration: underline;
+  text-underline-offset: 3px;
+  padding: 7px 0;
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+.measurement-link:hover { color: #d8e9e9; }
+.measurement-link:focus-visible,
+.measurement-details summary:focus-visible { outline: 2px solid currentColor; outline-offset: 2px; }
+
 .game-shell[data-screen="battle"] .drive-zone-hud:not([hidden]) {
   display: block;
   position: absolute;

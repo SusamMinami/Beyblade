@@ -1,0 +1,62 @@
+[
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\battle-structure.css",
+    "line": 36,
+    "snippet": "Undocumented color #fff0ad is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#fff0ad"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\battle-structure.css",
+    "line": 38,
+    "snippet": "Undocumented color #b2a779 is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#b2a779"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\battle-structure.css",
+    "line": 49,
+    "snippet": "Undocumented color #ffccbb is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#ffccbb"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\battle-structure.css",
+    "line": 50,
+    "snippet": "Undocumented color #e99578 is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#e99578"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\battle-structure.css",
+    "line": 90,
+    "snippet": "Undocumented color #c0d5d1 is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#c0d5d1"
+  }
+]

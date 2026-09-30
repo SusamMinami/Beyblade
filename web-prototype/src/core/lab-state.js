@@ -35,7 +35,9 @@ export function normalizeLabState(saved = {}) {
       : [],
     calibratedAt: nonNegative(saved?.calibratedAt),
     settings: {
-      room: saved?.settings?.room === "advanced" && nonNegative(saved?.xp) >= 120 ? "advanced" : "childhood",
+      room: saved?.settings?.room === "advanced" && nonNegative(saved?.xp) >= 120 ? "advanced"
+        : saved?.settings?.room === "childhood" ? "childhood" : "minimal",
+      followStory: typeof saved?.settings?.followStory === "boolean" ? saved.settings.followStory : saved?.settings?.room !== "advanced",
       wind: WIND_OPTIONS.includes(saved?.settings?.wind) ? saved.settings.wind : "无风",
       windSpeed: windParameters(saved?.settings).speed,
       windDirection: windParameters(saved?.settings).direction,

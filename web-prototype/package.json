@@ -10,7 +10,13 @@
     "test": "vitest run",
     "verify:lab": "node tools/verify-lab.mjs",
     "verify:showroom": "node tools/verify-showroom.mjs",
+    "verify:home": "node tools/verify-home-lab.mjs",
+    "verify:assembly": "node tools/verify-assembly.mjs",
     "verify:worlds": "node tools/verify-worlds.mjs",
+    "verify:launcher": "node tools/verify-launcher.mjs",
+    "verify:launcher-outfit": "node tools/verify-launcher-performance.mjs && node tools/verify-launcher-outfit.mjs",
+    "verify:maintenance": "node tools/verify-maintenance-physics.mjs && node tools/verify-maintenance.mjs",
+    "verify:materials": "node tools/verify-world-materials.mjs",
     "verify:championship": "node tools/verify-championship.mjs",
     "verify:loading": "node tools/verify-loading.mjs",
     "measure:loading": "node tools/measure-scene-loading.mjs",
@@ -20,6 +26,8 @@
     "verify:flow": "node tools/verify-flow.mjs",
     "verify:growth": "node tools/verify-growth.mjs",
     "verify:structure": "node tools/verify-structure.mjs",
+    "verify:physics": "node tools/verify-physics-v5.mjs",
+    "verify:physics-v6": "node tools/verify-physics-v6.mjs",
     "verify:battle-ui": "node tools/verify-battle-ui.mjs"
   },
   "dependencies": {

@@ -1,0 +1,62 @@
+{
+  "capturedAt": "2026-09-30T13:56:20.320Z",
+  "base": "http://127.0.0.1:5173",
+  "viewport": {
+    "width": 540,
+    "height": 960,
+    "deviceScaleFactor": 2
+  },
+  "source": "Current local Web prototype; actual UI and renderer",
+  "isolation": "Disposable browser context; tutorial completed, canonical starter equipment, 1000 local fixture coins; no user save access",
+  "captures": [
+    {
+      "file": "raw/05-street.png",
+      "description": "Real daytime arena in running gameplay; animation clock frozen at 0.85 s",
+      "route": "#battle",
+      "screen": "battle",
+      "arena": "street",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      },
+      "battleTime": 0.866666666666666
+    },
+    {
+      "file": "raw/05-ruins.png",
+      "description": "Real daytime arena in running gameplay; animation clock frozen at 0.85 s",
+      "route": "#battle",
+      "screen": "battle",
+      "arena": "ruins",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      },
+      "battleTime": 0.866666666666666
+    }
+  ],
+  "errors": []
+}

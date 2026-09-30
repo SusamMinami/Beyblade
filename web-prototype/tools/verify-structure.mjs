@@ -37,11 +37,12 @@ check(hit({ material: "alloy" }).structure.parts[0].worst < hit({ material: "pol
 check(hit({ height: .72, size: 1.24, shape: 100 }).structure.parts[0].worst >
   hit({ height: 1.3, size: .8 }).structure.parts[0].worst, "Thin large lobes concentrate damage");
 const damaged = make();
+const spinBeforeDamage = damaged.player.spin;
 for (let i = 0; i < 4; i++) applyStructuralImpact(damaged.player, 22, 0);
 check(damaged.player.structure.totalMass < base.totalMass, "Severe local damage sheds effective mass");
 check(Math.hypot(...[0,2].map((i) => damaged.player.structure.centerOfMass[i])) > .005, "Missing mass shifts COM");
 check(damaged.player.structure.momentOfInertia < base.momentOfInertia, "Damage updates inertia");
-check(damaged.player.spin === base.maxSpinSpeed * (1 - .45 * .035), "Shedding never creates angular speed");
+check(damaged.player.spin === spinBeforeDamage, "Shedding never creates angular speed");
 for (let i = 0; i < 600; i++) damaged._updateTilt(damaged.player, 1/60);
 check(damaged.player.imbalance >= damaged.player.structure.imbalance && damaged.player.imbalance > 0, "Permanent imbalance survives recovery");
 const symmetric = createStructure(base);

@@ -1,0 +1,1424 @@
+{
+  "checks": [
+    "Actual battle mounts the Blender GLB",
+    "Articulated assembly preserves independent gears, fork, cam and dogs",
+    "Steel, rubber and moulded plastic retain distinct PBR responses",
+    "Inspection lid reveals internal geometry without opaque depth occlusion",
+    "Attachment is measured from the real equipped crown",
+    "Articulated launcher stays within 2 MB / 75k triangle budget",
+    "Socket follows crown at both direction and tilt extremes",
+    "Dragging the real arrow still changes launch direction/power",
+    "Mobile launch screen has no horizontal overflow",
+    "Launch releases the equipped top and clears the launcher/aiming arrow",
+    "Repeated battle entry/exit releases launcher GPU allocations",
+    "Missing launcher blocks launch with the existing asset error",
+    "Failed GLB requests are retried on re-entry",
+    "Leaving during download discards the stale launcher",
+    "No page exceptions: "
+  ],
+  "model": {
+    "name": "GearDriveLauncher",
+    "meshes": [
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 752
+      },
+      {
+        "name": "Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 928
+      },
+      {
+        "name": "Launcher_Ivory_ABS",
+        "metalness": 0,
+        "roughness": 0.3199999928474426,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 2168
+      },
+      {
+        "name": "Paint_primary__Launcher_Cobalt_ABS",
+        "metalness": 0,
+        "roughness": 0.28999999165534973,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 664
+      },
+      {
+        "name": "Paint_window__Launcher_Smoked_PC",
+        "metalness": 0,
+        "roughness": 0.12999999523162842,
+        "opacity": 0.14000000059604645,
+        "depthWrite": false,
+        "triangles": 308
+      },
+      {
+        "name": "Label_adaptive",
+        "metalness": 0,
+        "roughness": 0.28999999165534973,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 1960
+      },
+      {
+        "name": "Paint_chassis__Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 296
+      },
+      {
+        "name": "Paint_grip__Launcher_Grip_TPE",
+        "metalness": 0,
+        "roughness": 0.8299999833106995,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 660
+      },
+      {
+        "name": "Paint_primary__Launcher_Cobalt_ABS",
+        "metalness": 0,
+        "roughness": 0.28999999165534973,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 1404
+      },
+      {
+        "name": "Paint_secondary__Launcher_Ivory_ABS",
+        "metalness": 0,
+        "roughness": 0.3199999928474426,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 340
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 1620
+      },
+      {
+        "name": "Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 840
+      },
+      {
+        "name": "Paint_chassis__Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 1476
+      },
+      {
+        "name": "Paint_primary__Launcher_Cobalt_ABS",
+        "metalness": 0,
+        "roughness": 0.28999999165534973,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 576
+      },
+      {
+        "name": "Paint_secondary__Launcher_Ivory_ABS",
+        "metalness": 0,
+        "roughness": 0.3199999928474426,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 704
+      },
+      {
+        "name": "Paint_grip__Launcher_Grip_TPE",
+        "metalness": 0,
+        "roughness": 0.8299999833106995,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 540
+      },
+      {
+        "name": "Paint_primary__Launcher_Cobalt_ABS",
+        "metalness": 0,
+        "roughness": 0.28999999165534973,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 1672
+      },
+      {
+        "name": "Paint_secondary__Launcher_Ivory_ABS",
+        "metalness": 0,
+        "roughness": 0.3199999928474426,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 216
+      },
+      {
+        "name": "Paint_accent__Launcher_Amber_Lock",
+        "metalness": 0,
+        "roughness": 0.3400000035762787,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 108
+      },
+      {
+        "name": "Paint_chassis__Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 108
+      },
+      {
+        "name": "Paint_primary__Launcher_Cobalt_ABS",
+        "metalness": 0,
+        "roughness": 0.28999999165534973,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 132
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 372
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 1044
+      },
+      {
+        "name": "Performance_Blue_Anodized",
+        "metalness": 0.550000011920929,
+        "roughness": 0.2800000011920929,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 768
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 124
+      },
+      {
+        "name": "Performance_Blue_Anodized",
+        "metalness": 0.550000011920929,
+        "roughness": 0.2800000011920929,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 44
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 124
+      },
+      {
+        "name": "Performance_Blue_Anodized",
+        "metalness": 0.550000011920929,
+        "roughness": 0.2800000011920929,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 44
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 124
+      },
+      {
+        "name": "Performance_Blue_Anodized",
+        "metalness": 0.550000011920929,
+        "roughness": 0.2800000011920929,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 44
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 768
+      },
+      {
+        "name": "Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 132
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 3460
+      },
+      {
+        "name": "Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 2740
+      },
+      {
+        "name": "Performance_Blue_Anodized",
+        "metalness": 0.550000011920929,
+        "roughness": 0.2800000011920929,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 768
+      },
+      {
+        "name": "Performance_Blue_Anodized",
+        "metalness": 0.550000011920929,
+        "roughness": 0.2800000011920929,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 44
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 432
+      },
+      {
+        "name": "Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 2200
+      },
+      {
+        "name": "Performance_Blue_Anodized",
+        "metalness": 0.550000011920929,
+        "roughness": 0.2800000011920929,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 220
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 312
+      },
+      {
+        "name": "Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 44
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 5444
+      },
+      {
+        "name": "Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 1112
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 4956
+      },
+      {
+        "name": "Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 1152
+      },
+      {
+        "name": "Performance_Blue_Anodized",
+        "metalness": 0.550000011920929,
+        "roughness": 0.2800000011920929,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 3328
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 768
+      },
+      {
+        "name": "Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 576
+      },
+      {
+        "name": "Performance_Blue_Anodized",
+        "metalness": 0.550000011920929,
+        "roughness": 0.2800000011920929,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 3328
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 2332
+      },
+      {
+        "name": "Launcher_Brushed_Steel",
+        "metalness": 0.8399999737739563,
+        "roughness": 0.30000001192092896,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 5812
+      },
+      {
+        "name": "Launcher_Graphite_POM",
+        "metalness": 0,
+        "roughness": 0.47999998927116394,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 3928
+      },
+      {
+        "name": "Performance_Blue_Anodized",
+        "metalness": 0.550000011920929,
+        "roughness": 0.2800000011920929,
+        "opacity": 1,
+        "depthWrite": true,
+        "triangles": 376
+      }
+    ],
+    "crown": 0.542708000087738
+  },
+  "manifest": {
+    "schemaVersion": 1,
+    "status": "web-runtime",
+    "units": "Web visual units",
+    "source": "tools/art_source/launcher_performance.blend",
+    "topMount": [
+      0,
+      -0.474,
+      -0.12
+    ],
+    "interfaceVersion": "launcher-performance-v1",
+    "geometry": {
+      "rackPitch": 0.046,
+      "gearModule": 0.014642254764454372,
+      "rackPitchLine": -0.78,
+      "inputAxis": [
+        0.2497536995010616,
+        0.055,
+        -0.5164394142398213
+      ],
+      "outputAxis": [
+        0,
+        0.055,
+        -0.12
+      ],
+      "inputTeeth": 36,
+      "compoundCenterDistance": 0.4685521524625399,
+      "pairTeethSum": 64,
+      "driveMaleHexRadius": 0.086,
+      "driveFemaleHexRadius": 0.093,
+      "handlePin": [
+        1.95,
+        0.055,
+        -0.85
+      ],
+      "pinRadius": 0.017,
+      "pinHoleRadius": 0.02
+    },
+    "inspection": {
+      "fps": 24,
+      "assemblyFrame": 1,
+      "explodedFrame": 60,
+      "moduleExplode": {
+        "housing": [
+          0,
+          0,
+          0
+        ],
+        "cover": [
+          -0.4,
+          2.8,
+          -0.4
+        ],
+        "grip": [
+          -1.3,
+          -0.25,
+          1.8
+        ],
+        "pull_handle": [
+          2.65,
+          0.25,
+          0
+        ],
+        "rack": [
+          1.3,
+          1,
+          0
+        ],
+        "transmission": [
+          0,
+          1.4,
+          0
+        ],
+        "coupler": [
+          0,
+          -1,
+          0
+        ],
+        "release": [
+          1.6,
+          -0.3,
+          0.3
+        ]
+      },
+      "detailDisplacementSpace": "parent local Web axes; add to assembled transform",
+      "motionStatus": "Web kinematic rack, compound gears, lifting fork, cam and radial dogs"
+    },
+    "parts": [
+      {
+        "code": "R01",
+        "slot": "rack",
+        "name": "循衡",
+        "family": "均衡齿条",
+        "benefit": "连续聚合物背梁，抽拉负担与刚性平衡",
+        "cost": "轻快与高载刚性均不突出",
+        "partId": "launcher.rack.r01",
+        "file": "r01.glb",
+        "anchor": [
+          0.875,
+          0.055,
+          -0.85
+        ],
+        "sourceMeshes": 60,
+        "runtime": {
+          "meshes": 6,
+          "triangles": 3252,
+          "bytes": 95420
+        },
+        "inspectionGroups": [
+          {
+            "node": "Export_R01_backbone",
+            "id": "backbone",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0.16,
+              0
+            ],
+            "motion": "fixed"
+          },
+          {
+            "node": "Export_R01_rack_body",
+            "id": "rack_body",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "fixed"
+          },
+          {
+            "node": "Export_R01_service_pin",
+            "id": "service_pin",
+            "pivot": [
+              1.0750000476837158,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0.33,
+              0
+            ],
+            "motion": "fixed"
+          }
+        ],
+        "ratio": null
+      },
+      {
+        "code": "R02",
+        "slot": "rack",
+        "name": "轻羽",
+        "family": "轻快齿条",
+        "benefit": "开窗骨架与窄筋，降低往复件惯量",
+        "cost": "高载下的挠曲与储能回弹更明显",
+        "partId": "launcher.rack.r02",
+        "file": "r02.glb",
+        "anchor": [
+          0.875,
+          0.055,
+          -0.85
+        ],
+        "sourceMeshes": 83,
+        "runtime": {
+          "meshes": 6,
+          "triangles": 4264,
+          "bytes": 126976
+        },
+        "inspectionGroups": [
+          {
+            "node": "Export_R02_backbone",
+            "id": "backbone",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0.16,
+              0
+            ],
+            "motion": "fixed"
+          },
+          {
+            "node": "Export_R02_rack_body",
+            "id": "rack_body",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "fixed"
+          },
+          {
+            "node": "Export_R02_service_pin",
+            "id": "service_pin",
+            "pivot": [
+              1.0750000476837158,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0.33,
+              0
+            ],
+            "motion": "fixed"
+          }
+        ],
+        "ratio": null
+      },
+      {
+        "code": "R03",
+        "slot": "rack",
+        "name": "刚脊",
+        "family": "加强齿条",
+        "benefit": "嵌入金属背脊，降低大拉力下的挠曲",
+        "cost": "往复质量增加，快速起拉更费力",
+        "partId": "launcher.rack.r03",
+        "file": "r03.glb",
+        "anchor": [
+          0.875,
+          0.055,
+          -0.85
+        ],
+        "sourceMeshes": 72,
+        "runtime": {
+          "meshes": 7,
+          "triangles": 4452,
+          "bytes": 133988
+        },
+        "inspectionGroups": [
+          {
+            "node": "Export_R03_backbone",
+            "id": "backbone",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0.16,
+              0
+            ],
+            "motion": "fixed"
+          },
+          {
+            "node": "Export_R03_rack_body",
+            "id": "rack_body",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "fixed"
+          },
+          {
+            "node": "Export_R03_service_pin",
+            "id": "service_pin",
+            "pivot": [
+              1.0750000476837158,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0.33,
+              0
+            ],
+            "motion": "fixed"
+          }
+        ],
+        "ratio": null
+      },
+      {
+        "code": "T01",
+        "slot": "transmission",
+        "name": "恒比",
+        "family": "均衡芯组",
+        "drive": 32,
+        "output": 32,
+        "benefit": "32 : 32，同速与扭矩平衡",
+        "cost": "没有极端速转或省力优势",
+        "partId": "launcher.transmission.t01",
+        "file": "t01.glb",
+        "anchor": [
+          0,
+          0.055,
+          -0.12
+        ],
+        "sourceMeshes": 65,
+        "runtime": {
+          "meshes": 12,
+          "triangles": 33112,
+          "bytes": 782700
+        },
+        "inspectionGroups": [
+          {
+            "node": "Export_T01_bearing_bridge",
+            "id": "bearing_bridge",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0.87,
+              0
+            ],
+            "motion": "fixed"
+          },
+          {
+            "node": "Export_T01_input_rotor",
+            "id": "input_rotor",
+            "pivot": [
+              0.2497536987066269,
+              0,
+              -0.39643943309783936
+            ],
+            "explode": [
+              0.12,
+              0.35,
+              -0.1
+            ],
+            "motion": "rotation"
+          },
+          {
+            "node": "Export_T01_output_rotor",
+            "id": "output_rotor",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              -0.13,
+              0.56,
+              0.09
+            ],
+            "motion": "rotation"
+          },
+          {
+            "node": "Export_T01_return_spring",
+            "id": "return_spring",
+            "pivot": [
+              0.2497536987066269,
+              0,
+              -0.39643943309783936
+            ],
+            "explode": [
+              0.12,
+              1.06,
+              -0.1
+            ],
+            "motion": "fixed"
+          },
+          {
+            "node": "Export_T01_tray",
+            "id": "tray",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "fixed"
+          }
+        ],
+        "ratio": 1
+      },
+      {
+        "code": "T02",
+        "slot": "transmission",
+        "name": "超越",
+        "family": "增速芯组",
+        "drive": 36,
+        "output": 28,
+        "benefit": "36 : 28，同抽速下输出转速更高",
+        "cost": "同输出负载需更大拉力",
+        "partId": "launcher.transmission.t02",
+        "file": "t02.glb",
+        "anchor": [
+          0,
+          0.055,
+          -0.12
+        ],
+        "sourceMeshes": 80,
+        "runtime": {
+          "meshes": 10,
+          "triangles": 32836,
+          "bytes": 846076
+        },
+        "inspectionGroups": [
+          {
+            "node": "Export_T02_bearing_bridge",
+            "id": "bearing_bridge",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0.87,
+              0
+            ],
+            "motion": "fixed"
+          },
+          {
+            "node": "Export_T02_input_rotor",
+            "id": "input_rotor",
+            "pivot": [
+              0.2497536987066269,
+              0,
+              -0.39643943309783936
+            ],
+            "explode": [
+              0.12,
+              0.35,
+              -0.1
+            ],
+            "motion": "rotation"
+          },
+          {
+            "node": "Export_T02_output_rotor",
+            "id": "output_rotor",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              -0.13,
+              0.56,
+              0.09
+            ],
+            "motion": "rotation"
+          },
+          {
+            "node": "Export_T02_return_spring",
+            "id": "return_spring",
+            "pivot": [
+              0.2497536987066269,
+              0,
+              -0.39643943309783936
+            ],
+            "explode": [
+              0.12,
+              1.06,
+              -0.1
+            ],
+            "motion": "fixed"
+          },
+          {
+            "node": "Export_T02_tray",
+            "id": "tray",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "fixed"
+          }
+        ],
+        "ratio": 1.2857142857142858
+      },
+      {
+        "code": "T03",
+        "slot": "transmission",
+        "name": "厚积",
+        "family": "扭矩芯组",
+        "drive": 28,
+        "output": 36,
+        "benefit": "28 : 36，高惯量负载更容易带起",
+        "cost": "同抽速下输出转速更低",
+        "partId": "launcher.transmission.t03",
+        "file": "t03.glb",
+        "anchor": [
+          0,
+          0.055,
+          -0.12
+        ],
+        "sourceMeshes": 65,
+        "runtime": {
+          "meshes": 12,
+          "triangles": 34004,
+          "bytes": 836516
+        },
+        "inspectionGroups": [
+          {
+            "node": "Export_T03_bearing_bridge",
+            "id": "bearing_bridge",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0.87,
+              0
+            ],
+            "motion": "fixed"
+          },
+          {
+            "node": "Export_T03_input_rotor",
+            "id": "input_rotor",
+            "pivot": [
+              0.2497536987066269,
+              0,
+              -0.39643943309783936
+            ],
+            "explode": [
+              0.12,
+              0.35,
+              -0.1
+            ],
+            "motion": "rotation"
+          },
+          {
+            "node": "Export_T03_output_rotor",
+            "id": "output_rotor",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              -0.13,
+              0.56,
+              0.09
+            ],
+            "motion": "rotation"
+          },
+          {
+            "node": "Export_T03_return_spring",
+            "id": "return_spring",
+            "pivot": [
+              0.2497536987066269,
+              0,
+              -0.39643943309783936
+            ],
+            "explode": [
+              0.12,
+              1.06,
+              -0.1
+            ],
+            "motion": "fixed"
+          },
+          {
+            "node": "Export_T03_tray",
+            "id": "tray",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "fixed"
+          }
+        ],
+        "ratio": 0.7777777777777778
+      },
+      {
+        "code": "C01",
+        "slot": "coupler",
+        "name": "直联",
+        "family": "通用连接头",
+        "benefit": "单支承与标准三爪，导向和阻力平衡",
+        "cost": "极限快脱与抗倾覆支承均不突出",
+        "partId": "launcher.coupler.c01",
+        "file": "c01.glb",
+        "anchor": [
+          0,
+          -0.25,
+          -0.12
+        ],
+        "sourceMeshes": 52,
+        "runtime": {
+          "meshes": 13,
+          "triangles": 10184,
+          "bytes": 264792
+        },
+        "inspectionGroups": [
+          {
+            "node": "Export_C01_coupler_rotor",
+            "id": "coupler_rotor",
+            "pivot": [
+              0,
+              -0.11000001430511475,
+              0
+            ],
+            "explode": [
+              0,
+              -0.15,
+              0
+            ],
+            "motion": "rotation"
+          },
+          {
+            "node": "Export_C01_release_jaw_0",
+            "id": "release_jaw_0",
+            "pivot": [
+              0.30000001192092896,
+              -0.09199997782707214,
+              0
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "translation"
+          },
+          {
+            "node": "Export_C01_release_jaw_1",
+            "id": "release_jaw_1",
+            "pivot": [
+              -0.15000000596046448,
+              -0.09199997782707214,
+              0.25980761647224426
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "translation"
+          },
+          {
+            "node": "Export_C01_release_jaw_2",
+            "id": "release_jaw_2",
+            "pivot": [
+              -0.15000000596046448,
+              -0.09199997782707214,
+              -0.25980761647224426
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "translation"
+          },
+          {
+            "node": "Export_C01_release_cam",
+            "id": "release_cam",
+            "pivot": [
+              0,
+              -0.11500000953674316,
+              0
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "translation"
+          },
+          {
+            "node": "Export_C01_stationary_housing",
+            "id": "stationary_housing",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0.38,
+              0
+            ],
+            "motion": "fixed"
+          }
+        ],
+        "ratio": null
+      },
+      {
+        "code": "C02",
+        "slot": "coupler",
+        "name": "瞬脱",
+        "family": "快脱连接头",
+        "benefit": "短导向裙与开窗转子，减少退出接触",
+        "cost": "对轴线偏斜的约束行程更短",
+        "partId": "launcher.coupler.c02",
+        "file": "c02.glb",
+        "anchor": [
+          0,
+          -0.25,
+          -0.12
+        ],
+        "sourceMeshes": 55,
+        "runtime": {
+          "meshes": 12,
+          "triangles": 10316,
+          "bytes": 275792
+        },
+        "inspectionGroups": [
+          {
+            "node": "Export_C02_coupler_rotor",
+            "id": "coupler_rotor",
+            "pivot": [
+              0,
+              -0.11000001430511475,
+              0
+            ],
+            "explode": [
+              0,
+              -0.15,
+              0
+            ],
+            "motion": "rotation"
+          },
+          {
+            "node": "Export_C02_release_jaw_0",
+            "id": "release_jaw_0",
+            "pivot": [
+              0.30000001192092896,
+              -0.09199997782707214,
+              0
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "translation"
+          },
+          {
+            "node": "Export_C02_release_jaw_1",
+            "id": "release_jaw_1",
+            "pivot": [
+              -0.15000000596046448,
+              -0.09199997782707214,
+              0.25980761647224426
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "translation"
+          },
+          {
+            "node": "Export_C02_release_jaw_2",
+            "id": "release_jaw_2",
+            "pivot": [
+              -0.15000000596046448,
+              -0.09199997782707214,
+              -0.25980761647224426
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "translation"
+          },
+          {
+            "node": "Export_C02_release_cam",
+            "id": "release_cam",
+            "pivot": [
+              0,
+              -0.11500000953674316,
+              0
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "translation"
+          },
+          {
+            "node": "Export_C02_stationary_housing",
+            "id": "stationary_housing",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0.38,
+              0
+            ],
+            "motion": "fixed"
+          }
+        ],
+        "ratio": null
+      },
+      {
+        "code": "C03",
+        "slot": "coupler",
+        "name": "定轴",
+        "family": "稳轴连接头",
+        "benefit": "双支承与连续导向裙，提高支承跨度",
+        "cost": "多一组支承与密封，拖曳和惯量增加",
+        "partId": "launcher.coupler.c03",
+        "file": "c03.glb",
+        "anchor": [
+          0,
+          -0.25,
+          -0.12
+        ],
+        "sourceMeshes": 69,
+        "runtime": {
+          "meshes": 13,
+          "triangles": 14412,
+          "bytes": 371316
+        },
+        "inspectionGroups": [
+          {
+            "node": "Export_C03_coupler_rotor",
+            "id": "coupler_rotor",
+            "pivot": [
+              0,
+              -0.11000001430511475,
+              0
+            ],
+            "explode": [
+              0,
+              -0.15,
+              0
+            ],
+            "motion": "rotation"
+          },
+          {
+            "node": "Export_C03_release_jaw_0",
+            "id": "release_jaw_0",
+            "pivot": [
+              0.30000001192092896,
+              -0.09199997782707214,
+              0
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "translation"
+          },
+          {
+            "node": "Export_C03_release_jaw_1",
+            "id": "release_jaw_1",
+            "pivot": [
+              -0.15000000596046448,
+              -0.09199997782707214,
+              0.25980761647224426
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "translation"
+          },
+          {
+            "node": "Export_C03_release_jaw_2",
+            "id": "release_jaw_2",
+            "pivot": [
+              -0.15000000596046448,
+              -0.09199997782707214,
+              -0.25980761647224426
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "translation"
+          },
+          {
+            "node": "Export_C03_release_cam",
+            "id": "release_cam",
+            "pivot": [
+              0,
+              -0.11500000953674316,
+              0
+            ],
+            "explode": [
+              0,
+              0,
+              0
+            ],
+            "motion": "translation"
+          },
+          {
+            "node": "Export_C03_stationary_housing",
+            "id": "stationary_housing",
+            "pivot": [
+              0,
+              0,
+              0
+            ],
+            "explode": [
+              0,
+              0.38,
+              0
+            ],
+            "motion": "fixed"
+          }
+        ],
+        "ratio": null
+      }
+    ],
+    "assembly": {
+      "parts": [
+        "R01",
+        "T01",
+        "C01"
+      ],
+      "file": "launcher-performance.glb",
+      "runtime": {
+        "meshes": 53,
+        "triangles": 64392,
+        "bytes": 1762956
+      }
+    }
+  },
+  "alignment": [
+    2.220446049250313e-16,
+    4.440892098500626e-16,
+    2.2247786310271853e-16
+  ],
+  "memories": [
+    {
+      "geometries": 62,
+      "textures": 6
+    },
+    {
+      "geometries": 62,
+      "textures": 6
+    },
+    {
+      "geometries": 62,
+      "textures": 6
+    }
+  ],
+  "errors": []
+}

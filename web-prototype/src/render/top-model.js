@@ -2,14 +2,7 @@ import * as THREE from "three";
 import { mergeGeometries } from "three/addons/utils/BufferGeometryUtils.js";
 import { normalizePartCustomization } from "../core/part-customization.js";
 import { applySurfaceFinish, cloneSurfaceMaterial } from "./surface-finish.js";
-
-const SLOT_Y = Object.freeze({
-  attackRing: 0.24,
-  coreLock: 0.42,
-  weightDisc: 0.02,
-  driverShaft: -0.22,
-  tip: -0.56,
-});
+import { SLOT_Y } from "../core/assembly-geometry.js";
 
 const METAL = 0xb7c0c2;
 const DARK_METAL = 0x192126;

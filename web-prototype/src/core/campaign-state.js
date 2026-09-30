@@ -25,7 +25,7 @@ export function normalizeCampaign(saved) {
     journal: list(source.journal).filter((entry) =>
       entry && getMission(entry.missionId) && typeof entry.battleId === "string" &&
       ["player", "enemy", "draw"].includes(entry.winner) &&
-      ["spin_out", "ring_out", "break", "time"].includes(entry.reason) &&
+      ["spin_out", "ring_out", "break", "time", "draw"].includes(entry.reason) &&
       Number.isFinite(entry.time) && entry.time >= 0,
     ).slice(-40).map((entry) => ({
       battleId: entry.battleId.slice(0, 100),
@@ -53,12 +53,12 @@ export function settleMission(campaign, { missionId, battleId, result, durabilit
   if (!mission || !canPlayMission(campaign, missionId) || !battleId ||
       campaign.journal.some((entry) => entry.battleId === battleId) ||
       !result || !["player", "enemy", "draw"].includes(result.winner) ||
-      !["spin_out", "ring_out", "break", "time"].includes(result.reason) ||
+      !["spin_out", "ring_out", "break", "time", "draw"].includes(result.reason) ||
       !Number.isFinite(result.time) || result.time < 0) {
     return { ok: false, campaign };
   }
   const won = result.winner === "player";
-  const cleared = won || mission.objective === "finish";
+  const cleared = result.winner !== "draw" && (won || mission.objective === "finish");
   const firstClear = cleared && !campaign.completed.includes(missionId);
   const challenge = mission.challenge;
   const mastered = won && (challenge.type === "win" ||
@@ -77,5 +77,5 @@ export function settleMission(campaign, { missionId, battleId, result, durabilit
     }].slice(-40),
   };
   return { ok: true, campaign: next, cleared, firstClear, mastered,
-    story: won ? mission.victory : mission.defeat };
+    story: result.winner === "draw" ? "双方未分胜负。保留这次战历，按当前配置再赛一局。" : won ? mission.victory : mission.defeat };
 }

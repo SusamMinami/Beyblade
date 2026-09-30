@@ -4,6 +4,7 @@ import {
   PART_TYPES,
 } from "../data/parts.js";
 import { applyPartCustomization } from "./part-customization.js";
+import { getBuildMeasurements } from "./build-measurements.js";
 
 const REFERENCE_MASS = 1.22;
 const REFERENCE_INERTIA = 0.89;
@@ -157,11 +158,12 @@ export function calculateBuild(selection, customizations = {}) {
 }
 
 export function getBuildRatings(build) {
+  const measured = getBuildMeasurements(build);
   return {
     攻击: clamp((build.attackPower / 1.25) * 100, 0, 100),
-    续航: clamp((5.2 / build.spinDecayPerSecond) * 72, 0, 100),
+    续航: 100 * measured.freeSeconds / (measured.freeSeconds + 6),
     稳定: clamp((build.stability / 1.2) * 100, 0, 100),
     控制: clamp((build.controlResponse / 1.25) * 100, 0, 100),
-    耐久: clamp((build.durability / 125) * 100, 0, 100),
+    耐久: 100 * (1 - measured.worstDamage),
   };
 }

@@ -1,7 +1,7 @@
 import * as THREE from "three";
 import { Reflector } from "three/addons/objects/Reflector.js";
 import { RectAreaLightUniformsLib } from "three/addons/lights/RectAreaLightUniformsLib.js";
-import { applySurfaceFinish } from "./surface-finish.js";
+import { applyWorldSurface, physicalSurface } from "./world-surface.js";
 import layout from "../../../resources/battle_worlds/street_layout.json";
 
 // A single reflected scene is shared by all the puddles. These positions match
@@ -77,67 +77,14 @@ const puddleShader = {
     }`,
 };
 
-// Fine mineral noise has no directional sine bands. Its normal perturbation
-// and roughness live on the asphalt only, not the battle surface.
-function finishAsphalt(material) {
-  material.userData.streetFinish = "wet-asphalt";
-  material.customProgramCacheKey = () => "street-asphalt-v1";
-  material.onBeforeCompile = (shader) => {
-    shader.vertexShader = shader.vertexShader
-      .replace("#include <common>", "#include <common>\nvarying vec3 vRoad;")
-      .replace("#include <begin_vertex>", "#include <begin_vertex>\nvRoad = (modelMatrix * vec4(position,1.0)).xyz;");
-    shader.fragmentShader = shader.fragmentShader.replace("#include <common>", `
-      #include <common>
-      varying vec3 vRoad;
-      float roadHash(vec2 p) { return fract(sin(dot(p,vec2(127.1,311.7)))*43758.5453); }
-      float roadNoise(vec2 p) {
-        vec2 i=floor(p), f=fract(p); f=f*f*(3.0-2.0*f);
-        return mix(mix(roadHash(i),roadHash(i+vec2(1,0)),f.x),
-          mix(roadHash(i+vec2(0,1)),roadHash(i+vec2(1,1)),f.x),f.y);
-      }`);
-    shader.fragmentShader = shader.fragmentShader.replace("#include <roughnessmap_fragment>", `
-      #include <roughnessmap_fragment>
-      float damp = roadNoise(vRoad.xz*.8);
-      float grit = roadNoise(vRoad.xz*12.0);
-      diffuseColor.rgb *= .94+grit*.05+damp*.06;
-      roughnessFactor = clamp(.36+damp*.16+(grit-.5)*.05,.3,.65);`);
-    shader.fragmentShader = shader.fragmentShader.replace("#include <normal_fragment_maps>", `
-      #include <normal_fragment_maps>
-      float gritHeight = roadNoise(vRoad.xz*12.0);
-      vec3 sx = dFdx(vViewPosition), sy = dFdy(vViewPosition);
-      vec3 rx = cross(sy,normal), ry = cross(normal,sx);
-      float det = dot(sx,rx);
-      normal = normalize(abs(det)*normal - sign(det)*.0015*
-        (dFdx(gritHeight)*rx+dFdy(gritHeight)*ry));`);
-  };
-  material.needsUpdate = true;
-}
-
-function finishPlastic(material) {
-  material.customProgramCacheKey = () => "street-worn-plastic-v1";
-  material.onBeforeCompile = (shader) => {
-    shader.vertexShader = shader.vertexShader
-      .replace("#include <common>", "#include <common>\nvarying vec3 vPlastic;")
-      .replace("#include <begin_vertex>", "#include <begin_vertex>\nvPlastic = (modelMatrix * vec4(position,1.0)).xyz;");
-    shader.fragmentShader = shader.fragmentShader
-      .replace("#include <common>", "#include <common>\nvarying vec3 vPlastic;")
-      .replace("#include <roughnessmap_fragment>", `
-        #include <roughnessmap_fragment>
-        float polishedRim = smoothstep(3.2,6.5,length(vPlastic.xz));
-        roughnessFactor = mix(.40,.17,polishedRim);
-        diffuseColor.rgb *= mix(vec3(.93,.95,.96),vec3(1.0,.97,.91),polishedRim);`);
-  };
-  material.needsUpdate = true;
-}
-
 function plasticReflection(renderer, day = false) {
   // Art-directed soft light cards: dark surroundings keep diffuse plastic calm,
   // while the warm shop-side strip and cool sky opening shape its clear coat.
   const room = new THREE.Scene();
-  room.background = new THREE.Color(day ? "#a8bfc5" : "#101923");
+  room.background = new THREE.Color(day ? "#526570" : "#101923");
   const cards = day ? [
-    { p: [-5, 12, 6], size: [5, 4], color: [4, 3.7, 3.1] },
-    { p: [8, 9, -4], size: [7, 10], color: [1.4, 1.9, 2.3] },
+    { p: [-4, 9, -11], size: [9, 4], color: [5, 4.4, 3.5] },
+    { p: [8, 9, -4], size: [5, 9], color: [1.1, 1.6, 2.2] },
   ] : [
     { p: [-3, 8, -10], size: [8, 1.8], color: [7, 4.7, 2.7] },
     { p: [7, 10, -5], size: [3, 7], color: [1.8, 3.1, 4.4] },
@@ -174,17 +121,15 @@ export class StreetAtmosphere {
       night: plasticReflection(renderer),
     };
     this.plastics = [];
-    const seen = new Set();
+    this.scene = scene;
+    const seen = this.surfaces = new Set();
     const coated = new Map();
     model.traverse((mesh) => {
       if (!mesh.isMesh) return;
       let material = mesh.material;
-      if (/Street (glazed|oxblood|smoked|cafe glazing)/.test(material.name)) {
+      if (/Street (glazed|oxblood|smoked|cafe glazing|bowl cobalt|wet asphalt)|Acrylic guard/.test(material.name)) {
         if (!coated.has(material)) {
-          const finish = new THREE.MeshPhysicalMaterial();
-          THREE.MeshStandardMaterial.prototype.copy.call(finish, material);
-          finish.clearcoat = .42;
-          finish.clearcoatRoughness = .19;
+          const finish = physicalSurface(material, { clearcoat: .65, clearcoatRoughness: .13 });
           coated.set(material, finish);
         }
         mesh.material = coated.get(material);
@@ -196,12 +141,31 @@ export class StreetAtmosphere {
       material.envMapIntensity = .62;
       if (/Street bowl ivory/.test(name)) {
         this.plastics.push(material);
+        material.color.setRGB(.62, .63, .61);
+        material.clearcoat = .78;
         material.envMapIntensity = 1.15;
-        finishPlastic(material);
+        applyWorldSurface(material, "plastic");
       }
-      if (/asphalt/i.test(name)) finishAsphalt(material);
-      else if (/oak/i.test(name)) applySurfaceFinish(material, "wood", .65);
-      else if (/plaster|paver|curb/i.test(name)) applySurfaceFinish(material, "stone", .32);
+      if (/Street bowl cobalt/.test(name)) {
+        material.color.setRGB(.018, .10, .26);
+        material.metalness = 0;
+      }
+      if (/Acrylic guard/.test(name)) {
+        material.color.setRGB(.80, .90, .94);
+        material.metalness = 0;
+        material.roughness = .075;
+        material.opacity = .18;
+        material.depthWrite = false;
+        material.envMapIntensity = 1.1;
+      }
+      if (/asphalt/i.test(name)) applyWorldSurface(material, "asphalt");
+      else if (/glazed|oxblood|smoked|cafe glazing|bowl cobalt/.test(name)) applyWorldSurface(material, "glaze");
+      else if (/oak/i.test(name)) applyWorldSurface(material, "wood");
+      else if (/plaster|paver|curb/i.test(name)) applyWorldSurface(material, "stone");
+      else if (/terracotta/i.test(name)) applyWorldSurface(material, "terracotta");
+      else if (/awning/i.test(name)) applyWorldSurface(material, "fabric");
+      else if (/brushed|aluminium|painted iron/i.test(name)) applyWorldSurface(material, "metal");
+      else if (/Street sign ink/.test(name)) applyWorldSurface(material, "rubber");
       if (/Street (lightbox|vending|lantern|window) glow|Street cafe interior/.test(name)) {
         this.materials.push({ material, base: material.emissiveIntensity,
           channel: name.includes("vending") ? "vending" : name.includes("lantern") ? "lantern" : "shop" });
@@ -266,9 +230,13 @@ export class StreetAtmosphere {
   setPeriod(period) {
     this.period = period === "day" ? "day" : "night";
     const day = this.period === "day";
+    this.surfaces.forEach(material => {
+      material.envMap = this.scene.environment;
+      material.needsUpdate = true;
+    });
     this.plastics.forEach(material => {
       material.envMap = this.plasticEnvironments[this.period].texture;
-      material.envMapIntensity = day ? .68 : 1.15;
+      material.envMapIntensity = day ? .95 : 1.25;
       material.needsUpdate = true;
     });
     this.puddles.material.uniforms.color.value.set(day ? "#617b83" : "#182b37");
@@ -308,5 +276,8 @@ export class StreetAtmosphere {
     this.root.clear();
     this.materials = [];
     this.luminaires = [];
+    this.surfaces.clear();
+    this.plastics = [];
+    this.scene = null;
   }
 }

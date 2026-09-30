@@ -1,0 +1,194 @@
+[
+  {
+    "path": "scripts\\battle\\v6_data.gd",
+    "Hash": "462FEA442B996B420AE3C067CEB0A9BD60D9ADDADEA437B23AC7CD8C7B5AB6B7"
+  },
+  {
+    "path": "scripts\\battle\\v6_dynamics.gd",
+    "Hash": "3F8667A774D5D4A7E1F024ACBD0D0C957F59C7D7AE921FF2767FD972F3968B03"
+  },
+  {
+    "path": "scripts\\battle\\v6_launcher.gd",
+    "Hash": "825436BEF445652AAA4188279B3198E39CD5680E49E7F03B7F69467B16CCCCE3"
+  },
+  {
+    "path": "scripts\\battle\\v6_presentation.gd",
+    "Hash": "582E33F03E56762FC51973A2CB813767758CAE6FC557454D3B5CDC03B74C004C"
+  },
+  {
+    "path": "scripts\\battle\\v6_simulation.gd",
+    "Hash": "608F838B4791C4D810CFCD3D3B243D0362A14186406F312B067BCCBA4FC5EC8F"
+  },
+  {
+    "path": "scripts\\battle\\battle_simulation.gd",
+    "Hash": "042902BB2D1D9708880450AFDC9527E4C62AE1044656EB656142F71F3F9FF35C"
+  },
+  {
+    "path": "scripts\\battle\\battle_session.gd",
+    "Hash": "A4A88BBA9CE57C58435D2460EEEE4CDD00689545864CCB8181AE1861CBE3FAE2"
+  },
+  {
+    "path": "scripts\\battle\\battle_screen.gd",
+    "Hash": "E573A5A3114194184AEBE527D93708C0B437557707D0FD48195D437626B56824"
+  },
+  {
+    "path": "scripts\\battle\\battle_state_codec.gd",
+    "Hash": "017038777765E500E9B21B854A21E217258D4645673B614F887E3765164D7138"
+  },
+  {
+    "path": "scripts\\assembly\\assembly_calculator.gd",
+    "Hash": "A85A3E4F697D246B6F7DA2D23934B3083C3EA4454906F8FB4AFA8670D5E6C7F7"
+  },
+  {
+    "path": "scripts\\assembly\\five_part_top_model.gd",
+    "Hash": "1296CD0F0CDCA05CD61F8F50A064EECD57EECB517C2ABD4A766F5563BC03777F"
+  },
+  {
+    "path": "scripts\\assembly\\top_build_data.gd",
+    "Hash": "D01E0CAE31CB91317F3A4CA7238AEF6B590E922C883180820AD9F75A479E4488"
+  },
+  {
+    "path": "scripts\\maps\\arena_map_catalog.gd",
+    "Hash": "C97E5B8419E04ABEDDAB060BE14582CCCDDFE12823B66DD4F8CDE9D8AF4DBEDB"
+  },
+  {
+    "path": "scripts\\maps\\arena_map_resource.gd",
+    "Hash": "43CFE8713493EF603F7127532EB8F37834D21EB092717470AF4CCE81D3EB7B7A"
+  },
+  {
+    "path": "scripts\\maps\\arena_terrain.gd",
+    "Hash": "DE533EEBD5C67F228653303C599D6CEF37AA226EEBC38603B9531D54B873C0EA"
+  },
+  {
+    "path": "scripts\\maps\\map_select_screen.gd",
+    "Hash": "ED45B6FE737ACD0BAEE871F17C0581163AAB5D6AC7E376F2DFF500A857FED3FC"
+  },
+  {
+    "path": "scripts\\maps\\terrain_surface_resource.gd",
+    "Hash": "32D58C4C749BC4F51570E25CC5A09AE5E28DCB10D7E3A23CD4DD3C23DF9CC66E"
+  },
+  {
+    "path": "scripts\\core\\game_state.gd",
+    "Hash": "865411041092749FF77FEC0B859794B42DDD16F051FB610B39768937F7D35BCD"
+  },
+  {
+    "path": "scripts\\network\\async_verify_provider.gd",
+    "Hash": "5C60FC25C708D249B547EB56C8D5EB237338AC2738326898254A726DA777BDDE"
+  },
+  {
+    "path": "scripts\\network\\frame_sync_provider.gd",
+    "Hash": "3703C5830EC92F2DDB6D7A1C6E6B03F3DC0C646284376EC3435EA2DF44B9DB81"
+  },
+  {
+    "path": "scripts\\network\\battle_transport.gd",
+    "Hash": "AE5BE3862EB7E0FCB3EE8652C8BE353F4200B9DE02402BBF32A525C95215E8A7"
+  },
+  {
+    "path": "scripts\\network\\local_transport.gd",
+    "Hash": "D6778DB63D5EBE5EADB85694CAD8DDAC8619B45BF186BB622F5F15E3A90A0B2F"
+  },
+  {
+    "path": "scripts\\network\\websocket_transport.gd",
+    "Hash": "3E090A3A451E680B93073E94FE0375A88CE6F09BA2EAC7010A648C047952EC0A"
+  },
+  {
+    "path": "scenes\\battle\\BattleScreen.tscn",
+    "Hash": "BCA5245B3984504D619CFE5EB6D602F793E432A71CC834A6F541394FD49FB26D"
+  },
+  {
+    "path": "resources\\physics\\v6_catalog.json",
+    "Hash": "25C6C9B237501022C911275763BBF2B9692C62174A29AA74D244393B9AEB0462"
+  },
+  {
+    "path": "resources\\physics\\v6_fixtures.json",
+    "Hash": "AC57FB01E57B21B065B6FA799EF48721E8D44120FAA1FEBCFDB68A59FDF10A61"
+  },
+  {
+    "path": "resources\\maps\\composite_arena.tres",
+    "Hash": "2BA8C67D3A36D9C2D4EBABA059D03D3E565EF322533BFE1CF5D35C0934B4B3C2"
+  },
+  {
+    "path": "resources\\maps\\metal_speed_arena.tres",
+    "Hash": "D81407516DD481A8513EBA39CBC955D7D1CA173CEC5DB99C56321C8F0B71D683"
+  },
+  {
+    "path": "resources\\maps\\ruins_arena.tres",
+    "Hash": "B3ED2464C649642D6B3A241A567A39AC187932AF899C82709180C45063CF8797"
+  },
+  {
+    "path": "resources\\maps\\standard_bowl_arena.tres",
+    "Hash": "273C5194E78E68E9F019B10959083D50E067FB9A2E4656D6A266AA187CF26D65"
+  },
+  {
+    "path": "resources\\maps\\street_arena.tres",
+    "Hash": "4F4AE37E4A73C0134E2C73946925FC025753FA36A713EFCEF07D24B1DFB3DD6C"
+  },
+  {
+    "path": "tests\\battle\\physics_v6_helpers.gd",
+    "Hash": "51E7D4D3C177D9086341BF80B61FE45F5D4C0EFC05171B803A54CCCA1D21074D"
+  },
+  {
+    "path": "tests\\battle\\physics_v6_parity.gd",
+    "Hash": "C3046CAAF0212E1650ECD18EE118DA4DB409377059254B4AE8BD60227C9B2235"
+  },
+  {
+    "path": "tests\\battle\\physics_v6_scene.gd",
+    "Hash": "DC3605459F90E859DA0F35E156F80E5B058F6D00D6F84CD54E421A6215C1B3A4"
+  },
+  {
+    "path": "tests\\battle\\battle_simulation_test.gd",
+    "Hash": "C287BDA8A0FD9C7571C4D9FF40F10CB53909252D91CC374DB779667DDEAA50E6"
+  },
+  {
+    "path": "tests\\maps\\arena_terrain_test.gd",
+    "Hash": "FDE67A393390CB759A673342DA01CAD5536801EE2373B5D9B77A72B57291017C"
+  },
+  {
+    "path": "web-prototype\\src\\core\\arena-contact.js",
+    "Hash": "BBB68358D5546204D808B61DC51F3741F72B7FDA16C5613A9171F858164555D4"
+  },
+  {
+    "path": "web-prototype\\src\\core\\assembly-geometry.js",
+    "Hash": "863AF1154A0DAE76A7E15B674EBD96CF43AB461F9C4DD164CFBB4FA0A5DC7779"
+  },
+  {
+    "path": "web-prototype\\src\\core\\battle-replay.js",
+    "Hash": "83CEB19B7BCF5C79952C9DC6B2FEA565F2131D911FF6405D72DD7E5571E871C7"
+  },
+  {
+    "path": "web-prototype\\src\\core\\battle-simulation.js",
+    "Hash": "6B5E2A52EF695F77DFECB4B31ABD2B319F1F0DA43F32EE49823DDE457D8B187B"
+  },
+  {
+    "path": "web-prototype\\src\\core\\top-dynamics.js",
+    "Hash": "51F2090C37DE1E00509DE0E592F9C5CFF33D768C4601009A7DD846FDAB75C901"
+  },
+  {
+    "path": "web-prototype\\src\\core\\top-structure.js",
+    "Hash": "896C2F0CDC1604C9D18DB3C4F67FAE75C02E6808AF0601629ED03DED1613C81F"
+  },
+  {
+    "path": "web-prototype\\src\\render\\battle-pose.js",
+    "Hash": "493094CB2BD41503C682912E87D4611DA8B2004F0012F69AE12F2B0EDEF00EAD"
+  },
+  {
+    "path": "web-prototype\\src\\render\\top-model.js",
+    "Hash": "62FA9ACA9B5B46C25656F62B4D2A1FD690186AEB9193CA6E094FEEB1137F6FE7"
+  },
+  {
+    "path": "web-prototype\\src\\render\\three-stage.js",
+    "Hash": "D974764967BF2D49A00AAD1D1224AE265B6ED9BBCD0083B9B47288BD34A112CC"
+  },
+  {
+    "path": "web-prototype\\src\\main.js",
+    "Hash": "63A21A449085BDC08DCF50CAB1B1C86BF3E837006235CFDAC60280395BDF04D4"
+  },
+  {
+    "path": "web-prototype\\tools\\verify-physics-v6.mjs",
+    "Hash": "95FCE2A774AA743128294CA03C7EA92E5E57A22C483CC0E816958D869FAAA746"
+  },
+  {
+    "path": "web-prototype\\tools\\verify-native-recovery.mjs",
+    "Hash": "C518B5113C1E76791923B5EB09F88F8B37DC24C2B889806B5C3BF36735B5F880"
+  }
+]

@@ -1,0 +1,55 @@
+{
+  "measurements": {
+    "movingPixels": 847,
+    "illuminatedPixels": 9198,
+    "paused": true,
+    "reduced": true,
+    "hidden": true,
+    "dayReduced": true,
+    "defaultSpotsDisabled": true,
+    "physicalMetal": true,
+    "noShadowMaps": true,
+    "lightCount": 6,
+    "released": true,
+    "standardRestored": true,
+    "stableMemory": true,
+    "drawCalls": 71,
+    "triangles": 683526,
+    "day": {
+      "beam": 0.012,
+      "light": 55,
+      "runner": 0.28
+    },
+    "night": {
+      "beam": 0.085,
+      "light": 380,
+      "runner": 0.9
+    },
+    "reflectionPixels": 71501,
+    "reliefPixels": 210,
+    "physicalDefines": true,
+    "finishCount": 6,
+    "lightweightGlass": true,
+    "dayReflectionBound": true,
+    "frameMs": {
+      "median": 2.0999999046325684,
+      "p95": 2.5999999046325684
+    },
+    "reliefBands": {
+      "any": 3513,
+      "over3": 210,
+      "over6": 35,
+      "over15": 0,
+      "max": 9
+    },
+    "spotlightBands": {
+      "any": 25695,
+      "over3": 9198,
+      "over6": 2911,
+      "over15": 5,
+      "max": 42
+    },
+    "softLightPixels": 2455
+  },
+  "errors": []
+}

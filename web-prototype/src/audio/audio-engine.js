@@ -10,6 +10,13 @@ export class AudioEngine {
     this.enemySpin = null;
     this.initPromise = null;
     this.lastUiTime = -1;
+    this.lastVoiceTime = new Map();
+  }
+
+  _voiceTime(voice) {
+    const now = Math.max(Tone.now(), (this.lastVoiceTime.get(voice) ?? -1) + .008);
+    this.lastVoiceTime.set(voice, now);
+    return now;
   }
 
   async init() {
@@ -110,7 +117,7 @@ export class AudioEngine {
 
   playUi(tone = "tap") {
     if (!this.ready || !this.enabled) return;
-    const now = Tone.now();
+    const now = this._voiceTime("ui");
     if (now - this.lastUiTime < 0.045) return;
     this.lastUiTime = now;
     const note = {
@@ -126,12 +133,13 @@ export class AudioEngine {
     );
     if (tone === "confirm") {
       this.uiSynth.triggerAttackRelease("C7", 0.055, now + 0.075, 0.3);
+      this.lastVoiceTime.set("ui", now + .075);
     }
   }
 
   playLaunch(power) {
     if (!this.ready || !this.enabled) return;
-    const now = Tone.now();
+    const now = this._voiceTime("launch");
     this.launchNoise.triggerAttackRelease(0.16, now, 0.5 + power * 0.35);
     this.launchBody.triggerAttackRelease(
       "G1",
@@ -139,12 +147,17 @@ export class AudioEngine {
       now + 0.055,
       0.55 + power * 0.42,
     );
+    this.lastVoiceTime.set("launch", now + .055);
   }
 
   playCollision(intensity) {
     if (!this.ready || !this.enabled) return;
     const amount = clamp(intensity, 0.08, 1);
-    const now = Tone.now();
+    // Effects may contain several fixed steps in one rendered frame.
+    const clock = Tone.now();
+    if (clock - (this.lastCollisionTime ?? -1) < .035) return;
+    this.lastCollisionTime = clock;
+    const now = this._voiceTime("collision");
     this.hitMetal.frequency.value = 180 + amount * 120;
     this.hitMetal.triggerAttackRelease(0.08 + amount * 0.17, now, amount);
     this.hitBody.triggerAttackRelease(
@@ -159,7 +172,7 @@ export class AudioEngine {
     if (!this.ready || !this.enabled || state === "safe" || state === "stable") {
       return;
     }
-    const now = Tone.now();
+    const now = this._voiceTime("warning");
     if (type === "stability") {
       this.scrapeNoise.triggerAttackRelease(
         state === "critical" ? 0.18 : 0.1,
@@ -192,7 +205,11 @@ export class AudioEngine {
 
   playResult(won, reason) {
     if (!this.ready || !this.enabled) return;
-    const now = Tone.now();
+    const now = this._voiceTime("launch");
+    if (reason === "draw") {
+      this.rewardSynth.triggerAttackRelease(["C4", "G4"], .2, now, .3);
+      return;
+    }
     if (won) {
       [
         ["C5", 0],

@@ -1,892 +1,201 @@
 class_name BattleSimulation
 extends RefCounted
 
-const BattleProtocolRef := preload("res://scripts/battle/battle_protocol.gd")
-const SIMULATION_VERSION := "2026.07.21-web-v2"
-const RESULT_SPIN_OUT := &"spin_out"
-const RESULT_RING_OUT := &"ring_out"
-const RESULT_BREAK := &"break"
-const RESULT_TIME := &"time"
-
-const TOP_RADIUS := 0.69
-const MIN_ACTIVE_SPIN := 2.0
-const MIN_DAMAGE_IMPULSE := 0.35
-const DAMAGE_PER_IMPULSE := 1.1
-const MAX_BATTLE_TIME := 75.0
-const TILT_WARNING := 0.38
-const TILT_CRITICAL := 0.62
-const MAX_TILT := 0.9
-const MAX_COLLISION_LOGS := 200
-
+# Native public adapter: keeps existing resource/Vector2 APIs at the scene
+# boundary, while the v6 solver and recovery data remain double precision.
+const CORE = preload("res://scripts/battle/v6_simulation.gd")
+const D = preload("res://scripts/battle/v6_data.gd")
+const SIMULATION_VERSION = D.VERSION
+const RESULT_SPIN_OUT = &"spin_out"
+const RESULT_RING_OUT = &"ring_out"
+const RESULT_BREAK = &"break"
+const RESULT_TIME = &"time"
+const RESULT_DRAW = &"draw"
+const TOP_RADIUS = .69
+const MIN_ACTIVE_SPIN = 2.0
 
 class TopState:
 	var build: TopBuildData
-	var position: Vector2
-	var velocity := Vector2.ZERO
-	var spin := 0.0
-	var durability := 0.0
-	var tilt := 0.0
-	var surface_name := ""
-	var control_input := Vector2.ZERO
-	var control_influence := 0.0
-	var imbalance := 0.0
-	var spin_loss_rate := 0.0
-	var ring_out_risk := 0.0
-	var stability_state := &"stable"
-	var ring_risk_state := &"safe"
-	var spin_risk_state := &"safe"
+	var data: Dictionary
+	var position: Vector2:
+		get: return Vector2(data.position.x,data.position.y)
+		set(value): data.position = {"x":float(value.x),"y":float(value.y)}
+	var velocity: Vector2:
+		get: return Vector2(data.velocity.x,data.velocity.y)
+		set(value): data.velocity = {"x":float(value.x),"y":float(value.y)}
+	var spin: float:
+		get: return data.spin
+		set(value): data.spin = value
+	var durability: float:
+		get: return data.durability
+		set(value): data.durability = value
+	var tilt: float:
+		get: return data.tilt
+		set(value):
+			var previous = float(data.tilt)
+			data.tilt = value
+			if previous>1e-12:
+				data.tiltVector.x *= value/previous
+				data.tiltVector.y *= value/previous
+			else:
+				data.tiltVector = {"x":value,"y":0.0}
+	var imbalance: float:
+		get: return data.imbalance
+		set(value): data.imbalance = value
+	var control_input: Vector2:
+		get: return Vector2(data.controlInput.x,data.controlInput.y)
+	var control_influence: float:
+		get: return data.controlInfluence
+	var surface_name: String:
+		get: return data.surfaceName
+	var spin_loss_rate: float:
+		get: return data.spinLossRate
+	var ring_out_risk: float:
+		get: return data.ringOutRisk
+	var stability_state: StringName:
+		get: return data.stabilityState
+	var ring_risk_state: StringName:
+		get: return data.ringRiskState
+	var spin_risk_state: StringName:
+		get: return data.spinRiskState
 
-	func _init(build_data: TopBuildData, start_position: Vector2) -> void:
-		build = build_data
-		position = start_position
-		durability = build_data.durability
+	func _init(resource: TopBuildData, state: Dictionary) -> void:
+		build = resource
+		data = state
 
+	func _get(property: StringName) -> Variant:
+		return data.get(String(property).to_camel_case())
 
+var core: CORE
 var player_build: TopBuildData
 var enemy_build: TopBuildData
 var arena: ArenaMapResource
-var seed: int
-var tuning: Dictionary
-var diagnostics := false
-var logger: Callable
-
-var phase := &"ready"
-var time := 0.0
-var frame := 0
-var result: Dictionary = {}
-var events: Array[Dictionary] = []
-var collision_log: Array[Dictionary] = []
-var collision_cooldown := 0.0
 var player: TopState
 var enemy: TopState
+var tuning: Dictionary = {}
+var diagnostics = false
+var logger: Callable
+var phase: StringName:
+	get: return core.phase
+	set(value): core.phase = value
+var time: float:
+	get: return core.time
+	set(value): core.time = value
+var frame: int:
+	get: return core.frame
+	set(value): core.frame = value
+var seed: int:
+	get: return core.seed
+var result: Dictionary:
+	get: return {} if core.result==null else native_data(core.result)
+var events: Array[Dictionary]:
+	get:
+		var value: Array[Dictionary] = []
+		for event in core.events: value.append(native_data(event))
+		return value
+var collision_log: Array[Dictionary]:
+	get:
+		var value: Array[Dictionary] = []
+		for event in core.collision_log: value.append(native_data(event))
+		return value
+var drive_zone: Dictionary:
+	get: return core.drive_zone
 
-
-func _init(
-	new_player_build: TopBuildData,
-	new_enemy_build: TopBuildData,
-	new_arena: ArenaMapResource,
-	new_seed: int = 20260718,
-	initial_tuning: Dictionary = {},
-	enable_diagnostics := false,
-	diagnostic_logger: Callable = Callable()
-) -> void:
-	player_build = new_player_build
-	enemy_build = new_enemy_build
-	arena = new_arena
-	seed = _uint32(new_seed)
+func _init(a: TopBuildData, b: TopBuildData, map: ArenaMapResource, new_seed: int = 20260718,
+	initial_tuning: Dictionary = {}, enable_diagnostics = false, diagnostic_logger: Callable = Callable(),
+	rules: Dictionary = {}) -> void:
+	player_build = a
+	enemy_build = b
+	arena = map
 	diagnostics = enable_diagnostics
 	logger = diagnostic_logger
-	tuning = {
-		"damage_scale": 1.0,
-		"spin_scale": 1.0,
-		"control_scale": 1.0,
-		"speed_scale": 1.0
-	}
+	var options = rules.duplicate(true)
+	options.seed = new_seed
+	core = CORE.new(D.build_data(a),D.build_data(b),map.get_v6_record(),options)
 	set_tuning(initial_tuning)
-	reset()
+	bind_tops()
 
+func bind_tops() -> void:
+	player = TopState.new(player_build,core.player)
+	enemy = TopState.new(enemy_build,core.enemy)
 
 func reset() -> void:
-	phase = &"ready"
-	time = 0.0
-	frame = 0
-	result.clear()
-	events.clear()
-	collision_log.clear()
-	collision_cooldown = 0.0
-	player = TopState.new(player_build, Vector2(0.0, 4.45))
-	enemy = TopState.new(enemy_build, Vector2(0.0, -4.45))
+	core.reset()
+	bind_tops()
 
+func set_tuning(next: Dictionary) -> void:
+	for key in next:
+		core.tuning[str(key).to_camel_case()] = float(next[key])
+	for key in core.tuning:
+		tuning[str(key).to_snake_case()] = core.tuning[key]
 
-func set_tuning(next_tuning: Dictionary) -> void:
-	for key in next_tuning:
-		var normalized_key := _normalize_tuning_key(str(key))
-		if tuning.has(normalized_key):
-			tuning[normalized_key] = float(next_tuning[key])
+func launch(power: float = .86, direction: float = 0, angle: float = 0, height: float = .45, spin_direction: int = 1) -> void:
+	core.launch({"power":power,"direction":direction,"angle":angle,"height":height,"spinDirection":spin_direction})
+	bind_tops()
 
+func launch_explicit(a: Dictionary, b: Dictionary) -> void:
+	core.launch_explicit(a,b)
+	bind_tops()
 
-func launch(
-	power: float = 0.86,
-	direction: float = 0.0,
-	angle: float = 0.0,
-	height: float = 0.45
-) -> void:
-	reset()
-	phase = &"running"
-	var launch_power := clampf(power, 0.35, 1.0)
-	var launch_height := clampf(height, 0.0, 1.0)
-	var launch_angle := clampf(angle, -1.0, 1.0)
-	var speed_scale := _tuning_value("speed_scale")
-	var player_speed := (
-		3.4 + player_build.launch_forward_impulse * launch_power
-	) * (0.94 + launch_height * 0.12) * speed_scale
-	var enemy_power := 0.78 + _seed_unit(3) * 0.16
-	var enemy_speed := (
-		3.4 + enemy_build.launch_forward_impulse * enemy_power
-	) * speed_scale
+func step(delta: float, control: Vector2 = Vector2.ZERO, opponent: Vector2 = Vector2.INF) -> void:
+	core.step(delta,D.vec(control.x,control.y),null if opponent==Vector2.INF else D.vec(opponent.x,opponent.y))
+	if diagnostics and logger.is_valid():
+		for event in events:
+			if event.type=="collision": logger.call("[BattleSimulation] collision",event.telemetry)
 
-	player.velocity = Vector2(
-		sin(direction) * player_speed + launch_angle * 0.72,
-		-cos(direction) * player_speed
-	)
-	var enemy_direction := (_seed_unit(5) - 0.5) * 0.24
-	enemy.velocity = Vector2(
-		sin(enemy_direction) * enemy_speed,
-		cos(enemy_direction) * enemy_speed
-	)
-	player.spin = (
-		player_build.max_spin_speed
-		* launch_power
-		* (1.0 - absf(launch_angle) * 0.08)
-		* (1.0 - launch_height * 0.035)
-	)
-	enemy.spin = enemy_build.max_spin_speed * enemy_power
-	player.tilt = (
-		absf(launch_angle) * 0.18
-		+ maxf(launch_height - 0.55, 0.0) * 0.08
-	)
-	enemy.tilt = _seed_unit(7) * 0.08
-	events.append({
-		"type": &"launch",
-		"power": launch_power,
-		"height": launch_height
-	})
-
-
-func step(delta: float, player_control: Vector2 = Vector2.ZERO, enemy_control: Vector2 = Vector2.INF) -> void:
-	events.clear()
-	if phase != &"running":
-		return
-
-	var dt := clampf(delta, 0.0, 1.0 / 30.0)
-	time += dt
-	frame += 1
-	collision_cooldown = maxf(collision_cooldown - dt, 0.0)
-
-	var ec: Vector2
-	if enemy_control == Vector2.INF:
-		ec = _get_enemy_control()
-	else:
-		ec = enemy_control
-	integrate_top(player, player_control, dt, false)
-	integrate_top(enemy, ec, dt, true)
-	_resolve_collision()
-	_update_tilt(player, dt)
-	_update_tilt(enemy, dt)
-	_update_risk_states(player, &"player")
-	_update_risk_states(enemy, &"enemy")
-	_check_result()
-
-
-func launch_explicit(player_cmd: Dictionary, enemy_cmd: Dictionary) -> void:
-	reset()
-	phase = &"running"
-	var speed_scale := _tuning_value("speed_scale")
-	_apply_launch_to_top(player, player_cmd, speed_scale, false)
-	_apply_launch_to_top(enemy, enemy_cmd, speed_scale, true)
-	events.append({
-		"type": &"launch",
-		"power": BattleProtocolRef.dequantize_power(player_cmd.power_q),
-		"height": BattleProtocolRef.dequantize_height(player_cmd.height_q)
-	})
-
-
-func _apply_launch_to_top(top: TopState, cmd: Dictionary, speed_scale: float, is_enemy: bool) -> void:
-	var power := BattleProtocolRef.dequantize_power(int(cmd.power_q))
-	var height := BattleProtocolRef.dequantize_height(int(cmd.height_q))
-	var direction := BattleProtocolRef.dequantize_direction(int(cmd.direction_q))
-	var angle := BattleProtocolRef.dequantize_angle(int(cmd.angle_q))
-	var launch_power := clampf(power, 0.35, 1.0)
-	var launch_height := clampf(height, 0.0, 1.0)
-	var launch_angle := clampf(angle, -1.0, 1.0)
-	var speed := (
-		3.4 + top.build.launch_forward_impulse * launch_power
-	) * (0.94 + launch_height * 0.12) * speed_scale
-	var dir_mult := 1.0 if not is_enemy else -1.0
-	top.velocity = Vector2(
-		sin(direction) * speed + launch_angle * 0.72,
-		-cos(direction) * speed * dir_mult
-	)
-	top.spin = (
-		top.build.max_spin_speed
-		* launch_power
-		* (1.0 - absf(launch_angle) * 0.08)
-		* (1.0 - launch_height * 0.035)
-	)
-	top.tilt = (
-		absf(launch_angle) * 0.18
-		+ maxf(launch_height - 0.55, 0.0) * 0.08
-	)
-	if is_enemy:
-		top.tilt += 0.0
-
-
-func restore_from_snapshot(snap: Dictionary) -> void:
-	phase = snap.get("phase", &"running")
-	time = float(snap.get("time", 0.0))
-	frame = int(snap.get("frame", 0))
-	if snap.has("result") and snap.result is Dictionary:
-		result = snap.result.duplicate()
-	else:
-		result.clear()
-	events.clear()
-	if snap.has("player"):
-		_restore_top(player, snap.player)
-	if snap.has("enemy"):
-		_restore_top(enemy, snap.enemy)
-
-
-func _restore_top(top: TopState, d: Dictionary) -> void:
-	var pos: Variant = d.get("position", Vector2.ZERO)
-	var vel: Variant = d.get("velocity", Vector2.ZERO)
-	if pos is Vector2:
-		top.position = pos
-	elif pos is Dictionary:
-		top.position = Vector2(float(pos.get("x", 0.0)), float(pos.get("y", 0.0)))
-	if vel is Vector2:
-		top.velocity = vel
-	elif vel is Dictionary:
-		top.velocity = Vector2(float(vel.get("x", 0.0)), float(vel.get("y", 0.0)))
-	top.spin = float(d.get("spin", top.spin))
-	top.durability = float(d.get("durability", top.durability))
-	top.tilt = float(d.get("tilt", top.tilt))
-	top.imbalance = float(d.get("imbalance", top.imbalance))
-	top.spin_loss_rate = float(d.get("spin_loss_rate", top.spin_loss_rate))
-	top.ring_out_risk = float(d.get("ring_out_risk", top.ring_out_risk))
-	top.stability_state = d.get("stability_state", top.stability_state)
-	top.ring_risk_state = d.get("ring_risk_state", top.ring_risk_state)
-	top.spin_risk_state = d.get("spin_risk_state", top.spin_risk_state)
-	top.control_influence = float(d.get("control_influence", top.control_influence))
-	if d.has("surface_name"):
-		top.surface_name = String(d.surface_name)
-
-
-func get_frame() -> int:
-	return frame
-
-
-func integrate_top(
-	top: TopState,
-	input: Vector2,
-	delta: float,
-	is_enemy: bool
-) -> void:
-	var radius := top.position.length()
-	var current_surface := arena.get_surface_at_radius(radius)
-	if current_surface == null:
-		return
-	top.surface_name = current_surface.surface_name
-	var spin_before := top.spin
-
-	top.spin = maxf(
-		top.spin
-		- top.build.spin_decay_per_second
-		* current_surface.spin_damping_multiplier
-		* _tuning_value("spin_scale")
-		* delta,
-		0.0
-	)
-
-	var spin_ratio := clampf(
-		top.spin / maxf(top.build.max_spin_speed, 0.001),
-		0.0,
-		1.0
-	)
-	var raw_control := Vector2(
-		clampf(input.x, -1.0, 1.0),
-		clampf(input.y, -1.0, 1.0)
-	)
-	var control_magnitude := clampf(raw_control.length(), 0.0, 1.0)
-	var control := raw_control.normalized() if raw_control.length() > 0.00001 else Vector2.ZERO
-	var mobility := _smoothstep(0.02, 0.55, spin_ratio)
-	var scrape_ratio := _smoothstep(0.48, 0.82, top.tilt)
-	var balance_control := clampf(
-		1.0 - top.imbalance * 0.45 - scrape_ratio * 0.35,
-		0.35,
-		1.0
-	)
-	var control_acceleration := (
-		top.build.control_force
-		/ top.build.total_mass
-		* current_surface.control_modifier
-		* _tuning_value("control_scale")
-		* mobility
-		* balance_control
-	)
-	top.velocity += control * control_acceleration * delta
-	top.control_input = control * control_magnitude
-	top.control_influence = clampf(
-		control_magnitude
-		* mobility
-		* current_surface.control_modifier
-		* top.build.control_response
-		* balance_control,
-		0.0,
-		1.0
-	)
-
-	if radius > 0.01:
-		var inward := -top.position / radius
-		var bowl_acceleration := arena.bowl_force * (
-			0.4 + radius / arena.wall_radius
-		)
-		top.velocity += inward * bowl_acceleration * delta
-
-	var center := top.build.center_of_mass
-	var eccentricity := Vector2(center.x, center.z).length()
-	if eccentricity > 0.005 and spin_ratio > 0.05:
-		var wobble_phase := (
-			time * (5.2 + spin_ratio * 3.1)
-			+ (2.1 if is_enemy else 0.4)
-			+ float(seed) * 0.0001
-		)
-		var wobble := eccentricity * 6.5 * (1.2 - top.build.stability)
-		top.velocity += Vector2(
-			cos(wobble_phase),
-			sin(wobble_phase)
-		) * wobble * delta
-
-	if current_surface.noise_strength > 0.0:
-		var noise := sin(
-			time * 17.0
-			+ float(seed) * 0.17
-			+ (4.0 if is_enemy else 0.0)
-		) * current_surface.noise_strength
-		top.velocity.x += noise * delta
-		top.velocity.y -= noise * 0.7 * delta
-
-	if scrape_ratio > 0.0:
-		var scrape_spin_loss := (
-			1.25
-			+ top.build.friction * current_surface.surface_friction * 1.8
-		) * scrape_ratio * delta
-		top.spin = maxf(top.spin - scrape_spin_loss, 0.0)
-		var scrape_phase := (
-			time * 12.7
-			+ float(seed) * 0.0007
-			+ (1.9 if is_enemy else 0.2)
-		)
-		var scrape_drift := (
-			scrape_ratio * (0.3 + top.imbalance * 0.9) * delta
-		)
-		top.velocity += Vector2(
-			cos(scrape_phase),
-			sin(scrape_phase)
-		) * scrape_drift
-
-	var drag := (
-		0.17
-		* top.build.friction
-		* current_surface.surface_friction
-		* current_surface.linear_drag_multiplier
-		+ (1.0 - mobility) * 8.0
-	)
-	top.velocity *= exp(-drag * delta)
-
-	var max_speed := (
-		0.35
-		+ (8.15 + top.build.attack_power * 1.5) * sqrt(mobility)
-	) * _tuning_value("speed_scale")
-	if top.velocity.length() > max_speed:
-		top.velocity = top.velocity.normalized() * max_speed
-	top.position += top.velocity * delta
-	_resolve_arena_rim(top, current_surface)
-	top.spin_loss_rate = maxf(
-		(spin_before - top.spin) / maxf(delta, 0.000001),
-		0.0
-	)
-
-
-func _resolve_arena_rim(
-	top: TopState,
-	surface: TerrainSurfaceResource
-) -> void:
-	var radius := top.position.length()
-	if radius <= arena.wall_radius or radius >= arena.ring_out_radius:
-		return
-	var normal := top.position / radius
-	var outward_speed := top.velocity.dot(normal)
-	if outward_speed >= 9.2:
-		return
-
-	top.position = normal * (arena.wall_radius - 0.03)
-	if outward_speed > 0.0:
-		var rebound := outward_speed * (
-			1.0 + surface.bounce_multiplier * 0.52
-		)
-		top.velocity -= normal * rebound
-		top.spin = maxf(top.spin - outward_speed * 0.24, 0.0)
-
-
-func _get_enemy_control() -> Vector2:
-	var to_player := player.position - enemy.position
-	var distance := maxf(to_player.length(), 0.001)
-	var pursuit := to_player / distance
-	var orbit_sign := 1.0 if _seed_unit(11) > 0.5 else -1.0
-	var orbit := Vector2(-pursuit.y * orbit_sign, pursuit.x * orbit_sign)
-	var aggression := clampf(enemy.build.attack_power - 0.72, 0.15, 0.7)
-	var retreat := Vector2.ZERO
-	if enemy.position.length() > arena.wall_radius * 0.78:
-		retreat = -enemy.position.normalized() * 0.85
-	return (
-		pursuit * aggression
-		+ orbit * (0.62 - aggression * 0.35)
-		+ retreat
-	)
-
-
-func _resolve_collision() -> void:
-	var offset := enemy.position - player.position
-	var distance := offset.length()
-	var minimum_distance := TOP_RADIUS * 2.0
-	if distance >= minimum_distance or distance <= 0.00001:
-		return
-
-	var normal := offset / distance
-	var relative_velocity := enemy.velocity - player.velocity
-	var normal_speed := relative_velocity.dot(normal)
-	var overlap := minimum_distance - distance
-	player.position -= normal * overlap * 0.5
-	enemy.position += normal * overlap * 0.5
-	if normal_speed >= 0.0:
-		return
-
-	var player_surface := arena.get_surface_at_radius(player.position.length())
-	var enemy_surface := arena.get_surface_at_radius(enemy.position.length())
-	if player_surface == null or enemy_surface == null:
-		return
-	var restitution := clampf(
-		(player.build.restitution + enemy.build.restitution) * 0.5,
-		0.12,
-		0.82
-	) * (
-		(player_surface.bounce_multiplier + enemy_surface.bounce_multiplier)
-		* 0.5
-	)
-	var inverse_player_mass := 1.0 / player.build.total_mass
-	var inverse_enemy_mass := 1.0 / enemy.build.total_mass
-	var impulse := (
-		-(1.0 + restitution) * normal_speed
-		/ (inverse_player_mass + inverse_enemy_mass)
-	)
-
-	player.velocity -= normal * impulse * inverse_player_mass
-	enemy.velocity += normal * impulse * inverse_enemy_mass
-
-	if collision_cooldown <= 0.0 and impulse > MIN_DAMAGE_IMPULSE:
-		var collision_before := {
-			"player": _collision_top_state(player),
-			"enemy": _collision_top_state(enemy)
-		}
-		var base_damage := (
-			(impulse - MIN_DAMAGE_IMPULSE)
-			* DAMAGE_PER_IMPULSE
-			* _tuning_value("damage_scale")
-		)
-		var damage_to_player := (
-			base_damage
-			* enemy.build.attack_power
-			* enemy_surface.damage_multiplier
-		)
-		var damage_to_enemy := (
-			base_damage
-			* player.build.attack_power
-			* player_surface.damage_multiplier
-		)
-		player.durability = maxf(
-			player.durability - damage_to_player,
-			0.0
-		)
-		enemy.durability = maxf(
-			enemy.durability - damage_to_enemy,
-			0.0
-		)
-		player.spin = maxf(player.spin - impulse * 0.19, 0.0)
-		enemy.spin = maxf(enemy.spin - impulse * 0.19, 0.0)
-		_apply_collision_imbalance(
-			player,
-			enemy.build.attack_power,
-			player_surface,
-			impulse
-		)
-		_apply_collision_imbalance(
-			enemy,
-			player.build.attack_power,
-			enemy_surface,
-			impulse
-		)
-		collision_cooldown = 0.12
-		var telemetry := _create_collision_telemetry(
-			impulse,
-			collision_before,
-			{
-				"player": _collision_top_state(player),
-				"enemy": _collision_top_state(enemy)
-			},
-			damage_to_player,
-			damage_to_enemy
-		)
-		collision_log.append(telemetry)
-		if collision_log.size() > MAX_COLLISION_LOGS:
-			collision_log.pop_front()
-		if diagnostics and logger.is_valid():
-			logger.call("[BattleSimulation] collision", telemetry)
-		events.append({
-			"type": &"collision",
-			"impulse": impulse,
-			"intensity": clampf(impulse / 7.0, 0.0, 1.0),
-			"position": (player.position + enemy.position) * 0.5,
-			"telemetry": telemetry
-		})
-
-
-func _apply_collision_imbalance(
-	top: TopState,
-	incoming_attack: float,
-	surface: TerrainSurfaceResource,
-	impulse: float
-) -> void:
-	var spin_ratio := clampf(
-		top.spin / maxf(top.build.max_spin_speed, 0.001),
-		0.0,
-		1.0
-	)
-	var effective_stability := maxf(
-		top.build.stability * surface.stability_modifier,
-		0.2
-	)
-	var low_spin_vulnerability := 0.72 + (1.0 - spin_ratio) * 0.55
-	var gain := clampf(
-		(
-			(impulse - MIN_DAMAGE_IMPULSE)
-			/ 7.0
-			* incoming_attack
-			/ effective_stability
-			* low_spin_vulnerability
-			* 0.48
-		),
-		0.0,
-		0.5
-	)
-	top.imbalance = clampf(top.imbalance + gain, 0.0, 1.0)
-	top.tilt = clampf(top.tilt + gain * 0.28, 0.0, MAX_TILT)
-
-
-func _collision_top_state(top: TopState) -> Dictionary:
-	return {
-		"tilt": _rounded(top.tilt),
-		"spin": _rounded(top.spin),
-		"imbalance": _rounded(top.imbalance),
-		"durability": _rounded(top.durability)
-	}
-
-
-func _create_collision_telemetry(
-	impulse: float,
-	before: Dictionary,
-	after: Dictionary,
-	damage_to_player: float,
-	damage_to_enemy: float
-) -> Dictionary:
-	return {
-		"time": _rounded(time),
-		"impulse": _rounded(impulse),
-		"intensity": _rounded(clampf(impulse / 7.0, 0.0, 1.0)),
-		"position": Vector2(
-			_rounded((player.position.x + enemy.position.x) * 0.5),
-			_rounded((player.position.y + enemy.position.y) * 0.5)
-		),
-		"player": _collision_top_delta(
-			before.player,
-			after.player,
-			damage_to_player
-		),
-		"enemy": _collision_top_delta(
-			before.enemy,
-			after.enemy,
-			damage_to_enemy
-		)
-	}
-
-
-func _collision_top_delta(
-	previous: Dictionary,
-	next: Dictionary,
-	damage: float
-) -> Dictionary:
-	return {
-		"tilt_before": previous.tilt,
-		"tilt_after": next.tilt,
-		"tilt_delta": _rounded(float(next.tilt) - float(previous.tilt)),
-		"spin_before": previous.spin,
-		"spin_after": next.spin,
-		"spin_delta": _rounded(float(next.spin) - float(previous.spin)),
-		"imbalance_before": previous.imbalance,
-		"imbalance_after": next.imbalance,
-		"imbalance_delta": _rounded(
-			float(next.imbalance) - float(previous.imbalance)
-		),
-		"durability_before": previous.durability,
-		"durability_after": next.durability,
-		"damage": _rounded(damage)
-	}
-
+func integrate_top(top: TopState, input: Vector2, delta: float, is_enemy: bool) -> void:
+	core.integrate(top.data,D.vec(input.x,input.y),delta,is_enemy)
 
 func _update_tilt(top: TopState, delta: float) -> void:
-	var speed := top.velocity.length()
-	var spin_ratio := clampf(
-		top.spin / maxf(top.build.max_spin_speed, 0.001),
-		0.0,
-		1.0
-	)
-	var surface := arena.get_surface_at_radius(top.position.length())
-	if surface == null:
-		return
-	var effective_stability := (
-		top.build.stability * surface.stability_modifier
-	)
-	var instability := clampf(
-		1.15 - effective_stability + top.imbalance * 0.72,
-		0.0,
-		1.25
-	)
-	var target_tilt := clampf(
-		instability * 0.48
-		+ speed * 0.012
-		+ (1.0 - spin_ratio) * 0.32
-		+ top.imbalance * 0.2,
-		0.0,
-		MAX_TILT
-	)
-	top.tilt += (target_tilt - top.tilt) * minf(delta * 4.0, 1.0)
-	var recovery := (
-		0.1 + effective_stability * 0.16
-	) * (
-		0.55 + spin_ratio * 0.45
-	)
-	top.imbalance = maxf(top.imbalance - recovery * delta, 0.0)
-	top.ring_out_risk = _calculate_ring_out_risk(top)
+	core.update_tilt(top.data,delta)
 
-
-func _calculate_ring_out_risk(top: TopState) -> float:
-	var radius := top.position.length()
-	var edge_risk := _smoothstep(
-		arena.wall_radius * 0.7,
-		arena.ring_out_radius,
-		radius
-	)
-	var outward := 0.0
-	if radius > 0.001:
-		outward = maxf(top.velocity.dot(top.position / radius), 0.0)
-	var momentum_risk := _smoothstep(1.5, 9.2, outward)
-	var tilt_risk := _smoothstep(TILT_WARNING, MAX_TILT, top.tilt)
-	return clampf(
-		edge_risk * 0.58 + momentum_risk * 0.27 + tilt_risk * 0.15,
-		0.0,
-		1.0
-	)
-
-
-func _update_risk_states(top: TopState, actor: StringName) -> void:
-	var next_stability_state := (
-		&"critical"
-		if top.tilt >= TILT_CRITICAL
-		else &"wobble" if top.tilt >= TILT_WARNING else &"stable"
-	)
-	var next_ring_risk_state := (
-		&"critical"
-		if top.ring_out_risk >= 0.78
-		else &"warning" if top.ring_out_risk >= 0.5 else &"safe"
-	)
-	var spin_ratio := clampf(
-		top.spin / maxf(top.build.max_spin_speed, 0.001),
-		0.0,
-		1.0
-	)
-	var next_spin_risk_state := (
-		&"critical"
-		if spin_ratio <= 0.16
-		else &"warning" if spin_ratio <= 0.32 else &"safe"
-	)
-	_emit_risk_transition(
-		top,
-		actor,
-		&"stability_state",
-		next_stability_state,
-		&"stability"
-	)
-	_emit_risk_transition(
-		top,
-		actor,
-		&"ring_risk_state",
-		next_ring_risk_state,
-		&"ring_out_risk"
-	)
-	_emit_risk_transition(
-		top,
-		actor,
-		&"spin_risk_state",
-		next_spin_risk_state,
-		&"spin_risk"
-	)
-
-
-func _emit_risk_transition(
-	top: TopState,
-	actor: StringName,
-	property: StringName,
-	next_state: StringName,
-	event_type: StringName
-) -> void:
-	if top.get(property) == next_state:
-		return
-	top.set(property, next_state)
-	events.append({
-		"type": event_type,
-		"actor": actor,
-		"state": next_state,
-		"tilt": _rounded(top.tilt),
-		"spin": _rounded(top.spin),
-		"imbalance": _rounded(top.imbalance),
-		"ring_out_risk": _rounded(top.ring_out_risk)
-	})
-
+func _resolve_collision() -> void:
+	core.resolve_collision()
 
 func _check_result() -> void:
-	if player.durability <= 0.0:
-		_finish(&"enemy", RESULT_BREAK)
-		return
-	if player.position.length() > arena.ring_out_radius:
-		_finish(&"enemy", RESULT_RING_OUT)
-		return
-	if player.spin <= MIN_ACTIVE_SPIN:
-		_finish(&"enemy", RESULT_SPIN_OUT)
-		return
+	core.check_result()
 
-	if enemy.durability <= 0.0:
-		_finish(&"player", RESULT_BREAK)
-		return
-	if enemy.position.length() > arena.ring_out_radius:
-		_finish(&"player", RESULT_RING_OUT)
-		return
-	if enemy.spin <= MIN_ACTIVE_SPIN:
-		_finish(&"player", RESULT_SPIN_OUT)
-		return
-
-	if time >= MAX_BATTLE_TIME:
-		var player_score := (
-			player.spin
-			+ player.durability / player.build.durability * 20.0
-		)
-		var enemy_score := (
-			enemy.spin
-			+ enemy.durability / enemy.build.durability * 20.0
-		)
-		_finish(
-			&"player" if player_score >= enemy_score else &"enemy",
-			RESULT_TIME
-		)
-
-
-func _finish(winner: StringName, reason: StringName) -> void:
-	phase = &"finished"
-	result = {
-		"winner": winner,
-		"reason": reason,
-		"time": time
-	}
-	events.append({
-		"type": &"result",
-		"winner": winner,
-		"reason": reason,
-		"time": time
-	})
-
-
-func snapshot() -> Dictionary:
-	return {
-		"phase": phase,
-		"frame": frame,
-		"time": _rounded(time),
-		"result": (
-			{}
-			if result.is_empty()
-			else {
-				"winner": result.winner,
-				"reason": result.reason,
-				"time": _rounded(result.time)
-			}
-		),
-		"player": _top_snapshot(player),
-		"enemy": _top_snapshot(enemy)
-	}
-
-
-func _top_snapshot(top: TopState) -> Dictionary:
-	return {
-		"position": Vector2(
-			_rounded(top.position.x),
-			_rounded(top.position.y)
-		),
-		"velocity": Vector2(
-			_rounded(top.velocity.x),
-			_rounded(top.velocity.y)
-		),
-		"spin": _rounded(top.spin),
-		"durability": _rounded(top.durability),
-		"tilt": _rounded(top.tilt),
-		"imbalance": _rounded(top.imbalance),
-		"spin_loss_rate": _rounded(top.spin_loss_rate),
-		"spin_ratio": _rounded(clampf(
-			top.spin / maxf(top.build.max_spin_speed, 0.001),
-			0.0,
-			1.0
-		)),
-		"ring_out_risk": _rounded(top.ring_out_risk),
-		"stability_state": top.stability_state,
-		"surface_name": top.surface_name,
-		"control_influence": _rounded(top.control_influence)
-	}
-
-
-func _normalize_tuning_key(key: String) -> String:
-	match key:
-		"damageScale":
-			return "damage_scale"
-		"spinScale":
-			return "spin_scale"
-		"controlScale":
-			return "control_scale"
-		"speedScale":
-			return "speed_scale"
-		_:
-			return key
-
-
-func _tuning_value(key: String) -> float:
-	return float(tuning.get(key, 1.0))
-
+func _get_enemy_control() -> Vector2:
+	var value = core.enemy_control()
+	return Vector2(value.x,value.y)
 
 func _seed_unit(salt: int) -> float:
-	var value := _uint32(seed + salt * 0x9e3779b9)
-	value = _uint32(value ^ _uint32(value << 13))
-	value = _uint32(value ^ (value >> 17))
-	value = _uint32(value ^ _uint32(value << 5))
-	return float(value) / 4294967295.0
+	return core.seed_unit(salt)
 
+func get_frame() -> int:
+	return core.frame
 
-func _uint32(value: int) -> int:
-	return value & 0xffffffff
+func export_state() -> Dictionary:
+	return core.export_state()
 
+func restore_state(value: Dictionary) -> bool:
+	if not core.restore_state(value): return false
+	bind_tops()
+	set_tuning({})
+	return true
 
-func _smoothstep(edge_from: float, edge_to: float, value: float) -> float:
-	var ratio := clampf(
-		(value - edge_from) / (edge_to - edge_from),
-		0.0,
-		1.0
-	)
-	return ratio * ratio * (3.0 - 2.0 * ratio)
+func restore_from_snapshot(value: Dictionary) -> bool:
+	# A rounded/legacy network snapshot cannot reconstruct v6 contact history.
+	return restore_state(value)
 
+static func native_data(value: Variant) -> Variant:
+	if value is Dictionary:
+		var converted = {}
+		for key in value:
+			if key in ["position","velocity","controlInput","tiltVector","tiltRate"] and value[key] is Dictionary:
+				converted[str(key).to_snake_case()] = Vector2(value[key].x,value[key].y)
+			else: converted[str(key).to_snake_case()] = native_data(value[key])
+		return converted
+	if value is Array:
+		var converted = []
+		for item in value: converted.append(native_data(item))
+		return converted
+	return value
 
-func _rounded(value: float) -> float:
-	return roundf(value * 1000000.0) / 1000000.0
+func snapshot() -> Dictionary:
+	var value = native_data(core.export_state())
+	value.result = result
+	value.erase("context")
+	for side in ["player","enemy"]:
+		value[side].spin_ratio = clampf(core[side].spin/core[side].build.maxSpinSpeed,0,1)
+	return value

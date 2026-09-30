@@ -65,6 +65,7 @@ export class BattleEffects {
       return {
         ribbon, geometry, positions, colors, color: new THREE.Color(hex), count: 0,
         history: Array.from({ length: TRAIL_COUNT }, () => new THREE.Vector3()),
+        timestamps: new Float64Array(TRAIL_COUNT),
       };
     });
   }
@@ -140,13 +141,16 @@ export class BattleEffects {
         return;
       }
       const position = model.position;
+      while (trail.count > 0 && this.time - trail.timestamps[trail.count - 1] > .55) trail.count--;
       const distance = Math.hypot(position.x - trail.history[0].x,
         position.z - trail.history[0].z);
-      if (delta > 0 && (trail.count === 0 || distance > 0.02)) {
+      if (delta > 0 && (trail.count === 0 || (distance > 0.02 && this.time - trail.timestamps[0] >= 1 / 90))) {
         for (let i = TRAIL_COUNT - 1; i > 0; i -= 1) {
           trail.history[i].copy(trail.history[i - 1]);
+          trail.timestamps[i] = trail.timestamps[i - 1];
         }
         trail.history[0].copy(position);
+        trail.timestamps[0] = this.time;
         trail.history[0].y = (model.userData.groundHeight ?? position.y
           - model.userData.contactOffset * model.scale.y) + 0.045;
         trail.count = Math.min(TRAIL_COUNT, trail.count + 1);
@@ -158,7 +162,7 @@ export class BattleEffects {
         const dx = next.x - point.x;
         const dz = next.z - point.z;
         const length = Math.max(Math.hypot(dx, dz), 0.001);
-        const fade = (1 - i / Math.max(trail.count, 1)) ** 2;
+        const fade = Math.max(0, 1 - (this.time - trail.timestamps[Math.min(i, last)]) / .55) ** 2;
         const width = 0.16 * fade;
         for (let side = 0; side < 2; side += 1) {
           const offset = i * 6 + side * 3;

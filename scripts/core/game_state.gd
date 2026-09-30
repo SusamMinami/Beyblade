@@ -88,7 +88,9 @@ const LOSS_REWARD := 40
 const VALID_MAPS := [
 	"标准碗形竞技场",
 	"金属高速竞技场",
-	"复合材质竞技场"
+	"复合材质竞技场",
+	"放学后的街头",
+	"浮空古代遗迹"
 ]
 const PRACTICE_MAP_IDS_BY_NAME := {
 	"标准碗形竞技场": "standard",

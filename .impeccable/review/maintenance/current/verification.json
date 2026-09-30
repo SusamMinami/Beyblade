@@ -1,0 +1,40 @@
+{
+  "checks": [
+    "Visible transmission surface is directly reachable",
+    "Model strokes create oil at actual contact positions",
+    "Draft strokes do not mutate saved state",
+    "Actual wipe pointer removes local oil",
+    "Undo restores the preceding stroke",
+    "Visible transmission surface is directly reachable",
+    "Controlled trial shows solver measurements",
+    "Visible support surface is directly reachable",
+    "Visible tip surface is directly reachable",
+    "Saving returns to assembly",
+    "Save preserves spatial oil",
+    "Saved oil survives reload",
+    "Next battle uses drive and tip maintenance",
+    "Discarding a clean does not change saved oil",
+    "Assembly button opens the maintenance workbench",
+    "Repeated entry releases maintenance GPU resources",
+    "Mobile has no horizontal overflow",
+    "Touch can reach exposed drive",
+    "Touch cancellation rolls back an interrupted stroke",
+    "Pinch/orbit does not accidentally paint",
+    "No browser or shader errors: "
+  ],
+  "errors": [],
+  "memory": [
+    {
+      "geometries": 60,
+      "textures": 3
+    },
+    {
+      "geometries": 60,
+      "textures": 3
+    },
+    {
+      "geometries": 60,
+      "textures": 3
+    }
+  ]
+}

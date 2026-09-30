@@ -1,0 +1,74 @@
+[
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\render\\championship-atmosphere.js",
+    "line": 46,
+    "snippet": "Undocumented color #687780 is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#687780"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\render\\championship-atmosphere.js",
+    "line": 47,
+    "snippet": "Undocumented color #27333b is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#27333b"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\render\\championship-atmosphere.js",
+    "line": 48,
+    "snippet": "Undocumented color #1a252d is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#1a252d"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\render\\championship-atmosphere.js",
+    "line": 49,
+    "snippet": "Undocumented color #627881 is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#627881"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\render\\championship-atmosphere.js",
+    "line": 50,
+    "snippet": "Undocumented color #b1c4cc is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#b1c4cc"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\render\\championship-atmosphere.js",
+    "line": 51,
+    "snippet": "Undocumented color #a2c1cc is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#a2c1cc"
+  }
+]

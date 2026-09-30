@@ -1,6 +1,7 @@
 // Balance-unit structural approximation. Eight body-local sectors per real part.
 // No FEA, SI stress, persistent inventory wear, or random damage is implied.
 import { normalizePartCustomization } from "./part-customization.js";
+import { assemblySupport } from "./assembly-geometry.js";
 
 export const STRUCTURE_SECTORS = 8;
 const TAU = Math.PI * 2;
@@ -59,6 +60,7 @@ export function deriveStructure(build, structure) {
   const center = moment.map((v) => v / mass);
   structure.totalMass = mass;
   structure.centerOfMass = center;
+  structure.bend = [bendX, bendZ];
   structure.momentOfInertia = Math.max(build.momentOfInertia * 0.35,
     rawInertia - mass * (center[0] ** 2 + center[2] ** 2));
   const shift = Math.hypot(center[0] - build.centerOfMass[0] + bendX,
@@ -76,6 +78,7 @@ export function deriveStructure(build, structure) {
   structure.brokenSectors = structure.parts.reduce((sum, p) =>
     sum + p.sectors.filter((damage) => damage >= 0.99).length, 0);
   structure.failed = ring.health < 0.3 || lock.health < 0.35 || shaft.health < 0.3;
+  Object.assign(structure, assemblySupport(build, structure.parts));
   return structure;
 }
 

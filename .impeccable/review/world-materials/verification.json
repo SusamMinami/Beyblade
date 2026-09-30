@@ -1,0 +1,52 @@
+{
+  "results": [
+    "ruins: physical materials use physical shader definitions",
+    "ruins: surface normals visibly affect light response",
+    "ruins: environment reflections affect rendered pixels",
+    "ruins: local lights illuminate the actual model",
+    "ruins: daylight and night remain distinct",
+    "ruins: reduced motion and pause freeze the rendered scene",
+    "ruins: local lights add no shadow maps",
+    "street: physical materials use physical shader definitions",
+    "street: surface normals visibly affect light response",
+    "street: environment reflections affect rendered pixels",
+    "street: local lights illuminate the actual model",
+    "street: daylight and night remain distinct",
+    "street: reduced motion and pause freeze the rendered scene",
+    "street: local lights add no shadow maps",
+    "Repeated switches release local lighting, materials and reflection resources",
+    "No browser or shader errors: "
+  ],
+  "measurements": {
+    "ruins": {
+      "materialCount": 10,
+      "physicalCount": 6,
+      "physicalDefines": true,
+      "reflectionPixels": 2135,
+      "reliefPixels": 694,
+      "localLightPixels": 46202,
+      "dayPixels": 229957,
+      "reducedMotion": true,
+      "pauseStable": true,
+      "noExtraShadows": true
+    },
+    "street": {
+      "materialCount": 22,
+      "physicalCount": 7,
+      "physicalDefines": true,
+      "reflectionPixels": 53106,
+      "reliefPixels": 9719,
+      "localLightPixels": 218294,
+      "dayPixels": 230396,
+      "reducedMotion": true,
+      "pauseStable": true,
+      "noExtraShadows": true
+    },
+    "releaseStable": true,
+    "baseline": {
+      "geometries": 49,
+      "textures": 19
+    }
+  },
+  "errors": []
+}

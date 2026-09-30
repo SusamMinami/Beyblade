@@ -8,9 +8,10 @@ import { prepareScene } from "./prepare-scene.js";
 import labAssetUrl from "../../../resources/test_lab/test_lab.glb?url";
 import childhoodUrl from "../../../resources/battle_worlds/childhood_lab.glb?url";
 import { windParameters } from "../core/lab-state.js";
+import { createMinimalRoom } from "./workshop-room.js";
 
 export class LabStage {
-  constructor(container) {
+  constructor(container, renderer) {
     this.container = container;
     this.scene = new THREE.Scene();
     this.scene.background = new THREE.Color("#a6b4b7");
@@ -22,7 +23,7 @@ export class LabStage {
     this.view = "front";
     this.elapsed = 0;
     this.rpm = 0;
-    this.renderer = new THREE.WebGLRenderer({ antialias: true, alpha: false });
+    this.renderer = renderer ?? new THREE.WebGLRenderer({ antialias: true, alpha: false });
     this.renderer.setPixelRatio(Math.min(devicePixelRatio, 2));
     this.renderer.outputColorSpace = THREE.SRGBColorSpace;
     this.renderer.toneMapping = THREE.ACESFilmicToneMapping;
@@ -106,6 +107,12 @@ export class LabStage {
 
   loadSet(room) {
     if (this.roomSets[room]) return Promise.resolve(this);
+    if (room === "minimal") {
+      this.roomSets.minimal = createMinimalRoom();
+      this.scene.add(this.roomSets.minimal);
+      this.labSet = this.roomSets.minimal;
+      return Promise.resolve(this);
+    }
     if (this.roomLoads[room]) return this.roomLoads[room];
     this.roomLoads[room] = new GLTFLoader().loadAsync(room === "advanced" ? labAssetUrl : childhoodUrl).then(gltf => {
       gltf.scene.traverse((mesh) => {
@@ -133,7 +140,7 @@ export class LabStage {
   }
 
   setRoom(room) {
-    this.room = room === "advanced" ? room : "childhood";
+    this.room = ["minimal", "childhood", "advanced"].includes(room) ? room : "minimal";
     Object.entries(this.roomSets ?? {}).forEach(([id,node])=>{node.visible=id===this.room;});
     this.labSet = this.roomSets?.[this.room];
     this.advancedShield.forEach(node=>{node.visible=this.room==="advanced";});
@@ -141,7 +148,8 @@ export class LabStage {
     this.keyLight.intensity=this.room==="childhood" ? 2.7 : 2.1;
     this.ambientLight.intensity=this.room==="childhood" ? .38 : .9;
     this.scene.environmentIntensity=this.room==="childhood" ? .38 : .8;
-    this.scene.background.set(this.room==="childhood" ? "#b6bba5" : "#a6b4b7");
+    this.scene.background.set(this.room === "minimal" ? "#f7f3e9" : this.room==="childhood" ? "#b6bba5" : "#a6b4b7");
+    this.scene.fog.color.copy(this.scene.background);
     this.setView(this.view);
     const selected = this.room;
     const token = this.prepareToken = (this.prepareToken ?? 0) + 1;
@@ -297,7 +305,7 @@ export class LabStage {
   setView(view, reducedMotion = false) {
     this.view = view;
     this.cameraInstant = reducedMotion;
-    this.monitor.visible = view !== "top";
+    this.monitor.visible = view !== "top" && this.room !== "minimal";
     const cut = view === "top" ? [new THREE.Plane(new THREE.Vector3(0, -1, 0), 1.82)] : [];
     this.labSet?.traverse((mesh) => {
       if (!mesh.isMesh) return;

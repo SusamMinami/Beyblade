@@ -7,6 +7,7 @@ import {
   INPUT_BATCH_MAX,
   HASH_CHECK_INTERVAL,
   FRAME_FLAGS_MASK,
+  SIMULATION_VERSION,
   quantizePower, quantizeHeight, quantizeDirection, quantizeAngle, quantizeControl, dequantizeControl, dequantizePower, dequantizeHeight, dequantizeDirection, dequantizeAngle,
   computeIntensityLevel,
   sendRateForLevel,
@@ -48,6 +49,9 @@ function snapshotHash(snap) {
 
 export class FrameSyncProvider {
   constructor(sim, transport, slot = SLOT.PLAYER) {
+    if (sim.version && sim.version !== SIMULATION_VERSION) {
+      throw new Error(`当前 Web 规则 ${sim.version} 尚未迁移到联机协议 ${SIMULATION_VERSION}`);
+    }
     this.sim = sim;
     this.transport = transport;
     this.mySlot = slot;

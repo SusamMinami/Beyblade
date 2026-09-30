@@ -1,0 +1,22 @@
+{
+  "asset": "SPIN / CORE Gear Drive 01",
+  "authoredParts": 193,
+  "runtimeMeshes": 7,
+  "triangles": 27560,
+  "bytes": 770460,
+  "topMount": [
+    0,
+    -0.474,
+    -0.12
+  ],
+  "units": "Web visual units",
+  "materials": [
+    "Launcher_Amber_Lock",
+    "Launcher_Brushed_Steel",
+    "Launcher_Cobalt_ABS",
+    "Launcher_Graphite_POM",
+    "Launcher_Grip_TPE",
+    "Launcher_Ivory_ABS",
+    "Launcher_Smoked_PC"
+  ]
+}

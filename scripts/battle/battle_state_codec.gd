@@ -166,7 +166,7 @@ static func _unpack_utf8(buf: PackedByteArray, offset: int) -> Array:
 	return [s, start + n]
 
 
-static fnv1a_hash(str: String) -> String:
+static func fnv1a_hash(str: String) -> String:
 	var h: int = 0x811c9dc5
 	for i in range(str.length()):
 		h = h ^ str.unicode_at(i)
@@ -247,14 +247,14 @@ static func encode_binary_launch_both(own_cmd: Dictionary, opp_cmd: Dictionary) 
 
 
 static func encode_binary_input_batch(frames: Array, _sender_slot: int = -1) -> PackedByteArray:
-	var count := min(frames.size(), BattleProtocol.INPUT_BATCH_MAX)
+	var count := mini(frames.size(), BattleProtocol.INPUT_BATCH_MAX)
 	var payload_size := 1
 	var chunks: Array = []
 	var last_cx := 0
 	var last_cy := 0
 	var last_fl := 0
 	for i in range(count):
-		var f := frames[i]
+		var f: Dictionary = frames[i]
 		var cx := int(f.get("cx", 0))
 		var cy := int(f.get("cy", 0))
 		var fl := int(f.get("fl", f.get("flags", 0))) & BattleProtocol.FRAME_FLAGS_MASK
@@ -368,11 +368,11 @@ static func decode_binary_message(packet: PackedByteArray) -> Dictionary:
 			var w_slot := r.get_u8()
 			var w_proto := r.get_u8()
 			var sv_len := r.get_u8()
-			var sv_bytes := r.get_data(sv_len)[1]
+			var sv_bytes: PackedByteArray = r.get_data(sv_len)[1]
 			var w_sv := sv_bytes.get_string_from_utf8()
 			var w_seed := r.get_u32()
 			var alen := r.get_u8()
-			var a_bytes := r.get_data(alen)[1]
+			var a_bytes: PackedByteArray = r.get_data(alen)[1]
 			var w_arena := a_bytes.get_string_from_utf8()
 			var w_time := r.get_u32()
 			data = {
@@ -388,7 +388,7 @@ static func decode_binary_message(packet: PackedByteArray) -> Dictionary:
 				return {}
 			var e_code := r.get_16()
 			var elen := r.get_u8()
-			var ebytes := r.get_data(elen)[1]
+			var ebytes: PackedByteArray = r.get_data(elen)[1]
 			data = {"code": e_code, "message": ebytes.get_string_from_utf8()}
 		BattleProtocol.MSG_LAUNCH_WINDOW:
 			if packet.size() < 8:
@@ -396,7 +396,7 @@ static func decode_binary_message(packet: PackedByteArray) -> Dictionary:
 			var lw_window := r.get_u16()
 			var lw_seed := r.get_u32()
 			var lw_alen := r.get_u8()
-			var lw_ab := r.get_data(lw_alen)[1]
+			var lw_ab: PackedByteArray = r.get_data(lw_alen)[1]
 			data = {"window_ms": lw_window, "seed": lw_seed, "arena_id": lw_ab.get_string_from_utf8()}
 		BattleProtocol.MSG_LAUNCH_BOTH:
 			if packet.size() < 9:
@@ -442,7 +442,7 @@ static func decode_binary_message(packet: PackedByteArray) -> Dictionary:
 				return {}
 			var r_winner := r.get_8()
 			var rlen := r.get_u8()
-			var rbytes := r.get_data(rlen)[1]
+			var rbytes: PackedByteArray = r.get_data(rlen)[1]
 			data = {"winner": r_winner, "reason": rbytes.get_string_from_utf8()}
 		BattleProtocol.MSG_ROOM_STATE:
 			if packet.size() < 3:
@@ -461,7 +461,7 @@ static func decode_binary_message(packet: PackedByteArray) -> Dictionary:
 					var nlen := r.get_u8()
 					if r.get_available_bytes() < nlen:
 						break
-					var nb := r.get_data(nlen)[1]
+					var nb: PackedByteArray = r.get_data(nlen)[1]
 					players_arr[pslot] = {"name": nb.get_string_from_utf8(), "ready": ready}
 			data = {"started": rs_started, "finished": rs_finished, "players": players_arr}
 		BattleProtocol.MSG_PING:
@@ -473,14 +473,14 @@ static func decode_binary_message(packet: PackedByteArray) -> Dictionary:
 				return {}
 			var hc_frame := r.get_u16()
 			var hlen := r.get_u8()
-			var hbytes := r.get_data(hlen)[1]
+			var hbytes: PackedByteArray = r.get_data(hlen)[1]
 			data = {"frame": hc_frame, "hash": hbytes.get_string_from_utf8()}
 		BattleProtocol.MSG_REPLAY_ACK:
 			if packet.size() < 3:
 				return {}
 			var ra_acc := r.get_u8() != 0
 			var rlen2 := r.get_u8()
-			var rbytes2 := r.get_data(rlen2)[1]
+			var rbytes2: PackedByteArray = r.get_data(rlen2)[1]
 			var rid := rbytes2.get_string_from_utf8()
 			var err_str := ""
 			if r.get_available_bytes() >= 1:

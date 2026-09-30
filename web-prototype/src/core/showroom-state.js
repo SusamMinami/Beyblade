@@ -10,7 +10,8 @@ export const DISPLAY_STAGES = [
 export function normalizeShowroom(saved = {}) {
   const storedOwned = Array.isArray(saved?.owned) ? saved.owned : [];
   const owned = DISPLAY_STAGES.filter((stage) => stage.id === "holo" || storedOwned.includes(stage.id)).map((stage) => stage.id);
-  return { owned, equipped: owned.includes(saved?.equipped) ? saved.equipped : "holo" };
+  return { owned, equipped: owned.includes(saved?.equipped) ? saved.equipped : "holo",
+    followStory: typeof saved?.followStory === "boolean" ? saved.followStory : !storedOwned.includes("arena") && saved?.equipped !== "arena" };
 }
 
 export function equipDisplayStage(showroom, id, xp) {
@@ -18,5 +19,5 @@ export function equipDisplayStage(showroom, id, xp) {
   if (!stage) return { ok: false, reason: "invalid-stage" };
   const current = normalizeShowroom(showroom);
   if (!current.owned.includes(id) && labLevel(xp).level < stage.level) return { ok: false, reason: "locked" };
-  return { ok: true, showroom: { equipped: id, owned: [...new Set([...current.owned, id])] } };
+  return { ok: true, showroom: { ...current, equipped: id, owned: [...new Set([...current.owned, id])] } };
 }

@@ -1,0 +1,374 @@
+{
+  "version": "2026.09.23-web-v5+launcher-v1",
+  "checks": 69,
+  "activeDuel": {
+    "time": 16.000000000000373,
+    "result": {
+      "winner": "enemy",
+      "reason": "spin_out",
+      "time": 16.000000000000373,
+      "eliminations": {
+        "player": "spin_out",
+        "enemy": null
+      },
+      "cause": "spin_out",
+      "weakestPart": "attackRing",
+      "weakestPartName": "六刃平衡攻击环",
+      "loserImbalance": 0.06708500127727235,
+      "stats": {
+        "player": {
+          "zoneSeconds": 5.116666666666654,
+          "spinHarvested": 16.051009347542575,
+          "hits": 26,
+          "peakImpulse": 4.7353595253559675
+        },
+        "enemy": {
+          "zoneSeconds": 10.550000000000104,
+          "spinHarvested": 53.984609213352826,
+          "hits": 26,
+          "peakImpulse": 4.7353595253559675
+        }
+      }
+    },
+    "player": {
+      "revision": 26,
+      "parts": [
+        {
+          "slot": "attackRing",
+          "id": "attack_ring.balance_six",
+          "name": "六刃平衡攻击环",
+          "sectors": [
+            0.08414868395960945,
+            0.23993999143660447,
+            0.27339540524704425,
+            0.12562462381156958,
+            0.16063036265757058,
+            0.13018875108110045,
+            0.06640062823971946,
+            0.23640837235537548
+          ],
+          "health": 0.8354078976514259,
+          "worst": 0.27339540524704425,
+          "lostMass": 0,
+          "index": 0
+        },
+        {
+          "slot": "coreLock",
+          "id": "core_lock.standard",
+          "name": "标准核心锁扣",
+          "sectors": [
+            0.017440383530005023,
+            0.04977712397015302,
+            0.056783361258129925,
+            0.02612200333327938,
+            0.03333344810072581,
+            0.026907960796038348,
+            0.013740316669408312,
+            0.04896952129936866
+          ],
+          "health": 0.9658657351303614,
+          "worst": 0.056783361258129925,
+          "lostMass": 0,
+          "index": 1
+        },
+        {
+          "slot": "weightDisc",
+          "id": "weight_disc.standard",
+          "name": "标准金属配重盘",
+          "sectors": [
+            0.02031999470615569,
+            0.05794005475031642,
+            0.06601877683522377,
+            0.030335491545407434,
+            0.03878858189174291,
+            0.03143762455083391,
+            0.016034242614704982,
+            0.05708724900626966
+          ],
+          "health": 0.9602547480124182,
+          "worst": 0.06601877683522377,
+          "lostMass": 0,
+          "index": 2
+        },
+        {
+          "slot": "driverShaft",
+          "id": "driver_shaft.standard",
+          "name": "标准驱动中轴",
+          "sectors": [
+            0.012074111674618863,
+            0.03446108582549055,
+            0.039311557794089944,
+            0.018084463846116495,
+            0.023077002531271703,
+            0.018628588243411157,
+            0.009512526924974986,
+            0.0339019762841783
+          ],
+          "health": 0.976368585859481,
+          "worst": 0.039311557794089944,
+          "lostMass": 0,
+          "index": 3
+        },
+        {
+          "slot": "tip",
+          "id": "tip.rubber_balance",
+          "name": "橡胶平衡尖",
+          "sectors": [
+            0.005707529659548886,
+            0.016356290756736398,
+            0.01874918267216254,
+            0.00866677678821572,
+            0.010966347194017269,
+            0.008702861527821903,
+            0.004466707504571072,
+            0.015987435086757255
+          ],
+          "health": 0.9887996086012711,
+          "worst": 0.01874918267216254,
+          "lostMass": 0,
+          "index": 4
+        }
+      ],
+      "totalMass": 1.2199999999999998,
+      "centerOfMass": [
+        0,
+        0.01262295081967214,
+        0
+      ],
+      "bend": [
+        -0.0008422952715864187,
+        -0.0015525584769466557
+      ],
+      "momentOfInertia": 0.89,
+      "wear": 0.06313596238885387,
+      "imbalance": 0.06708500127727235,
+      "stiffness": 0.9575824039154751,
+      "stability": 0.963233709905796,
+      "spinDrag": 0.19995600718759554,
+      "integrity": 0.9368640376111461,
+      "brokenSectors": 0,
+      "failed": false
+    },
+    "enemy": {
+      "revision": 26,
+      "parts": [
+        {
+          "slot": "attackRing",
+          "id": "attack_ring.balance_six",
+          "name": "六刃平衡攻击环",
+          "sectors": [
+            0.20611371365329376,
+            0.09743278250123383,
+            0.10296291495917906,
+            0.14998206346677156,
+            0.19209191048534913,
+            0.197674472868357,
+            0.2038619435890226,
+            0.16661701726538689
+          ],
+          "health": 0.8354078976514258,
+          "worst": 0.20611371365329376,
+          "lostMass": 0,
+          "index": 0
+        },
+        {
+          "slot": "coreLock",
+          "id": "core_lock.standard",
+          "name": "标准核心锁扣",
+          "sectors": [
+            0.04266321508423929,
+            0.02021308422324948,
+            0.021349406346874003,
+            0.03107277900294178,
+            0.03988183528436476,
+            0.040888669355161084,
+            0.04227288471405545,
+            0.034534247676476074
+          ],
+          "health": 0.9658904847890798,
+          "worst": 0.04266321508423929,
+          "lostMass": 0,
+          "index": 1
+        },
+        {
+          "slot": "weightDisc",
+          "id": "weight_disc.standard",
+          "name": "标准金属配重盘",
+          "sectors": [
+            0.049771777444687415,
+            0.023527802592627493,
+            0.024863203896392676,
+            0.03621725964396473,
+            0.04638583065697352,
+            0.04773389259605211,
+            0.0492280261507583,
+            0.04023422291919853
+          ],
+          "health": 0.9602547480124182,
+          "worst": 0.049771777444687415,
+          "lostMass": 0,
+          "index": 2
+        },
+        {
+          "slot": "driverShaft",
+          "id": "driver_shaft.standard",
+          "name": "标准驱动中轴",
+          "sectors": [
+            0.029536071981396426,
+            0.013993673693018873,
+            0.01478035824014354,
+            0.02151192392511354,
+            0.027610501350714068,
+            0.028307540322803828,
+            0.029265843263576855,
+            0.023908325314483433
+          ],
+          "health": 0.9763857202385937,
+          "worst": 0.029536071981396426,
+          "lostMass": 0,
+          "index": 3
+        },
+        {
+          "slot": "tip",
+          "id": "tip.rubber_balance",
+          "name": "橡胶平衡尖",
+          "sectors": [
+            0.013885581903304996,
+            0.006641848236170784,
+            0.007000126689709956,
+            0.01015224961290462,
+            0.013147748884721573,
+            0.01326966125045891,
+            0.013863388800942362,
+            0.011304068940256257
+          ],
+          "health": 0.9888419157101913,
+          "worst": 0.013885581903304996,
+          "lostMass": 0,
+          "index": 4
+        }
+      ],
+      "totalMass": 1.2199999999999998,
+      "centerOfMass": [
+        0,
+        0.01262295081967214,
+        0
+      ],
+      "bend": [
+        0.00025495685442589384,
+        0.001220734715013591
+      ],
+      "momentOfInertia": 0.89,
+      "wear": 0.0631220962339053,
+      "imbalance": 0.05529222544852115,
+      "stiffness": 0.9581920656265858,
+      "stability": 0.9638469696204477,
+      "spinDrag": 0.17505093002622682,
+      "integrity": 0.9368779037660946,
+      "brokenSectors": 0,
+      "failed": false
+    }
+  },
+  "outcomes": [
+    {
+      "mission": "first-echo",
+      "winner": "enemy",
+      "cause": "spin_out",
+      "time": 17.22,
+      "aiZoneSeconds": 11.33,
+      "idleZoneSeconds": 0.83,
+      "hits": 5,
+      "playerIntegrity": 0.987
+    },
+    {
+      "mission": "rival-arrives",
+      "winner": "enemy",
+      "cause": "spin_out",
+      "time": 17.65,
+      "aiZoneSeconds": 11.05,
+      "idleZoneSeconds": 1.02,
+      "hits": 5,
+      "playerIntegrity": 0.981
+    },
+    {
+      "mission": "repair-lesson",
+      "winner": "enemy",
+      "cause": "spin_out",
+      "time": 17.43,
+      "aiZoneSeconds": 11.13,
+      "idleZoneSeconds": 0.9,
+      "hits": 5,
+      "playerIntegrity": 0.985
+    },
+    {
+      "mission": "choose-a-line",
+      "winner": "enemy",
+      "cause": "spin_out",
+      "time": 25.48,
+      "aiZoneSeconds": 14.58,
+      "idleZoneSeconds": 2.37,
+      "hits": 4,
+      "playerIntegrity": 0.983
+    },
+    {
+      "mission": "no-brand",
+      "winner": "enemy",
+      "cause": "spin_out",
+      "time": 25.27,
+      "aiZoneSeconds": 16.33,
+      "idleZoneSeconds": 2.1,
+      "hits": 4,
+      "playerIntegrity": 0.971
+    },
+    {
+      "mission": "rival-rematch",
+      "winner": "enemy",
+      "cause": "spin_out",
+      "time": 22.1,
+      "aiZoneSeconds": 14.95,
+      "idleZoneSeconds": 1.25,
+      "hits": 3,
+      "playerIntegrity": 0.961
+    },
+    {
+      "mission": "broken-pillars",
+      "winner": "enemy",
+      "cause": "spin_out",
+      "time": 17.08,
+      "aiZoneSeconds": 10.28,
+      "idleZoneSeconds": 0.85,
+      "hits": 8,
+      "playerIntegrity": 0.985
+    },
+    {
+      "mission": "rival-without-badge",
+      "winner": "enemy",
+      "cause": "spin_out",
+      "time": 17,
+      "aiZoneSeconds": 10,
+      "idleZoneSeconds": 0.93,
+      "hits": 9,
+      "playerIntegrity": 0.978
+    },
+    {
+      "mission": "open-the-gate",
+      "winner": "enemy",
+      "cause": "spin_out",
+      "time": 18.07,
+      "aiZoneSeconds": 10.28,
+      "idleZoneSeconds": 0,
+      "hits": 7,
+      "playerIntegrity": 0.98
+    },
+    {
+      "mission": "our-names",
+      "winner": "enemy",
+      "cause": "spin_out",
+      "time": 20.83,
+      "aiZoneSeconds": 12.18,
+      "idleZoneSeconds": 0.13,
+      "hits": 8,
+      "playerIntegrity": 0.976
+    }
+  ]
+}

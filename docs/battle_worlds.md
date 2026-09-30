@@ -1,6 +1,7 @@
 # Web 场景与战斗美术
 
-2026-09-16。Web 优先，Godot 场景未迁移。
+2026-09-22。Web 美术专题。Godot 已在 [共享物理 v6](physics_v6_implementation.md)
+接入五张地图的玩法、程序地形和碰撞；本页完整美术、材质及动态照明尚未迁移。
 
 ## 入口
 
@@ -26,7 +27,7 @@
 `resources/battle_worlds/` 是按材质合并的运行时 GLB。街头约 7.93 MB。所有装饰、店名、标志为本项目制作；没有将参考截图用作背景。这是实时风格化模型。
 
 冠军场独立生成器为 `tools/build_championship_scene.py`，完整重建也调用它。
-运行以下命令仅重建冠军场（约 6.66 MB），并导出 `championship_layout.json`
+运行以下命令仅重建冠军场（约 8.66 MB），并导出 `championship_layout.json`
 供运行时读取六处灯头锚点和两圈跑灯位置：
 
 ```powershell
@@ -111,6 +112,92 @@
 共享几何/材质，主场景继续负责模型材质销毁。旧通用双聚光灯在冠军场禁用，
 离开冠军场后恢复目的地的照明设置。
 
+### 冠军竞技场材质与结构细化（2026-09-23）
+
+按本轮金属/玻璃/青色概念图，在 Web 完成六类物理表面：缎面钛色盘、
+石墨漆甲板、深色机壳、拉丝铝、抛光铝和透明亚克力。盘面增加细磨纹、
+浅六角蚀刻、外围接缝和轻微擦痕；细节使用法线与粗糙度着色，不改变盘形。
+护圈加入随视角变化的透明度、边缘高光和分段接缝，不增加实时折射目标。
+各材质显式绑定当前环境反射，修正单独反光强度在 Three r178 中不生效的问题。
+
+Blender 源文件与 GLB 同步增加十二组护圈压条/密封垫/锁扣螺钉、十二组侧面
+检修盒及斜撑、外圈底座盖板与凹槽、贴合盘面的刻度和箭头。战斗半径仍为
+`6.9`；装置尺寸、A/B/C 区和物理求解器沿用现有定义。
+
+两处侧向矩形面光为盘面与铝边提供宽反光，日/夜强度为 `1.25`/`2.1`。
+原六路移动聚光、两圈跑灯、暂停与减少动态效果逻辑保留；没有新增阴影贴图、
+环境探针或实时反射绘制。面光复用 Three 的 LTC 查找纹理。
+
+本轮独立记录见 [材质与模型验收](../.impeccable/review/championship-materials/verification.md)。
+`verify:championship` 现额外覆盖六类 Physical 定义、法线/环境反射/面光像素响应、
+日夜环境绑定与透明护圈开销。浏览器验证脚本可用 `QA_OUTPUT_DIR` 将新证据写入
+独立目录，避免覆盖旧报告；截图工具用 `WORLD_CAPTURE_DIR` 和场地参数选择范围。
+
+## 街头与遗迹材质补全（2026-09-22）
+
+本轮在现有 GLB 上实现 Web 运行时材质，模型源文件和碰撞清单保持原样：
+
+- 遗迹：石板矿物凹凸、接缝积污、少量裂缝、局部湿润反光；石柱风化，
+  旧铜的裸露金属与绿色氧化层；晶体亮面、门内发光符文及邻近石面的紫/青照明。
+- 街头：粗细沥青颗粒与孔隙、干湿粗糙度；中间磨损较粗、边缘较亮的象牙白
+  塑料盘，蓝色卡扣与透明护圈；陶土、釉面、金属、木材和布料分别响应光照。
+- 修正独立材质反光强度：在 Three r178 中，材质 `envMap` 为空时使用
+  `scene.environmentIntensity`，单独设置 `envMapIntensity` 不生效。
+  两个场景现显式绑定当前日夜环境；盘面仍使用其专用柔光探针。
+- 遗迹新增五处点光和两处面光，不新增阴影贴图或反射目标；街头继续共用
+  原来的一个积水平面反射。细节为程序化着色，不增加图片下载或模型面数。
+
+实现为 `web-prototype/src/render/world-surface.js`、`ruins-atmosphere.js`、
+`street-atmosphere.js` 与 `three-stage.js`；参数约定见
+[Web DESIGN](../web-prototype/DESIGN.md#outdoor-surface-refinement-2026-09-22)。
+日夜、暂停、减少动态效果和资源释放均保留。仍为风格化实时场景，
+不是参考图的摄影级复刻；本轮没有重做街区布局或扩建遗迹建筑。
+
+新增 `npm run verify:materials`：隔离渲染环境分别移除法线凹凸、环境反射和
+局部照明，验证实际像素响应；检查日夜、暂停、减少动态效果、物理材质定义
+和两轮换图后的几何/纹理数量稳定性。对照截图与验收记录见
+[本轮证据](../.impeccable/review/world-materials/verification.md)。
+
+## 发射器模型（2026-09-23，Web 已接入）
+
+**2026-09-24 更新**：运行时已改用
+`resources/launcher/performance/launcher-performance.glb` 与九款独立部件，
+支持换装、换色、真实齿比和释放叉／凸轮／三爪联动；53 个材质网格、
+64,392 三角面，约 1.76 MB。当前入口、缓存和数值边界见
+[发射器运行时](launcher_runtime.md)。以下整体版规格保留为第一阶段记录。
+
+战斗准备使用独立的 `resources/launcher/launcher.glb`，替换原来的四个程序化
+几何体。结合蓝白握柄参考与透明机械盖参考，模型包含分体 ABS 外壳、护肩、
+防滑握柄、独立 T 形拉柄、内外齿条、三组齿轮、回位弹簧、螺丝及底部卡口。
+蓝白为主色，橙色仅用于解锁滑钮；塑料、橡胶、钢件和烟灰透明盖分别着色。
+透明盖使用低透明度薄壳，不增加实时折射渲染目标。机械结构目前为静态可视
+部件；拉条、齿轮尚无独立驱动动画，发射操作仍使用现有方向/力度箭头与确认按钮。
+
+源文件 `tools/art_source/launcher.blend` 保留 193 个可编辑部件、五组结构
+Collection、倒角修改器和单独的产品摄影灯光。运行时按材质合为七个网格，
+27,560 三角面、770,460 字节，无外部贴图。重建命令：
+
+```powershell
+& 'C:\Program Files\Blender Foundation\Blender 5.2\blender.exe' --background --python tools/build_launcher.py -- --render
+```
+
+`--render` 可省略；启用时将 Blender 产品图输出到
+`.impeccable/review/launcher/blender-product.png`。同次导出的 `launcher.json`
+记录面数、文件体积及 `TopMount` 卡口锚点。所有坐标沿用 Web 视觉单位，
+不采用参考图标注的毫米/克作为战斗数值。
+
+`launcher-model.js` 按需加载并缓存 CPU 模板；每次真实战斗或下一场预热
+克隆独立几何和材质，退出/取消时释放。普通加载须等发射器就绪才允许发射，
+失败使用既有场景错误提示，重进可重试；迟到的下载不会挂载到已离开的场景。
+卡口以当前陀螺实际核心高度定位，随方向和倾角同步旋转，兼容已有 DIY 高度。
+玩家陀螺的地面定位、发射参数和战斗求解器不变。
+
+`npm run verify:launcher` 覆盖模型预算、材质、接口定位、箭头拖动、实际发射、
+手机布局、资源回收、失败重试与迟到下载；同时运行 `verify:gpu` 和
+`verify:worlds` 验证预热及场景兼容。截图和当次结果保存在
+`.impeccable/review/launcher/`。街头/书桌的背景小型发射器仍为场景内装饰，
+本次替换的是玩家实际操作的战斗发射器。Godot 尚未迁移。
+
 ## 验证
 
 ```powershell
@@ -120,6 +207,8 @@ npm run build
 npm run verify:lab
 npm run verify:showroom
 npm run verify:worlds
+npm run verify:launcher
+npm run verify:materials
 npm run verify:championship
 node tools/verify-street.mjs
 ```

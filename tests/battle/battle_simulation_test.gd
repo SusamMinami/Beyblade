@@ -33,47 +33,32 @@ func _run() -> void:
 
 
 func _test_web_golden_snapshot() -> void:
+	# The fixture is exported by the real Web solver. This adapter test also
+	# exercises Vector2 input conversion; exhaustive double precision parity
+	# lives in physics_v6_parity.gd.
+	var fixtures = JSON.parse_string(FileAccess.get_file_as_string(
+		"res://resources/physics/v6_fixtures.json"))
+	var fixture: Dictionary = fixtures.fixtures[0]
 	var battle = _create_battle(
-		ARENA_MAP_CATALOG.get_by_name("标准碗形竞技场"),
-		42
+		ARENA_MAP_CATALOG.get_by_name("标准碗形竞技场")
 	)
-	battle.launch(0.8, -0.1, 0.2)
-	for frame in range(240):
-		battle.step(
-			1.0 / 60.0,
-			Vector2(sin(float(frame) * 0.05), -0.3)
-		)
-
-	var snapshot: Dictionary = battle.snapshot()
-	_expect(snapshot.phase == &"finished", "固定输入必须结束为已完成状态")
-	_expect(snapshot.result.winner == &"enemy", "Web 金标快照必须由 AI 获胜")
-	_expect(snapshot.result.reason == &"ring_out", "Web 金标快照必须为 Ring Out")
-	_expect_close(snapshot.time, 1.233333, "金标结束时间")
-	_expect_vector_close(
-		snapshot.player.position,
-		Vector2(6.230855, -3.707901),
-		"金标玩家位置"
-	)
-	_expect_vector_close(
-		snapshot.player.velocity,
-		Vector2(6.8538, -6.614687),
-		"金标玩家速度"
-	)
-	_expect_close(snapshot.player.spin, 43.674775, "金标玩家转速")
-	_expect_close(snapshot.player.durability, 94.208807, "金标玩家耐久")
-	_expect_close(snapshot.player.tilt, 0.415654, "金标玩家倾角")
-	_expect_close(snapshot.player.imbalance, 0.194366, "金标玩家失衡")
-	_expect_close(snapshot.player.spin_loss_rate, 4.41236, "金标玩家转速损耗")
-	_expect_close(snapshot.player.ring_out_risk, 0.852019, "金标玩家撞飞风险")
-	_expect(snapshot.player.stability_state == &"wobble", "金标玩家必须处于摇晃状态")
-	_expect_close(snapshot.player.control_influence, 0.598964, "金标玩家操控")
-	_expect_vector_close(
-		snapshot.enemy.position,
-		Vector2(-3.763804, 4.94961),
-		"金标 AI 位置"
-	)
-	_expect_close(snapshot.enemy.spin, 54.029925, "金标 AI 转速")
-	_expect_close(snapshot.enemy.imbalance, 0.143148, "金标 AI 失衡")
+	battle.launch()
+	for frame in range(60):
+		var input = fixture.inputs[frame]
+		battle.step(1.0/60.0, Vector2(input.player.x, input.player.y))
+		for point in fixture.checkpoints:
+			if point.frame != frame+1:
+				continue
+			var snapshot: Dictionary = battle.snapshot()
+			var expected: Dictionary = BATTLE_SIMULATION.native_data(point.state)
+			_expect(snapshot.phase == expected.phase, "v6 金标阶段必须一致")
+			_expect_close(snapshot.time, expected.time, "v6 金标时间")
+			for side in ["player", "enemy"]:
+				_expect_vector_close(snapshot[side].position, expected[side].position, side+" 位置")
+				_expect_vector_close(snapshot[side].velocity, expected[side].velocity, side+" 速度")
+				for field in ["spin", "tilt", "imbalance", "durability", "spin_loss_rate", "control_influence"]:
+					_expect_close(snapshot[side][field], expected[side][field], side+" "+field)
+	_expect(battle.export_state().simulationVersion == fixtures.version, "适配层必须使用当前金标版本")
 
 
 func _test_collision_and_rim_response() -> void:
@@ -97,14 +82,17 @@ func _test_collision_and_rim_response() -> void:
 	battle = _create_battle(arena)
 	battle.launch(1.0, 0.0, 0.0)
 	battle.player.position = Vector2(arena.wall_radius + 0.02, 0.0)
-	battle.player.velocity = Vector2(6.0, 0.0)
+	battle.player.velocity = Vector2(0.4, 0.0)
 	battle.step(1.0 / 60.0, Vector2.ZERO)
 	_expect(
-		battle.player.position.x < arena.wall_radius,
-		"普通出射必须被护圈推回场内"
+		battle.player.position.x > arena.wall_radius,
+		"低边沿接触不能把位置瞬移回场内"
 	)
-	_expect(battle.player.velocity.x < 0.0, "护圈必须反弹向外速度")
-	_expect(battle.result.is_empty(), "护圈反弹不能立即判定 Ring Out")
+	_expect(
+		battle.player.velocity.x > 0.0 and battle.player.velocity.x < 0.4,
+		"低边沿必须通过坡度逐步减速"
+	)
+	_expect(battle.result.is_empty(), "仍有地面支撑时不能立即判定 Ring Out")
 
 
 func _test_imbalance_and_launch_height() -> void:

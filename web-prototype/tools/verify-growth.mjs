@@ -35,7 +35,7 @@ for (const mission of CAMPAIGN_MISSIONS) {
 }
 check(unlockedChapterMoments(normalizeCampaign({ completed: ["our-names"] })).length === 0, "Malformed completion cannot reveal final response");
 
-const out = "../.impeccable/review/growth";
+const out = process.env.QA_OUTPUT_DIR ?? "../.impeccable/review/growth";
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({ executablePath: process.env.CHROME_PATH ?? "C:/Program Files/Google/Chrome/Application/chrome.exe", headless: true });
 const base = process.env.LAB_TEST_URL ?? "http://127.0.0.1:5173";

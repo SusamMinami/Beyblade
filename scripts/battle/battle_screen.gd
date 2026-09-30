@@ -11,19 +11,21 @@ const BATTLE_PROTOCOL := preload(
 )
 const UI_THEME_FACTORY := preload("res://scripts/ui/ui_theme_factory.gd")
 const ARENA_MAP_CATALOG := preload("res://scripts/maps/arena_map_catalog.gd")
+const V6_VIEW := preload("res://scripts/battle/v6_presentation.gd")
+const V6_DATA := preload("res://scripts/battle/v6_data.gd")
 
 const FIXED_STEP := 1.0 / 60.0
 const MAX_FRAME_DELTA := 0.05
 const KEYBOARD_CONTROL_STEP := 1.0
 const JOYSTICK_RADIUS := 72.0
 const PRE_LAUNCH_CAMERA_POSITION := Vector3(0.0, 7.2, 9.0)
-const TOP_GROUND_CLEARANCE := 0.45
 
 const RESULT_LABELS := {
 	&"spin_out": "停转胜利",
 	&"ring_out": "撞飞胜利",
 	&"break": "击破胜利",
-	&"time": "计时判定"
+	&"time": "计时判定",
+	&"draw": "平局"
 }
 const ENEMY_BUILD_IDS := {
 	&"standard": [
@@ -112,6 +114,9 @@ var player_spin_angle := 0.0
 var enemy_spin_angle := 0.0
 var _network_mode := false
 var _latest_snapshot: Dictionary = {}
+var camera_yaw := 0.0
+var _joystick_touch := -1
+var _audio_update_pending := false
 
 
 var simulation:
@@ -127,6 +132,11 @@ func set_battle_session(battle_session: RefCounted) -> void:
 	session = battle_session
 	_network_mode = true
 	_connect_session_signals()
+	if session.phase==BATTLE_PROTOCOL.PHASE_CLOSED:
+		battle_summary_label.text = "联机服务尚未支持当前规则"
+		battle_log_label.text = "v6 可进行本地对战；联机与异步验证等待服务升级。"
+		$BattleUI/Root/ButtonColumn/LaunchButton.disabled = true
+		return
 	if session.has_method("submit_ready"):
 		session.submit_ready()
 	_set_phase_ui(BATTLE_PROTOCOL.PHASE_LAUNCH_WINDOW)
@@ -191,6 +201,7 @@ func _on_session_error(code: int, message: String) -> void:
 func _set_phase_ui(phase: String) -> void:
 	match phase:
 		BATTLE_PROTOCOL.PHASE_LAUNCH_WINDOW, "ready":
+			$BattleUI/Root/TopPanel.offset_bottom = 220
 			launch_panel.visible = true
 			battle_summary_label.visible = true
 			joystick_area.visible = false
@@ -201,6 +212,9 @@ func _set_phase_ui(phase: String) -> void:
 			sound_button.visible = true
 			tune_button.visible = false
 		BATTLE_PROTOCOL.PHASE_RUNNING:
+			$BattleUI/Root/TopPanel.offset_bottom = 152
+			for label in [spin_label,battle_time_label,enemy_spin_label]:
+				label.size_flags_horizontal = Control.SIZE_EXPAND_FILL
 			launch_panel.visible = false
 			battle_summary_label.visible = false
 			joystick_area.visible = true
@@ -244,6 +258,14 @@ func _process(delta: float) -> void:
 	_sync_battle_visuals(delta)
 	_update_camera(delta)
 	_update_hud()
+	_update_drive_zones()
+	if not _audio_update_pending:
+		_audio_update_pending = true
+		_flush_spin_audio.call_deferred()
+
+
+func _flush_spin_audio() -> void:
+	_audio_update_pending = false
 	_update_spin_audio()
 
 
@@ -319,6 +341,9 @@ func _configure_visual_body(
 		{} if is_enemy else _game_state().get_active_loadout_customizations()
 	)
 	body.visual_model.set_active_part(-1)
+	body.visual_model.position = Vector3.ZERO
+	body.visual_model.scale = Vector3.ONE*.92
+	body.visual_model.structural_revision = -1
 
 
 func _configure_arena() -> void:
@@ -338,38 +363,28 @@ func _configure_arena() -> void:
 		else 1.0
 	)
 	center_metal_patch.scale = Vector3(patch_scale, 1.0, patch_scale)
-	center_metal_patch.visible = arena_map.supports_composite_terrain
+	center_metal_patch.visible = false # Material regions are part of the sampled mesh.
 	_configure_arena_features()
 
 
 func _configure_arena_features() -> void:
 	for child in map_features.get_children():
 		child.free()
-	var palette: Dictionary = UI_THEME_FACTORY.get_battle_palette(
-		arena_map.map_name
-	)
-	match arena_map.map_id:
-		&"standard":
-			_add_circular_feature(1.15, 0.08, palette.accent, 0.0)
-		&"metal":
-			_add_circular_feature(4.8, 0.025, Color(0.23, 0.43, 0.5), 0.0)
-			_add_circular_feature(3.15, 0.035, Color(0.32, 0.58, 0.66), 0.012)
-			_add_circular_feature(1.55, 0.05, Color(0.52, 0.78, 0.84), 0.024)
-		&"composite":
-			for index in range(8):
-				var angle := TAU * float(index) / 8.0
-				var position := Vector3(
-					cos(angle) * 6.05,
-					0.0,
-					sin(angle) * 6.05
-				)
-				position.y = arena_map.get_height_at(position) + 0.08
-				_add_box_feature(
-					Vector3(1.05, 0.12, 0.48),
-					position,
-					Vector3(0.0, -angle, 0.0),
-					Color(0.74, 0.2, 0.12)
-				)
+	for zone in V6_DATA.zones(arena_map.get_v6_record(),0).zones:
+		map_features.add_child(V6_VIEW.zone_mesh(arena_map,zone))
+	for blocker in arena_map.blockers:
+		var point := Vector3(blocker.x,0,blocker.z)
+		point.y = arena_map.get_height_at(point)+.42
+		_add_box_feature(Vector3(blocker.hx*2,.84,blocker.hz*2),point,Vector3.ZERO,Color("#817b88"))
+
+
+func _update_drive_zones() -> void:
+	if session == null: return
+	var drive: Dictionary = session.sim.drive_zone
+	for child in map_features.get_children():
+		if not child.has_meta("zone_id"): continue
+		var active: bool = drive.active!=null and child.get_meta("zone_id")==drive.active.id and not drive.cooling
+		child.material_override.albedo_color = Color("#50efcc") if active else Color("#47515a")
 
 
 func _add_circular_feature(
@@ -460,28 +475,15 @@ func _advance_simulation(delta: float) -> void:
 		if _network_mode:
 			session.poll(delta)
 		return
-	if _network_mode:
-		var control := _get_control_vector()
-		session.set_local_input(control)
-		session.poll(delta)
-	else:
-		accumulator += clampf(delta, 0.0, MAX_FRAME_DELTA)
-		var control := _get_control_vector()
-		session.set_local_input(control)
-		while accumulator + 0.0000001 >= FIXED_STEP:
-			session.poll(FIXED_STEP)
-			accumulator -= FIXED_STEP
-			if sim_ref.phase != &"running":
-				break
-	if session.sim.phase == &"finished":
-		pass
+	session.set_local_input(_get_control_vector())
+	session.poll(delta)
 
 
 func _process_event_dict(event: Dictionary) -> void:
 	if event.type == &"collision":
 		var intensity := float(event.intensity)
 		if _game_state().sound_enabled:
-			beyblade.call("_play_collision_sound", intensity * 12.0)
+			beyblade.call_deferred("_play_collision_sound", intensity * 12.0)
 		battle_log_label.text = "碰撞冲量 %.2f" % float(event.impulse)
 	elif event.type == &"stability" and event.actor == &"player":
 		battle_log_label.text = (
@@ -508,37 +510,40 @@ func _sim_handle_result_from_dict(result_dict: Dictionary) -> void:
 	var winner: StringName = result_dict.get("winner", &"enemy")
 	var reason: StringName = result_dict.get("reason", &"time")
 	var won := winner == &"player"
+	var draw := winner == &"draw"
 	var reason_label: String = RESULT_LABELS.get(reason, "对战结束")
 	var reward := 0
 	var tutorial_stage_before: String = str(_game_state().tutorial.stage)
-	if not reward_granted and not _network_mode:
+	if not reward_granted and not _network_mode and not draw:
 		reward_granted = true
 		reward = _game_state().apply_battle_result(won)
 	result_label.text = (
 		"%s\n%.1f 秒 · %s"
 		% [
-			reason_label if won else "本回合失败",
+			"平局" if draw else (reason_label if won else "本回合失败"),
 			float(result_dict.get("time", 0.0)),
-			("+%d 赏金" % reward) if not _network_mode else "网络对战"
+			("双方同帧淘汰" if reason==&"draw" else "计时评分相同") if draw else (
+				("+%d 赏金" % reward) if not _network_mode else "网络对战")
 		]
 	)
 	result_panel.visible = true
 	pause_button.disabled = true
-	battle_log_label.text = reason_label if won else "对手获胜：%s" % reason_label
-	if not _network_mode:
+	battle_log_label.text = "平局 · 不计入胜负" if draw else (reason_label if won else "对手获胜：%s" % reason_label)
+	_release_controls()
+	if not _network_mode and not draw:
 		if tutorial_stage_before == _game_state().TUTORIAL_FIRST_BATTLE:
 			$BattleUI/Root/ResultPanel/ResultColumn/ResultActions/ResultRestartButton.visible = false
 			$BattleUI/Root/ResultPanel/ResultColumn/ResultActions/ResultAssemblyButton.text = "购买第一个零件"
 			battle_log_label.text = "首战训练完成，下一步购买并装备新零件。"
 	tutorial_button.visible = not bool(_game_state().tutorial.completed)
 	_stop_spin_audio()
-	if _game_state().sound_enabled and not _network_mode:
+	if _game_state().sound_enabled and not _network_mode and not draw:
 		if won or tutorial_stage_before == _game_state().TUTORIAL_FIRST_BATTLE:
-			reward_audio.play()
+			reward_audio.call_deferred("play")
 		elif reason == &"ring_out":
-			ring_out_audio.play()
+			ring_out_audio.call_deferred("play")
 		else:
-			spin_out_audio.play()
+			spin_out_audio.call_deferred("play")
 
 
 func _on_launch_button_pressed() -> void:
@@ -546,7 +551,9 @@ func _on_launch_button_pressed() -> void:
 		_create_local_session()
 	var power := float(launch_power_slider.value)
 	var height := float(launch_height_slider.value)
-	var direction := deg_to_rad(float(launch_direction_slider.value))
+	var screen_direction := deg_to_rad(float(launch_direction_slider.value))
+	var forward := V6_VIEW.screen_to_world(camera,Vector2(sin(screen_direction),-cos(screen_direction)))
+	var direction := atan2(forward.x,-forward.y)
 	var angle := float(launch_angle_slider.value) / 12.0
 	session.submit_launch(power, height, direction, angle)
 	accumulator = 0.0
@@ -557,7 +564,7 @@ func _on_launch_button_pressed() -> void:
 	battle_log_label.text = "发射完成。拖动摇杆微调轨迹。" if not _network_mode else "发射指令已发送。"
 	if _game_state().sound_enabled:
 		launch_audio.pitch_scale = lerpf(0.9, 1.08, power)
-		launch_audio.play()
+		launch_audio.call_deferred("play")
 	_sync_battle_visuals(0.0)
 
 
@@ -574,6 +581,7 @@ func _on_pause_button_pressed() -> void:
 	if session == null or session.sim == null or session.sim.phase != &"running":
 		return
 	paused = not paused
+	_release_controls()
 	pause_button.text = "继续" if paused else "暂停"
 	battle_log_label.text = "模拟已暂停" if paused else "模拟继续"
 
@@ -750,7 +758,7 @@ func _on_tutorial_button_pressed() -> void:
 
 func _get_control_vector() -> Vector2:
 	var keyboard_vector := _get_keyboard_control_vector()
-	return (
+	return V6_VIEW.screen_to_world(camera,
 		keyboard_vector
 		if keyboard_vector.length_squared() > 0.01
 		else joystick_vector
@@ -776,13 +784,12 @@ func _get_sim():
 	return null
 
 
-func _sync_battle_visuals(delta: float) -> void:
+func _sync_battle_visuals(_delta: float) -> void:
 	var sim_ref = _get_sim()
 	if sim_ref == null:
 		return
-	if sim_ref.phase == &"running":
-		player_spin_angle += sim_ref.player.spin * delta
-		enemy_spin_angle -= sim_ref.enemy.spin * delta
+	player_spin_angle = sim_ref.player.data.spinPhase
+	enemy_spin_angle = sim_ref.enemy.data.spinPhase
 	_sync_top_visual(
 		beyblade,
 		sim_ref.player,
@@ -800,7 +807,7 @@ func _sync_battle_visuals(delta: float) -> void:
 func _sync_top_visual(
 	body: BeybladeBody,
 	state,
-	spin_angle: float,
+	_spin_angle: float,
 	phase: StringName
 ) -> void:
 	var terrain_position := Vector3(
@@ -808,17 +815,11 @@ func _sync_top_visual(
 		0.0,
 		state.position.y
 	)
-	terrain_position.y = (
-		arena_map.get_height_at(terrain_position)
-		+ TOP_GROUND_CLEARANCE
-	)
-	body.global_position = terrain_position
-	var movement_angle := atan2(state.velocity.y, state.velocity.x)
-	body.rotation = Vector3(
-		sin(movement_angle) * state.tilt,
-		spin_angle,
-		-cos(movement_angle) * state.tilt
-	)
+	var data: Dictionary = state.data
+	terrain_position.y = data.edge.height-data.edge.drop if data.edge.falling else arena_map.get_height_at(terrain_position)
+	body.basis = V6_VIEW.pose(data)
+	# Solver position is the axis-tip support point. Keep it fixed while spinning.
+	body.global_position = terrain_position+body.basis*Vector3(0,data.structure.contactOffset*.92,0)+Vector3(0,.012,0)
 	body.spin_speed = state.spin
 	body.current_durability = state.durability
 	body.is_launched = phase == &"running"
@@ -830,27 +831,13 @@ func _sync_top_visual(
 
 
 func _sync_damage_visual(body: BeybladeBody, state) -> void:
-	var integrity := clampf(
-		state.durability / maxf(state.build.durability, 0.001),
-		0.0,
-		1.0
-	)
-	var previous := float(body.get_meta("simulation_integrity", -1.0))
-	if absf(previous - integrity) < 0.001:
-		return
-	body.set_meta("simulation_integrity", integrity)
-	for part_index in range(body.visual_model.get_customizable_part_count()):
-		body.visual_model.set_part_damage_state(
-			part_index,
-			integrity,
-			integrity <= 0.0
-		)
+	body.visual_model.set_structural_damage(state.data.structure)
 
 
 func _update_camera(delta: float) -> void:
 	var sim_ref = _get_sim()
 	if sim_ref == null or sim_ref.phase == &"ready":
-		camera.global_position = PRE_LAUNCH_CAMERA_POSITION
+		camera.global_position = PRE_LAUNCH_CAMERA_POSITION.rotated(Vector3.UP,camera_yaw)
 		camera.look_at(Vector3.ZERO, Vector3.UP)
 		return
 	var midpoint := (
@@ -859,11 +846,11 @@ func _update_camera(delta: float) -> void:
 	var separation := beyblade.global_position.distance_to(
 		enemy_beyblade.global_position
 	)
-	var target_position := midpoint + Vector3(
-		0.0,
-		2.9 + separation * 0.18,
-		3.8 + separation * 0.34
-	)
+	var viewport_size := get_viewport().get_visible_rect().size
+	var aspect := viewport_size.x/maxf(viewport_size.y,1)
+	var horizontal_tan := tan(deg_to_rad(camera.fov)*.5)*aspect
+	var distance := maxf(10,(separation*.5+1.5)/horizontal_tan*1.12)
+	var target_position := midpoint+Vector3(0,.85,1).normalized().rotated(Vector3.UP,camera_yaw)*distance
 	camera.global_position = camera.global_position.lerp(
 		target_position,
 		minf(delta * 6.5, 1.0)
@@ -877,16 +864,18 @@ func _update_hud() -> void:
 		return
 	var opponent_label := "AI" if not _network_mode else "对手"
 	spin_label.text = "YOU\n%.0f RPM\n%.0f DUR" % [
-		sim_ref.player.spin,
+		sim_ref.player.spin*60/TAU,
 		sim_ref.player.durability
 	]
 	enemy_spin_label.text = "%s\n%.0f RPM\n%.0f DUR" % [
 		opponent_label,
-		sim_ref.enemy.spin,
+		sim_ref.enemy.spin*60/TAU,
 		sim_ref.enemy.durability
 	]
-	battle_time_label.text = "ROUND 01\n%.1f" % sim_ref.time
-	_update_control_feedback(sim_ref.player.control_input)
+	var drive: Dictionary = sim_ref.drive_zone
+	battle_time_label.text = "%.1f 秒\n%s · %.1f" % [sim_ref.time,
+		"冷却" if drive.cooling else "驱动区 "+str(drive.active.id),drive.remaining]
+	_update_control_feedback(V6_VIEW.world_to_screen(camera,sim_ref.player.control_input))
 
 
 func _update_spin_audio() -> void:
@@ -953,6 +942,11 @@ func _update_control_feedback(control: Vector2) -> void:
 			state_text = "失衡：控制力已被削弱"
 		elif control.length_squared() > 0.01:
 			state_text = "箭头方向即当前施力方向"
+	if sim_ref != null and sim_ref.player.data.edge.falling:
+		state_text = "已失去地面支撑"
+	elif sim_ref != null and sim_ref.player.data.zone.id!=null:
+		state_text = "争夺中 · 补能降低" if sim_ref.player.data.zone.contested else (
+			"驱动区 · 转速回升" if sim_ref.player.spin_loss_rate<0 else "驱动区 · 抵消部分损耗")
 	control_feedback_label.text = "操控 %s  推力 %.0f%%\n%s" % [
 		_control_arrow(control),
 		influence,
@@ -989,11 +983,20 @@ func _apply_map_theme() -> void:
 	environment.background_mode = Environment.BG_COLOR
 	environment.background_color = palette.background
 	environment.ambient_light_source = Environment.AMBIENT_SOURCE_COLOR
-	environment.ambient_light_color = palette.accent.lightened(0.35)
-	environment.ambient_light_energy = 0.58
+	environment.ambient_light_color = Color("#dce7ee")
+	environment.ambient_light_energy = .7
+	var sky_material := ProceduralSkyMaterial.new()
+	sky_material.sky_top_color = Color("#7d9ebd")
+	sky_material.sky_horizon_color = Color("#e6eef3")
+	sky_material.ground_horizon_color = Color("#bcc9d3")
+	sky_material.ground_bottom_color = Color("#26313c")
+	environment.sky = Sky.new()
+	environment.sky.sky_material = sky_material
+	environment.reflected_light_source = Environment.REFLECTION_SOURCE_SKY
 	$WorldEnvironment.environment = environment
 	_apply_mesh_color(center_metal_patch, palette.center, 0.76, 0.24)
-	$DirectionalLight3D.light_color = palette.accent.lightened(0.45)
+	$DirectionalLight3D.light_color = Color("#f7f0de")
+	$DirectionalLight3D.shadow_enabled = true
 	joystick_knob.color = Color(
 		palette.accent.r,
 		palette.accent.g,
@@ -1017,6 +1020,7 @@ func _apply_mesh_color(
 
 func _on_joystick_area_gui_input(event: InputEvent) -> void:
 	if event is InputEventMouseButton:
+		if event.button_index!=MOUSE_BUTTON_LEFT: return
 		joystick_dragging = event.pressed
 		if event.pressed:
 			_set_joystick_from_local_position(event.position)
@@ -1026,14 +1030,50 @@ func _on_joystick_area_gui_input(event: InputEvent) -> void:
 	elif event is InputEventMouseMotion and joystick_dragging:
 		_set_joystick_from_local_position(event.position)
 	elif event is InputEventScreenTouch:
+		if event.pressed and _joystick_touch not in [-1,event.index]: return
+		_joystick_touch = event.index if event.pressed else -1
 		joystick_dragging = event.pressed
 		if event.pressed:
 			_set_joystick_from_local_position(event.position)
 		else:
 			joystick_vector = Vector2.ZERO
 			_update_joystick_knob()
-	elif event is InputEventScreenDrag:
+	elif event is InputEventScreenDrag and event.index==_joystick_touch:
 		_set_joystick_from_local_position(event.position)
+
+
+func _release_controls() -> void:
+	joystick_vector = Vector2.ZERO
+	joystick_dragging = false
+	_joystick_touch = -1
+	accumulator = 0
+	if session!=null: session.release_input()
+	_update_joystick_knob()
+
+
+func _input(event: InputEvent) -> void:
+	if event is InputEventMouseButton and event.button_index==MOUSE_BUTTON_LEFT and not event.pressed:
+		_release_controls()
+	elif event is InputEventScreenTouch and not event.pressed and event.index==_joystick_touch:
+		_release_controls()
+
+
+func _unhandled_input(event: InputEvent) -> void:
+	if event is InputEventMouseMotion and event.button_mask & MOUSE_BUTTON_MASK_RIGHT:
+		camera_yaw -= event.relative.x*.006
+
+
+func _notification(what: int) -> void:
+	if what==NOTIFICATION_WM_WINDOW_FOCUS_OUT and is_node_ready():
+		_release_controls()
+		if not _network_mode and simulation!=null and simulation.phase==&"running":
+			paused = true
+			pause_button.text = "继续"
+			battle_log_label.text = "已暂停 · 点击继续"
+
+
+func _exit_tree() -> void:
+	if session!=null: session.close_session()
 
 
 func _set_joystick_from_local_position(local_position: Vector2) -> void:

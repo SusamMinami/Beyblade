@@ -1,6 +1,9 @@
 import { chromium } from "playwright";
 import assert from "node:assert/strict";
-import { writeFile } from "node:fs/promises";
+import { mkdir, writeFile } from "node:fs/promises";
+
+const out = process.env.QA_OUTPUT_DIR ?? "../.impeccable/review/loading";
+await mkdir(out, { recursive: true });
 
 const browser = await chromium.launch({
   executablePath: process.env.CHROME_PATH ?? "C:/Program Files/Google/Chrome/Application/chrome.exe",
@@ -12,7 +15,8 @@ const check = (ok, label) => { assert.ok(ok, label); checks.push(label); };
 try {
   const context = await browser.newContext({ viewport: { width: 1440, height: 1000 } });
   await context.addInitScript(() => localStorage.setItem("spin-core-web-prototype-v2",
-    JSON.stringify({ version: 2, sound: false, tutorial: { completed: true, stage: "complete" }, lab: { xp: 0 } })));
+    JSON.stringify({ version: 2, sound: false, tutorial: { completed: true, stage: "complete" },
+      lab: { xp: 0, settings: { room: "childhood", followStory: false } } })));
   const page = await context.newPage();
   const errors = [];
   page.on("pageerror", error => errors.push(error.message));
@@ -94,15 +98,17 @@ try {
   await page.evaluate(() => {
     window.atmosphere = app.stage.championshipAtmosphere;
     window.arenaModel = app.stage.arenaRoot.children.find(node => node !== app.stage.driveZoneModel);
-    window.requestCountBeforeBattle = performance.getEntriesByType("resource").filter(e => e.name.includes(".glb")).length;
+    window.requestCountBeforeBattle = performance.getEntriesByType("resource")
+      .filter(e => e.name.includes("/battle_worlds/") && e.name.includes(".glb")).length;
     const loadout = app.state.loadouts[0];
     app.stage.prepareBattle(arenas.metal, loadout.build, loadout.build, loadout.colors);
   });
   await page.waitForFunction(() => app.stage.arenaReady);
   check(await page.evaluate(() => app.stage.championshipAtmosphere === atmosphere &&
     app.stage.arenaRoot.children.includes(arenaModel) &&
-    performance.getEntriesByType("resource").filter(e => e.name.includes(".glb")).length === requestCountBeforeBattle),
-  "Preview to battle retains arena, lighting and loaded assets");
+    performance.getEntriesByType("resource").filter(e =>
+      e.name.includes("/battle_worlds/") && e.name.includes(".glb")).length === requestCountBeforeBattle),
+  "Preview to battle retains arena assets and lighting while the launcher may load on demand");
   check(await page.evaluate(() => {
     const previous = app.stage.playerTop;
     app.stage.playerTop.rotation.z = 1;
@@ -155,7 +161,7 @@ try {
     return stage.preparations.size === 0;
   }), "Destroying a world during compilation settles without stale draw or renderer access");
   check(errors.length === 0, `No uncaught errors during async switches or destruction: ${errors.join("; ")}`);
-  await writeFile("../.impeccable/review/loading/verification.json", JSON.stringify({ checks, errors }, null, 2));
+  await writeFile(`${out}/verification.json`, JSON.stringify({ checks, errors }, null, 2));
   console.log(`PASS: ${checks.length} loading lifecycle checks`);
 } finally {
   await browser.close();

@@ -1,0 +1,1291 @@
+{
+  "metrics": [
+    {
+      "id": "ruins",
+      "period": "night",
+      "render": {
+        "frame": 487,
+        "calls": 145,
+        "triangles": 321560,
+        "points": 0,
+        "lines": 211
+      },
+      "materials": [
+        {
+          "name": "Ancient bronze",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.550000011920929,
+          "metalness": 0.550000011920929,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Blue grey stone.001",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8299999833106995,
+          "metalness": 0.10000000149011612,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Crystal_violet",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.25,
+          "metalness": 0.25,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Cutting mat.002",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8799999952316284,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Energy_cyan.001",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.2800000011920929,
+          "metalness": 0.20000000298023224,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Graphite.003",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.3799999952316284,
+          "metalness": 0.6499999761581421,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Honey oak.002",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.7599999904632568,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Slate 0",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8999999761581421,
+          "metalness": 0.05000000074505806,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Slate 1",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8999999761581421,
+          "metalness": 0.05000000074505806,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Slate 2",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8999999761581421,
+          "metalness": 0.05000000074505806,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Slate 3",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8999999761581421,
+          "metalness": 0.05000000074505806,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Slate 4",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8999999761581421,
+          "metalness": 0.05000000074505806,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        }
+      ]
+    },
+    {
+      "id": "ruins",
+      "period": "day",
+      "render": {
+        "frame": 1082,
+        "calls": 145,
+        "triangles": 321560,
+        "points": 0,
+        "lines": 211
+      },
+      "materials": [
+        {
+          "name": "Ancient bronze",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.550000011920929,
+          "metalness": 0.550000011920929,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Blue grey stone.001",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8299999833106995,
+          "metalness": 0.10000000149011612,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Crystal_violet",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.25,
+          "metalness": 0.25,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Cutting mat.002",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8799999952316284,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Energy_cyan.001",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.2800000011920929,
+          "metalness": 0.20000000298023224,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Graphite.003",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.3799999952316284,
+          "metalness": 0.6499999761581421,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Honey oak.002",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.7599999904632568,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Slate 0",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8999999761581421,
+          "metalness": 0.05000000074505806,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Slate 1",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8999999761581421,
+          "metalness": 0.05000000074505806,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Slate 2",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8999999761581421,
+          "metalness": 0.05000000074505806,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Slate 3",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8999999761581421,
+          "metalness": 0.05000000074505806,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Slate 4",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8999999761581421,
+          "metalness": 0.05000000074505806,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        }
+      ]
+    },
+    {
+      "id": "street",
+      "period": "night",
+      "render": {
+        "frame": 2109,
+        "calls": 287,
+        "triangles": 1143702,
+        "points": 0,
+        "lines": 421
+      },
+      "materials": [
+        {
+          "name": "Acrylic guard",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.14000000059604645,
+          "metalness": 0.10000000149011612,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Amber",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.4000000059604645,
+          "metalness": 0.25,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Brushed aluminium",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.30000001192092896,
+          "metalness": 0.800000011920929,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Cutting mat",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8799999952316284,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Graphite",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.3799999952316284,
+          "metalness": 0.6499999761581421,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street aged paper",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.6499999761581421,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street awning cream",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8899999856948853,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street awning teal",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8899999856948853,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street bowl cobalt",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.28999999165534973,
+          "metalness": 0.15000000596046448,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street bowl ivory",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.2800000011920929,
+          "metalness": 0,
+          "finish": {},
+          "env": 1.15
+        },
+        {
+          "name": "Street brushed steel",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.25999999046325684,
+          "metalness": 0.8199999928474426,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street cafe glazing",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.12999999523162842,
+          "metalness": 0.10000000149011612,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street cafe interior",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8500000238418579,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street curb stone",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.7799999713897705,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street damp soil",
+          "type": "MeshStandardMaterial",
+          "roughness": 1,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street glazed jade tile",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.23999999463558197,
+          "metalness": 0.1599999964237213,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street indigo plaster",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8700000047683716,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street ivory plaster",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8199999928474426,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street lantern glow",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.5,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street leaf 0",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.6600000262260437,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street leaf 1",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.6600000262260437,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street leaf 2",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.6600000262260437,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street lightbox glow",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.30000001192092896,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street oxblood enamel",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.27000001072883606,
+          "metalness": 0.30000001192092896,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street painted iron",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.30000001192092896,
+          "metalness": 0.6499999761581421,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street pavement joints",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.9200000166893005,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street paver 0",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.5699999928474426,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street paver 1",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.5699999928474426,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street paver 2",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.5699999928474426,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street paver 3",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.5699999928474426,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street sign ink",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8799999952316284,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street smoked glass",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.15000000596046448,
+          "metalness": 0.44999998807907104,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street stained oak",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.550000011920929,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "wood",
+              "scale": 0.65
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street terracotta",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.7900000214576721,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street tile grout",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.949999988079071,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street vending glow",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.2199999988079071,
+          "metalness": 0.10000000149011612,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street wet asphalt",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.47999998927116394,
+          "metalness": 0.07999999821186066,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            },
+            "streetFinish": "wet-asphalt"
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street window glow",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.3499999940395355,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Surface hairlines",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.949999988079071,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Vermilion",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.44999998807907104,
+          "metalness": 0.10000000149011612,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        }
+      ]
+    },
+    {
+      "id": "street",
+      "period": "day",
+      "render": {
+        "frame": 2907,
+        "calls": 287,
+        "triangles": 1143702,
+        "points": 0,
+        "lines": 421
+      },
+      "materials": [
+        {
+          "name": "Acrylic guard",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.14000000059604645,
+          "metalness": 0.10000000149011612,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Amber",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.4000000059604645,
+          "metalness": 0.25,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Brushed aluminium",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.30000001192092896,
+          "metalness": 0.800000011920929,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Cutting mat",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8799999952316284,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Graphite",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.3799999952316284,
+          "metalness": 0.6499999761581421,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street aged paper",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.6499999761581421,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street awning cream",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8899999856948853,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street awning teal",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8899999856948853,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street bowl cobalt",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.28999999165534973,
+          "metalness": 0.15000000596046448,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street bowl ivory",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.2800000011920929,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.68
+        },
+        {
+          "name": "Street brushed steel",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.25999999046325684,
+          "metalness": 0.8199999928474426,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street cafe glazing",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.12999999523162842,
+          "metalness": 0.10000000149011612,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street cafe interior",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8500000238418579,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street curb stone",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.7799999713897705,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street damp soil",
+          "type": "MeshStandardMaterial",
+          "roughness": 1,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street glazed jade tile",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.23999999463558197,
+          "metalness": 0.1599999964237213,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street indigo plaster",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8700000047683716,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street ivory plaster",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8199999928474426,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street lantern glow",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.5,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street leaf 0",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.6600000262260437,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street leaf 1",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.6600000262260437,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street leaf 2",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.6600000262260437,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street lightbox glow",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.30000001192092896,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street oxblood enamel",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.27000001072883606,
+          "metalness": 0.30000001192092896,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street painted iron",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.30000001192092896,
+          "metalness": 0.6499999761581421,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street pavement joints",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.9200000166893005,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street paver 0",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.5699999928474426,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street paver 1",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.5699999928474426,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street paver 2",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.5699999928474426,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street paver 3",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.5699999928474426,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street sign ink",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8799999952316284,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street smoked glass",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.15000000596046448,
+          "metalness": 0.44999998807907104,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street stained oak",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.550000011920929,
+          "metalness": 0,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "wood",
+              "scale": 0.65
+            }
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street terracotta",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.7900000214576721,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street tile grout",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.949999988079071,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street vending glow",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.2199999988079071,
+          "metalness": 0.10000000149011612,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Street wet asphalt",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.47999998927116394,
+          "metalness": 0.07999999821186066,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "stone",
+              "scale": 0.7
+            },
+            "streetFinish": "wet-asphalt"
+          },
+          "env": 0.62
+        },
+        {
+          "name": "Street window glow",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.3499999940395355,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Surface hairlines",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.949999988079071,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "Vermilion",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.44999998807907104,
+          "metalness": 0.10000000149011612,
+          "finish": {},
+          "env": 0.62
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

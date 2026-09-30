@@ -1,0 +1,86 @@
+[
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\maintenance.css",
+    "line": 8,
+    "snippet": "border-radius: 3px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "3px"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\maintenance.css",
+    "line": 11,
+    "snippet": "Undocumented color #238cff is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#238cff"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\maintenance.css",
+    "line": 48,
+    "snippet": "border-radius: 3px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "3px"
+  },
+  {
+    "antipattern": "design-system-radius",
+    "name": "Radius outside DESIGN.md",
+    "description": "A border-radius value is outside the DESIGN.md rounded scale. Use a documented radius token or update the design system if the new shape is intentional.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\maintenance.css",
+    "line": 63,
+    "snippet": "border-radius: 3px is outside the DESIGN.md rounded scale",
+    "advisory": true,
+    "ignoreValue": "3px"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\maintenance.css",
+    "line": 67,
+    "snippet": "Undocumented color #238cff is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#238cff"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\maintenance.css",
+    "line": 89,
+    "snippet": "Undocumented color #238cff is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#238cff"
+  },
+  {
+    "antipattern": "design-system-color",
+    "name": "Color outside DESIGN.md",
+    "description": "A literal color is outside the DESIGN.md palette and sidecar tonal ramps. This may be legitimate, but it should be an intentional design-system addition rather than drift.",
+    "severity": "advisory",
+    "category": "quality",
+    "file": "C:\\Users\\Admin\\Downloads\\战斗陀螺\\web-prototype\\src\\ui\\maintenance.css",
+    "line": 129,
+    "snippet": "Undocumented color #238cff is outside DESIGN.md colors",
+    "advisory": true,
+    "ignoreValue": "#238cff"
+  }
+]

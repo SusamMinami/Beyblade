@@ -1,5 +1,6 @@
 import { DEFAULT_BUILD, getPart, PARTS } from "../data/parts.js";
 import { PART_MATERIALS } from "./part-customization.js";
+import { LAUNCHER_PARTS, DEFAULT_LAUNCHER_BUILD, getLauncherPart } from "./launcher-state.js";
 
 export const STORAGE_VERSION = 2;
 
@@ -17,11 +18,11 @@ export const BATTLE_REWARDS = Object.freeze({
 });
 
 export const INITIAL_OWNED_PART_IDS = Object.freeze(
-  Object.values(DEFAULT_BUILD),
+  [...Object.values(DEFAULT_BUILD), ...Object.values(DEFAULT_LAUNCHER_BUILD)],
 );
 export const INITIAL_OWNED_MATERIAL_IDS = Object.freeze(["stock"]);
 
-const VALID_PART_IDS = new Set(PARTS.map((part) => part.id));
+const VALID_PART_IDS = new Set([...PARTS, ...LAUNCHER_PARTS].map((part) => part.id));
 const VALID_MATERIAL_IDS = new Set(Object.keys(PART_MATERIALS));
 const VALID_TUTORIAL_STAGES = new Set(Object.values(TUTORIAL_STAGE));
 
@@ -100,7 +101,7 @@ export function getPartAccess(part, progression) {
 }
 
 export function purchasePart(progression, partId) {
-  const part = getPart(partId);
+  const part = getPart(partId) ?? getLauncherPart(partId);
   if (!part) return { ok: false, reason: "unknown_part" };
 
   const access = getPartAccess(part, progression);
@@ -161,7 +162,8 @@ export function purchaseMaterial(progression, materialId) {
   };
 }
 
-export function getBattleReward({ won, tutorial }) {
+export function getBattleReward({ won, draw = false, tutorial }) {
+  if (draw) return 0;
   if (
     tutorial.stage === TUTORIAL_STAGE.FIRST_BATTLE &&
     !tutorial.firstRewardClaimed

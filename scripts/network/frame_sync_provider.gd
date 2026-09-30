@@ -41,6 +41,10 @@ func _init(simulation: BattleSimulation, t: BattleTransport, slot: int) -> void:
 
 
 func start() -> void:
+	if not _rules_supported():
+		_set_phase(BattleProtocol.PHASE_CLOSED)
+		error_occurred.emit(-6,"联机服务仍使用旧规则；v6 当前支持本地对战与完整状态回放。")
+		return
 	_set_phase(BattleProtocol.PHASE_CONNECTING)
 	if transport:
 		transport.connect("message_received", Callable(self, "_on_message"))
@@ -50,6 +54,7 @@ func start() -> void:
 
 
 func submit_ready() -> void:
+	if not _rules_supported(): return
 	if ready_sent:
 		return
 	ready_sent = true
@@ -57,6 +62,7 @@ func submit_ready() -> void:
 
 
 func submit_launch(power: float, height: float, direction: float, angle: float) -> void:
+	if not _rules_supported(): return
 	local_input.set_launch(power, height, direction, angle)
 	var pq := BattleProtocol.quantize_power(power)
 	var hq := BattleProtocol.quantize_height(height)
@@ -79,6 +85,7 @@ func set_local_input(control: Vector2, flags: int = 0) -> void:
 
 
 func poll(delta: float) -> Dictionary:
+	if not _rules_supported(): return sim.snapshot() if sim else {}
 	if transport:
 		transport.poll()
 	_set_phase_from_sim()
@@ -147,14 +154,12 @@ func _try_send_pending(current_frame: int) -> void:
 	_send_accumulator = 0.0
 	_force_send = false
 	var batch: Array = []
-	var take := min(_pending_frames.size(), BattleProtocol.INPUT_BATCH_MAX)
-	var first_frame := _pending_frames[0].f
-	var last_frame := _pending_frames[take - 1].f
+	var take := mini(_pending_frames.size(), BattleProtocol.INPUT_BATCH_MAX)
 	for i in range(take):
 		batch.append(_pending_frames[i])
 	_pending_frames = _pending_frames.slice(take)
 	if not batch.is_empty():
-		var last := batch[-1]
+		var last: Dictionary = batch[-1]
 		_last_sent_cx = int(last.cx)
 		_last_sent_cy = int(last.cy)
 		_last_sent_fl = int(last.fl)
@@ -166,7 +171,7 @@ func _consume_input_for_frame(slot: int, frame: int) -> Dictionary:
 	var queue: Array = input_queue.get(slot, [])
 	for i in range(queue.size()):
 		if int(queue[i].f) == frame:
-			var result := queue[i].duplicate()
+			var result: Dictionary = queue[i].duplicate()
 			queue.remove_at(i)
 			return {
 				"frame": frame,
@@ -197,11 +202,13 @@ func _handle_battle_end() -> void:
 
 
 func _on_connected() -> void:
+	if not _rules_supported(): return
 	_set_phase(BattleProtocol.PHASE_READY)
 	_send_binary(BattleStateCodec.encode_binary_hello())
 
 
 func _on_message(msg: Dictionary) -> void:
+	if not _rules_supported(): return
 	var type_val: Variant = msg.get("type", "")
 	if type_val is String:
 		_on_text_message(type_val, msg.get("data", {}))
@@ -340,6 +347,11 @@ func _set_phase_from_sim() -> void:
 		_set_phase(BattleProtocol.PHASE_RUNNING)
 
 
+func _rules_supported() -> bool:
+	# Binary v2 drops the axis, sectors, drive-zone and contact history.
+	return sim!=null and sim.SIMULATION_VERSION==BattleProtocol.SIMULATION_VERSION
+
+
 func _send_binary(data: PackedByteArray) -> void:
 	if transport and transport.has_method("send_binary"):
 		transport.send_binary(data)
@@ -348,5 +360,5 @@ func _send_binary(data: PackedByteArray) -> void:
 
 
 func shutdown() -> void:
-	if transport and transport.has_method("disconnect"):
-		transport.disconnect()
+	if transport:
+		transport.close_connection()

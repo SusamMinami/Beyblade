@@ -1,0 +1,226 @@
+{
+  "checks": [
+    "Reference launcher preserves dry/wet baseline across real builds, force and tilt",
+    "27 combinations conserve input energy; normal and quantized launch agree; velocity stays independent",
+    "Existing economy buys once; migration validates slots, colors and ownership",
+    "Removed cartridge oil cannot transfer into the newly mounted cartridge"
+  ],
+  "table": [
+    {
+      "parts": "R01/T01/C01",
+      "spin": 53.47902689999999,
+      "effort": 0.86,
+      "releaseMs": 160,
+      "tilt": 0.063,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R01/T01/C02",
+      "spin": 54.11578021675808,
+      "effort": 0.86,
+      "releaseMs": 95,
+      "tilt": 0.0657391,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R01/T01/C03",
+      "spin": 52.50338722841227,
+      "effort": 0.86,
+      "releaseMs": 210,
+      "tilt": 0.0604716,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R01/T02/C01",
+      "spin": 53.75015668190406,
+      "effort": 1.0172571428571429,
+      "releaseMs": 160,
+      "tilt": 0.063,
+      "energy": 2051.8262797496714
+    },
+    {
+      "parts": "R01/T02/C02",
+      "spin": 54.40550621037377,
+      "effort": 1.0172571428571429,
+      "releaseMs": 95,
+      "tilt": 0.0657391,
+      "energy": 2051.8262797496714
+    },
+    {
+      "parts": "R01/T02/C03",
+      "spin": 52.745871851972495,
+      "effort": 1.0172571428571429,
+      "releaseMs": 210,
+      "tilt": 0.0604716,
+      "energy": 2051.8262797496714
+    },
+    {
+      "parts": "R01/T03/C01",
+      "spin": 49.08186246599999,
+      "effort": 0.7648691358024691,
+      "releaseMs": 160,
+      "tilt": 0.063,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R01/T03/C02",
+      "spin": 49.08186246599999,
+      "effort": 0.7648691358024691,
+      "releaseMs": 95,
+      "tilt": 0.0657391,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R01/T03/C03",
+      "spin": 49.08186246599999,
+      "effort": 0.7648691358024691,
+      "releaseMs": 210,
+      "tilt": 0.0604716,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R02/T01/C01",
+      "spin": 53.71451152680793,
+      "effort": 0.82388,
+      "releaseMs": 160,
+      "tilt": 0.063,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R02/T01/C02",
+      "spin": 54.36619585776281,
+      "effort": 0.82388,
+      "releaseMs": 95,
+      "tilt": 0.0657391,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R02/T01/C03",
+      "spin": 52.71587025630894,
+      "effort": 0.82388,
+      "releaseMs": 210,
+      "tilt": 0.0604716,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R02/T02/C01",
+      "spin": 54.005113367022986,
+      "effort": 0.9811371428571428,
+      "releaseMs": 160,
+      "tilt": 0.063,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R02/T02/C02",
+      "spin": 54.67135560641197,
+      "effort": 0.9811371428571428,
+      "releaseMs": 95,
+      "tilt": 0.0657391,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R02/T02/C03",
+      "spin": 52.98408077293838,
+      "effort": 0.9811371428571428,
+      "releaseMs": 210,
+      "tilt": 0.0604716,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R02/T03/C01",
+      "spin": 49.08186246599999,
+      "effort": 0.728749135802469,
+      "releaseMs": 160,
+      "tilt": 0.063,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R02/T03/C02",
+      "spin": 49.08186246599999,
+      "effort": 0.728749135802469,
+      "releaseMs": 95,
+      "tilt": 0.0657391,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R02/T03/C03",
+      "spin": 49.08186246599999,
+      "effort": 0.728749135802469,
+      "releaseMs": 210,
+      "tilt": 0.0604716,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R03/T01/C01",
+      "spin": 52.894701889558895,
+      "effort": 0.903,
+      "releaseMs": 160,
+      "tilt": 0.063,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R03/T01/C02",
+      "spin": 53.51103103169148,
+      "effort": 0.903,
+      "releaseMs": 95,
+      "tilt": 0.0657391,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R03/T01/C03",
+      "spin": 51.95053257029771,
+      "effort": 0.903,
+      "releaseMs": 210,
+      "tilt": 0.0604716,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R03/T02/C01",
+      "spin": 52.425752160030086,
+      "effort": 1.0602571428571428,
+      "releaseMs": 160,
+      "tilt": 0.063,
+      "energy": 1968.612004209418
+    },
+    {
+      "parts": "R03/T02/C02",
+      "spin": 53.05625756153064,
+      "effort": 1.0602571428571428,
+      "releaseMs": 95,
+      "tilt": 0.0657391,
+      "energy": 1968.612004209418
+    },
+    {
+      "parts": "R03/T02/C03",
+      "spin": 51.45961724029163,
+      "effort": 1.0602571428571428,
+      "releaseMs": 210,
+      "tilt": 0.0604716,
+      "energy": 1968.612004209418
+    },
+    {
+      "parts": "R03/T03/C01",
+      "spin": 49.08186246599999,
+      "effort": 0.8078691358024691,
+      "releaseMs": 160,
+      "tilt": 0.063,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R03/T03/C02",
+      "spin": 49.08186246599999,
+      "effort": 0.8078691358024691,
+      "releaseMs": 95,
+      "tilt": 0.0657391,
+      "energy": 2087.2349389773512
+    },
+    {
+      "parts": "R03/T03/C03",
+      "spin": 49.08186246599999,
+      "effort": 0.8078691358024691,
+      "releaseMs": 210,
+      "tilt": 0.0604716,
+      "energy": 2087.2349389773512
+    }
+  ]
+}

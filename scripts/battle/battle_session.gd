@@ -27,13 +27,16 @@ var _local_input: Vector2 = Vector2.ZERO
 var _interpolated_snapshot: Dictionary = {}
 var _snapshot_history: Array = []
 var _max_history := 30
+var _local_accumulator := 0.0
+var local_replay: Dictionary = {}
 
 
 static func create_local_ai_battle(
 	p_build,
 	e_build,
 	arena_res,
-	battle_seed: int = 20260718
+	battle_seed: int = 20260718,
+	rules: Dictionary = {}
 ):
 	var session_script := load("res://scripts/battle/battle_session.gd")
 	var session = session_script.new()
@@ -42,7 +45,7 @@ static func create_local_ai_battle(
 	session.enemy_build = e_build
 	session.arena = arena_res
 	session.seed = battle_seed
-	session.sim = BattleSimulationRef.new(p_build, e_build, arena_res, battle_seed)
+	session.sim = BattleSimulationRef.new(p_build, e_build, arena_res, battle_seed, {}, false, Callable(), rules)
 	session.my_slot = BattleProtocolRef.SLOT_PLAYER
 	session._set_phase(BattleProtocolRef.PHASE_LAUNCH_WINDOW)
 	return session
@@ -133,6 +136,8 @@ func submit_ready() -> void:
 func submit_launch(power: float, height: float, direction: float, angle: float) -> void:
 	if mode == BattleProtocolRef.MODE_LOCAL:
 		sim.launch(power, direction, angle, height)
+		release_input()
+		local_replay = {"schema":1,"initial":sim.export_state(),"inputs":[]}
 		_set_phase(BattleProtocolRef.PHASE_RUNNING)
 		return
 	if provider and provider.has_method("submit_launch"):
@@ -149,13 +154,19 @@ func set_local_input(control: Vector2, flags: int = 0) -> void:
 
 func poll(delta: float) -> Dictionary:
 	if mode == BattleProtocolRef.MODE_LOCAL:
-		if sim.phase == &"running":
-			sim.step(delta, _local_input)
+		if sim.phase == &"running" and is_finite(delta):
+			_local_accumulator += clampf(delta,0,.05)
+		while sim.phase == &"running" and _local_accumulator >= 1.0/60-1e-12:
+			_local_accumulator -= 1.0/60
+			if not local_replay.is_empty():
+				local_replay.inputs.append({"player":{"x":float(_local_input.x),"y":float(_local_input.y)},"enemy":null})
+			sim.step(1.0/60, _local_input)
 			for ev in sim.events:
 				emit_signal("event_occurred", ev)
 			if sim.phase == &"finished":
 				_set_phase(BattleProtocolRef.PHASE_FINISHED)
 				emit_signal("battle_finished", sim.result)
+				emit_signal("replay_ready", local_replay.duplicate(true))
 		var snap = sim.snapshot()
 		_track_snapshot(snap)
 		emit_signal("state_updated", snap)
@@ -166,6 +177,20 @@ func poll(delta: float) -> Dictionary:
 		emit_signal("state_updated", snap)
 		return snap
 	return sim.snapshot() if sim else {}
+
+
+func release_input() -> void:
+	_local_accumulator = 0.0
+	set_local_input(Vector2.ZERO)
+
+
+func restore_local_state(state: Dictionary) -> bool:
+	if mode != BattleProtocolRef.MODE_LOCAL or not sim.restore_state(state): return false
+	release_input()
+	_snapshot_history.clear()
+	local_replay = {"schema":1,"initial":sim.export_state(),"inputs":[]}
+	_set_phase(sim.phase)
+	return true
 
 
 func get_render_snapshot() -> Dictionary:

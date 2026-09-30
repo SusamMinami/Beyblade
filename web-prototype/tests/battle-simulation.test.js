@@ -62,7 +62,10 @@ describe("BattleSimulation", () => {
     );
   });
 
-  it("诊断模式记录碰撞前后的倾角、转速与失衡变化", () => {
+  it.each([
+    { scenario: "撞击加重原有倾斜", launchSign: -1, tiltDeltaSign: 1 },
+    { scenario: "反向撞击抵消部分倾斜", launchSign: 1, tiltDeltaSign: -1 },
+  ])("诊断模式准确记录倾角、转速与失衡：$scenario", ({ launchSign, tiltDeltaSign }) => {
     const diagnostics = [];
     const battle = new BattleSimulation({
       playerBuild: STANDARD_BUILD,
@@ -70,35 +73,92 @@ describe("BattleSimulation", () => {
       arena: ARENAS.standard,
       seed: 17,
       diagnostics: true,
-      logger: (message, telemetry) => diagnostics.push({ message, telemetry }),
+      logger: (message, telemetry) => diagnostics.push({
+        message,
+        telemetry,
+        // Copy the real collision-time state before the rest of the step
+        // applies axis motion and imbalance recovery.
+        observed: Object.fromEntries(["player", "enemy"].map(id => {
+          const top = battle[id];
+          return [id, {
+            tilt: top.tilt,
+            tiltVector: { ...top.tiltVector },
+            spin: top.spin,
+            imbalance: top.imbalance,
+            durability: top.durability,
+          }];
+        })),
+      }),
     });
-    battle.launch({ power: 1, direction: 0, angle: 0 });
+    // Public launch commands initialize tilt and tiltVector together.
+    // The enemy launch frame is rotated by PI, so the same signed command
+    // makes both tops lean toward, or away from, their point of contact.
+    battle.launchExplicit(
+      { power_q: 255, height_q: 0, direction_q: 0, angle_q: launchSign * 85 },
+      { power_q: 255, height_q: 0, direction_q: 0, angle_q: launchSign * 57 },
+    );
+    const initialTilts = {};
+    for (const id of ["player", "enemy"]) {
+      const top = battle[id];
+      expect(top.tilt).toBeCloseTo(Math.hypot(top.tiltVector.x, top.tiltVector.y), 12);
+      initialTilts[id] = top.tilt;
+    }
     battle.player.position = { x: -0.45, y: 0 };
     battle.enemy.position = { x: 0.45, y: 0 };
     battle.player.velocity = { x: 7, y: 0 };
     battle.enemy.velocity = { x: -7, y: 0 };
-    battle.player.tilt = 0.12;
-    battle.enemy.tilt = 0.08;
 
-    battle.step(1 / 60, { x: 0, y: 0 });
+    battle.step(1 / 60, { x: 0, y: 0 }, { x: 0, y: 0 });
 
     const collision = battle.events.find((event) => event.type === "collision");
     expect(diagnostics).toHaveLength(1);
     expect(diagnostics[0].message).toContain("BattleSimulation");
-    expect(collision.telemetry.player).toMatchObject({
-      tiltBefore: expect.any(Number),
-      tiltAfter: expect.any(Number),
-      tiltDelta: expect.any(Number),
-      spinBefore: expect.any(Number),
-      spinAfter: expect.any(Number),
-      spinDelta: expect.any(Number),
-      imbalanceBefore: expect.any(Number),
-      imbalanceAfter: expect.any(Number),
-    });
-    expect(collision.telemetry.player.spinDelta).toBeLessThan(0);
-    expect(collision.telemetry.player.tiltDelta).toBeGreaterThan(0);
-    expect(collision.telemetry.player.imbalanceDelta).toBeGreaterThan(0);
+    expect(diagnostics[0].telemetry).toBe(collision.telemetry);
+    for (const id of ["player", "enemy"]) {
+      const entry = collision.telemetry[id];
+      const observed = diagnostics[0].observed[id];
+      expect(entry.tiltBefore).toBeCloseTo(initialTilts[id], 5);
+      expect(observed.tilt).toBeCloseTo(
+        Math.hypot(observed.tiltVector.x, observed.tiltVector.y), 12,
+      );
+      for (const metric of ["tilt", "spin", "imbalance"]) {
+        expect(entry[`${metric}After`]).toBeCloseTo(observed[metric], 5);
+        expect(entry[`${metric}Delta`]).toBeCloseTo(
+          entry[`${metric}After`] - entry[`${metric}Before`], 5,
+        );
+      }
+      expect(entry.tiltDelta * tiltDeltaSign).toBeGreaterThan(0);
+      expect(entry.spinDelta).toBeLessThan(0);
+      expect(entry.imbalanceDelta).toBeGreaterThan(0);
+      expect(entry.damage).toBeGreaterThan(0);
+      expect(entry.durabilityAfter).toBeCloseTo(observed.durability, 5);
+      expect(entry.damage).toBeCloseTo(entry.durabilityBefore - entry.durabilityAfter, 5);
+    }
     expect(battle.collisionLog).toEqual([collision.telemetry]);
+  });
+
+  it("未接触时不生成碰撞诊断、记录或伤害", () => {
+    const diagnostics = [];
+    const battle = new BattleSimulation({
+      playerBuild: STANDARD_BUILD,
+      enemyBuild: STANDARD_BUILD,
+      arena: ARENAS.standard,
+      diagnostics: true,
+      logger: (...args) => diagnostics.push(args),
+    });
+    battle.launch({ power: 1, direction: 0, angle: 0 });
+    battle.player.position = { x: -3, y: 0 };
+    battle.enemy.position = { x: 3, y: 0 };
+    battle.player.velocity = { x: 0, y: 0 };
+    battle.enemy.velocity = { x: 0, y: 0 };
+    const durabilityBefore = [battle.player.durability, battle.enemy.durability];
+
+    battle.step(1 / 60, { x: 0, y: 0 }, { x: 0, y: 0 });
+
+    expect(diagnostics).toEqual([]);
+    expect(battle.collisionLog).toEqual([]);
+    expect(battle.events.some(event => event.type === "collision")).toBe(false);
+    expect([battle.player.durability, battle.enemy.durability]).toEqual(durabilityBefore);
   });
 
   it("失衡会抬高倾角、削弱控制，并随稳定性逐步恢复", () => {
@@ -130,7 +190,7 @@ describe("BattleSimulation", () => {
     expect(battle.player.imbalance).toBeLessThan(initialImbalance * 0.25);
   });
 
-  it("普通出射会被护圈反弹而不是立即判定撞飞", () => {
+  it("低速接触圆滑护圈会逐步回落，保持支撑", () => {
     const battle = new BattleSimulation({
       playerBuild: STANDARD_BUILD,
       enemyBuild: STANDARD_BUILD,
@@ -141,9 +201,12 @@ describe("BattleSimulation", () => {
       x: ARENAS.standard.wallRadius + 0.02,
       y: 0,
     };
-    battle.player.velocity = { x: 6, y: 0 };
+    battle.player.velocity = { x: .5, y: 0 };
 
     battle.step(1 / 60, { x: 0, y: 0 });
+    // v6 follows the visible slope; the tip is not teleported behind the rim.
+    expect(battle.player.position.x).toBeGreaterThan(ARENAS.standard.wallRadius);
+    for (let i = 0; i < 29; i++) battle.step(1 / 60, { x: 0, y: 0 });
 
     expect(battle.player.position.x).toBeLessThan(
       ARENAS.standard.wallRadius,

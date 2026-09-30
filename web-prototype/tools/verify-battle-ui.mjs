@@ -65,7 +65,7 @@ try {
   const specimen = await browser.newPage({ viewport: { width: 1440, height: 680 } });
   await specimen.route("**/__structure_fixture", (route) => route.fulfill({
     contentType: "text/html",
-    body: '<body style="margin:0;background:#182c34"><main style="color:#eaf3ec;font:18px sans-serif"></main></body>',
+    body: '<script type="importmap">{"imports":{"three":"/node_modules/three/build/three.module.js"}}</script><body style="margin:0;background:#182c34"><main style="color:#eaf3ec;font:18px sans-serif"></main></body>',
   }));
   await specimen.goto(`${base}/__structure_fixture`);
   await specimen.evaluate(async () => {

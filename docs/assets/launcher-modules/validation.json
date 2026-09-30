@@ -1,0 +1,33 @@
+{
+  "moduleCount": 8,
+  "slots": [
+    "coupler",
+    "cover",
+    "grip",
+    "housing",
+    "pull_handle",
+    "rack",
+    "release",
+    "transmission"
+  ],
+  "meshCount": 29,
+  "stockBounds": [
+    -0.8799999952316284,
+    -2.069999933242798,
+    -0.47450000047683716,
+    2.1857762336730957,
+    1.4500000476837158,
+    0.30300000309944153
+  ],
+  "modularBounds": [
+    -0.8799999952316284,
+    -2.069999933242798,
+    -0.47450000047683716,
+    2.1857762336730957,
+    1.4500000476837158,
+    0.30300000309944153
+  ],
+  "topMountPreserved": true,
+  "internalPaintIsolated": true,
+  "note": "GLB re-import check; bounds use Blender Z-up coordinates"
+}

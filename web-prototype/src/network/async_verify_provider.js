@@ -1,5 +1,6 @@
 import {
   FIXED_DT,
+  SIMULATION_VERSION,
   HASH_CHECK_INTERVAL,
   PHASE,
   SLOT,
@@ -64,6 +65,9 @@ function normalizeSnapshot(snap) {
 
 export class AsyncVerifyProvider {
   constructor(sim, slot = SLOT.PLAYER, ghostSeed = 0, ghostStrategy = null) {
+    if (sim.version && sim.version !== SIMULATION_VERSION) {
+      throw new Error(`异步验算尚未支持 Web 规则 ${sim.version}`);
+    }
     this.sim = sim;
     this.mySlot = slot;
     this.phase = PHASE.INIT;

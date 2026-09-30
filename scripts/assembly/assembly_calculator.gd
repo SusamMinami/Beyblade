@@ -44,6 +44,9 @@ static func calculate(
 	driver_shaft = _customized_part(driver_shaft, customizations)
 	tip = _customized_part(tip, customizations)
 	var result := TopBuildData.new()
+	# Retain the input contract for cross-runtime recovery; each consumer applies
+	# the existing normalizer when deriving geometry or physical properties.
+	result.customizations = customizations.duplicate(true)
 	result.attack_ring = _accept_type(attack_ring, TopPartResource.PartType.ATTACK_RING)
 	result.core_lock = _accept_type(core_lock, TopPartResource.PartType.CORE_LOCK)
 	result.weight_disc = _accept_type(weight_disc, TopPartResource.PartType.WEIGHT_DISC)

@@ -1,0 +1,46 @@
+{
+  "checks": [
+    "Legacy launcher route opens outfit inside original assembly",
+    "Locked preview cannot mutate coins, ownership, or equipment",
+    "Preview mounts real R02 geometry",
+    "Purchase deducts existing coins once; equipment remains a draft",
+    "Swapping a cartridge retains housing and inspection camera",
+    "Bench exposes actual energy, effort and release measurements",
+    "Fork, cam, three radial dogs and input gear articulate independently",
+    "Three cartridges and red paint survive save/reload",
+    "Battle geometry and solver use identical equipment",
+    "Physics waits for the dogs to clear",
+    "Release uses equipped exit time and clears aiming",
+    "Navigation cancels pending release",
+    "Insufficient coins allow preview but block purchase",
+    "Saving a locked preview never equips it",
+    "Mobile workbench has no horizontal overflow",
+    "F1: equipment dirty state remains visible in maintenance mode",
+    "Keyboard reticle applies oil to an actual transmission surface",
+    "F1: maintenance and equipment dirty states remain visible together",
+    "F2: slot activation retains keyboard focus",
+    "F2: async preview retains keyboard focus",
+    "F3: selected button retains a visible separated focus outline",
+    "F2: keyboard trial retains focus",
+    "Keyboard save commits both drafts but never the locked preview",
+    "No browser exceptions: "
+  ],
+  "linkage": {
+    "moved": true,
+    "gears": true
+  },
+  "saved": {
+    "version": "launcher-v1",
+    "build": {
+      "rack": "launcher.rack.r02",
+      "transmission": "launcher.transmission.t02",
+      "coupler": "launcher.coupler.c02"
+    },
+    "colors": {
+      "shell": "#34393d",
+      "accent": "#b83722",
+      "grip": "#202733"
+    }
+  },
+  "errors": []
+}

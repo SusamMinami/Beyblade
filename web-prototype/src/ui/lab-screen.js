@@ -3,6 +3,7 @@ import { calculateBuild } from "../core/assembly-calculator.js";
 import { completeLabTest, LAB_MODES, labLevel, measureBuild, TERRAIN_OPTIONS, WIND_OPTIONS, WIND_PRESETS, windParameters } from "../core/lab-state.js";
 import { PARTS, PART_TYPE_META, getPart } from "../data/parts.js";
 import { getPartAccess, purchasePart } from "../core/progression.js";
+import { homeProgressLabel } from "../core/home-progression.js";
 import "./lab.css";
 
 const escapeHtml = (value) => String(value).replace(/[&<>"']/g, (char) =>
@@ -43,7 +44,7 @@ export class LabScreen {
     app.root.querySelector(".game-shell").append(this.root);
     this.mount();
     try {
-      this.stage = new LabStage(this.root.querySelector(".lab-scene"));
+      this.stage = new LabStage(this.root.querySelector(".lab-scene"), app.stage.renderer);
     } catch {
       this.assetError();
     }
@@ -67,7 +68,7 @@ export class LabScreen {
         </button>
       </header>
       <aside class="lab-utilities" aria-label="实验室工具">
-        ${[["records", "folder", "测试记录"], ["settings", "settings", "实验室设置"], ["help", "help", "帮助"]].map(([action, icon, title]) =>
+        ${[["maintenance", "tools", "改装保养"], ["records", "folder", "测试记录"], ["settings", "settings", "实验室设置"], ["help", "help", "帮助"]].map(([action, icon, title]) =>
           `<button data-lab="${action}" aria-label="${title}"><span>${labIcon(icon)}</span><small>${title}</small></button>`).join("")}
       </aside>
       <div class="lab-loading" role="status"><span>正在准备实验台</span><small>载入仪器与当前陀螺</small></div>
@@ -124,7 +125,8 @@ export class LabScreen {
       const value = event.target.type === "checkbox" ? event.target.checked
         : event.target.type === "range" ? Number(event.target.value) : event.target.value;
       if (setting === "room" && value === "advanced" && labLevel(this.lab.xp).level < 2) return;
-      const settings = { ...this.lab.settings, [setting]: value, ...(setting === "wind" ? WIND_PRESETS[value] : {}) };
+      const settings = { ...this.lab.settings, [setting]: value, ...(setting === "wind" ? WIND_PRESETS[value] : {}),
+        ...(setting === "room" ? { followStory: false } : {}) };
       const next = { ...this.lab, settings };
       if (!this.persist(next)) return;
       this.complete = false;
@@ -134,6 +136,7 @@ export class LabScreen {
       this.stage?.clearTrace();
       this.updateWindControls();
       this.draw();
+      if (setting === "followStory" || setting === "room") this.showSettings();
     });
     this.root.addEventListener("input", (event) => {
       const setting = event.target.dataset.setting;
@@ -172,7 +175,11 @@ export class LabScreen {
 
   leave() {
     this.active = false;
-    if (this.stage) this.stage.active = false;
+    this.roomLoadToken = (this.roomLoadToken ?? 0) + 1;
+    if (this.stage) {
+      this.stage.active = false;
+      this.stage.prepareToken = (this.stage.prepareToken ?? 0) + 1;
+    }
     this.busy = false;
     this.complete = false;
     this.closeSheet();
@@ -366,6 +373,10 @@ export class LabScreen {
     if (action === "close") return this.closeSheet();
     if (action === "test") return this.start();
     if (action === "calibrate") return this.start(true);
+    if (action === "maintenance") {
+      if (this.busy) return this.notify("请等待当前检测完成。");
+      return this.app.goTo("maintenance");
+    }
     if (action === "next" || action === "previous") return this.selectLoadout(this.app.state.activeLoadoutIndex + (action === "next" ? 1 : -1));
     if (action === "assembly" || action === "battle") {
       if (this.busy) return this.notify("请等待当前检测完成。");
@@ -391,7 +402,7 @@ export class LabScreen {
     if (action === "gems") return this.showSheet("钻石", `<div class="lab-empty">${labIcon("gem")}<h3>钻石系统准备中</h3><p>钻石余额与入口已预留。获取、充值和消费将在后续版本接入。</p><span class="lab-tag">尚未开放</span></div>`, action);
     if (action === "level") {
       const level = labLevel(this.lab.xp);
-      return this.showSheet("实验室等级", `<div class="lab-level-detail"><strong>LV.${level.level}</strong><p>累计经验 ${this.lab.xp} · 完成报告 ${this.lab.records.length}</p></div><h3>测试，让研究继续</h3><p>每个新配置的每种测试首次完成获得 30 经验。相同条件重复测试不会重复奖励。</p><p>距离下一等级还需 ${level.required - level.current} 经验。LV.2 可免费使用精密实验室与冠军展示舞台，在实验室设置中切换房间。房间外观不改变测量结果。</p>`, action);
+      return this.showSheet("实验室等级", `<div class="lab-level-detail"><strong>LV.${level.level}</strong><p>累计经验 ${this.lab.xp} · 完成报告 ${this.lab.records.length}</p></div><h3>测试，让研究继续</h3><p>每个新配置的每种测试首次完成获得 30 经验。相同条件重复测试不会重复奖励。</p><p>距离下一等级还需 ${level.required - level.current} 经验。LV.2 可免费使用精密实验室与冠军展示舞台，在实验室设置中切换房间。房间外观不改变测量结果。</p><p>${homeProgressLabel(this.app.state)}。首次完成工坊修行时，经验不足 120 则补到 120。</p>`, action);
     }
     if (action === "help") return this.showSheet("测试室使用指南", `
       <ol><li><b>选择陀螺</b><p>下方三张卡片与改装台共用出战配置，DIY 材料与外形会同步。</p></li>
@@ -416,7 +427,9 @@ export class LabScreen {
     const settings = this.lab.settings;
     this.showSheet("实验室设置", `
       <h3>测试环境</h3>
-      <label class="lab-setting">实验室场景<select data-setting="room"><option value="childhood" ${settings.room === "childhood" ? "selected" : ""}>童年书桌 · 入门</option><option value="advanced" ${settings.room === "advanced" ? "selected" : ""} ${labLevel(this.lab.xp).level < 2 ? "disabled" : ""}>精密实验室 · LV.2</option></select></label>
+      <p>${homeProgressLabel(this.app.state)}。保养共用当前房间。</p>
+      <label class="lab-setting">随剧情升级房间<input type="checkbox" data-setting="followStory" ${settings.followStory ? "checked" : ""}></label>
+      <label class="lab-setting">实验室场景<select data-setting="room"><option value="minimal" ${settings.room === "minimal" ? "selected" : ""}>极简空间</option><option value="childhood" ${settings.room === "childhood" ? "selected" : ""}>童年书桌</option><option value="advanced" ${settings.room === "advanced" ? "selected" : ""} ${labLevel(this.lab.xp).level < 2 ? "disabled" : ""}>精密实验室 · LV.2</option></select></label>
       <label class="lab-setting">风力<select data-setting="wind">${WIND_OPTIONS.map((v) => `<option ${v === settings.wind ? "selected" : ""}>${v}</option>`).join("")}</select></label>
       <label class="lab-setting">地面<select data-setting="terrain">${TERRAIN_OPTIONS.map((v) => `<option ${v === settings.terrain ? "selected" : ""}>${v}</option>`).join("")}</select></label>
       <h3>场景表现</h3>

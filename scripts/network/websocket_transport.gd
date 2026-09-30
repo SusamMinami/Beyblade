@@ -23,22 +23,23 @@ func connect_to_room(url: String, ticket: Dictionary = {}) -> void:
 		headers.append("Authorization: Bearer " + str(ticket.token))
 	if ticket.has("room_id"):
 		headers.append("X-Room-Id: " + str(ticket.room_id))
-	var err := _ws.connect_to_url(url, headers)
+	_ws.handshake_headers = headers
+	var err := _ws.connect_to_url(url)
 	if err != OK:
 		emit_signal("error_occurred", err, "Failed to connect to " + url)
 		return
 
 
-func disconnect() -> void:
+func close_connection() -> void:
 	_ws.close()
 
 
-func is_connected() -> bool:
+func is_room_connected() -> bool:
 	return _ws.get_ready_state() == WebSocketPeer.STATE_OPEN
 
 
 func send_message(msg: Dictionary) -> void:
-	if not is_connected():
+	if not is_room_connected():
 		return
 	_seq += 1
 	if msg.has("_binary") and msg["_binary"] is PackedByteArray:
@@ -51,7 +52,7 @@ func send_message(msg: Dictionary) -> void:
 
 
 func send_binary(data: PackedByteArray) -> void:
-	if is_connected():
+	if is_room_connected():
 		_seq += 1
 		_ws.send(data, WebSocketPeer.WRITE_MODE_BINARY)
 
@@ -63,7 +64,7 @@ func poll(delta: float = -1.0) -> void:
 	_ws.poll()
 	var dt := delta
 	if dt < 0.0:
-		var now := OS.get_ticks_msec()
+		var now := Time.get_ticks_msec()
 		if _last_poll_time == 0:
 			_last_poll_time = now
 		dt = float(now - _last_poll_time) / 1000.0

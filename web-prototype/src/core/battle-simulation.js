@@ -1,13 +1,20 @@
 import { createStructure, applyStructuralImpact } from "./top-structure.js";
 import { driveZoneState, insideDriveZone, DRIVE_ZONE_RULES } from "./drive-zones.js";
+import { oilEffects } from "./maintenance-state.js";
+import { normalizeLauncher, activeLauncherOil, LAUNCHER_VERSION } from "./launcher-state.js";
+import { launcherLaunchState } from "./launcher-physics.js";
+import { DYNAMICS_VERSION, lossTorques, applyGroundContact,
+  updateAxis, signedSpin, loseSpin, resolveDiskContact } from "./top-dynamics.js";
+import { sampleArenaContact, boundaryDistance, controlResponse, CONTACT_GRAVITY } from "./arena-contact.js";
 
-export const SIMULATION_VERSION = "2026.09.16-web-v4";
+export const SIMULATION_VERSION = `${DYNAMICS_VERSION}+${LAUNCHER_VERSION}`;
 
 export const BATTLE_RESULT = Object.freeze({
   SPIN_OUT: "spin_out",
   RING_OUT: "ring_out",
   BREAK: "break",
   TIME: "time",
+  DRAW: "draw",
 });
 
 const TOP_RADIUS = 0.69;
@@ -38,6 +45,23 @@ const normalize = (vector) => {
     : { x: 0, y: 0 };
 };
 const round = (value) => Math.round(value * 1e6) / 1e6;
+const plain = value => JSON.parse(JSON.stringify(value));
+const canonical = value => JSON.stringify(value, function(key, item) {
+  return item && typeof item === "object" && !Array.isArray(item)
+    ? Object.fromEntries(Object.keys(item).sort().map(k => [k, item[k]])) : item;
+});
+// Required solver fields follow the initial state, including nested axis,
+// structure and oil data. Runtime diagnostics may add fields.
+const hasStateShape = (value, template) => {
+  if (template === null) return value === null || typeof value === "string";
+  if (Array.isArray(template)) return Array.isArray(value) &&
+    (!template.length || (value.length === template.length &&
+      template.every((item, i) => hasStateShape(value[i], item))));
+  if (typeof template === "object") return value !== null && typeof value === "object" &&
+    !Array.isArray(value) && Object.entries(template).every(([key, item]) =>
+      Object.hasOwn(value, key) && hasStateShape(value[key], item));
+  return typeof value === typeof template;
+};
 
 function createTop(build, position) {
   return {
@@ -46,6 +70,13 @@ function createTop(build, position) {
     velocity: { x: 0, y: 0 },
     spin: 0,
     spinPhase: 0,
+    spinDirection: 1,
+    tiltVector: { x: 0, y: 0 },
+    tiltRate: { x: 0, y: 0 },
+    axis: { x: 0, y: 1, z: 0 },
+    ground: { state: "gripping", slip: 0 },
+    edge: { falling: false, drop: 0, velocity: 0, height: 0 },
+    obstacleContacts: new Set(),
     structure: createStructure(build),
     zone: { id: null, contested: false, gain: 0 },
     stats: { zoneSeconds: 0, spinHarvested: 0, hits: 0, peakImpulse: 0 },
@@ -70,10 +101,13 @@ export class BattleSimulation {
     arena,
     seed = 20260718,
     tuning = {},
+    maintenance = {},
+    launchers = {},
     diagnostics = false,
     logger = console.debug,
   }) {
     this.playerBuild = playerBuild;
+    this.version = SIMULATION_VERSION;
     this.enemyBuild = enemyBuild;
     this.arena = arena;
     this.seed = seed >>> 0;
@@ -87,6 +121,10 @@ export class BattleSimulation {
       speedScale: 1,
       ...tuning,
     };
+    this.launchers = { player: normalizeLauncher(launchers.player), enemy: normalizeLauncher(launchers.enemy) };
+    this.maintenance = Object.fromEntries(["player", "enemy"].map(side => [side,
+      oilEffects({ ...maintenance[side],
+        launcher: activeLauncherOil(maintenance[side]?.launcher, this.launchers[side]) })]));
     this.reset();
   }
 
@@ -96,10 +134,12 @@ export class BattleSimulation {
     this.frame = 0;
     this.result = null;
     this.events = [];
-    this.collisionCooldown = 0;
+    this.contactActive = false;
     this.collisionLog = [];
     this.player = createTop(this.playerBuild, { x: 0, y: 4.45 });
     this.enemy = createTop(this.enemyBuild, { x: 0, y: -4.45 });
+    this.player.oil = this.maintenance.player;
+    this.enemy.oil = this.maintenance.enemy;
     this.driveZone = driveZoneState(this.arena, 0);
     this.zoneOccupants = [];
     this.lastZoneKey = "";
@@ -115,6 +155,8 @@ export class BattleSimulation {
       enemy: this.enemy,
       events: this.events,
       driveZone: this.driveZone,
+      launchers: structuredClone(this.launchers),
+      simulationVersion: SIMULATION_VERSION,
     };
   }
 
@@ -122,73 +164,103 @@ export class BattleSimulation {
     Object.assign(this.tuning, nextTuning);
   }
 
-  launch({ power = 0.86, height = 0.45, direction = 0, angle = 0 } = {}) {
+  _stateContext() {
+    const { surfaceAt, ...arena } = this.arena;
+    const builds = [this.playerBuild, this.enemyBuild].map(build => ({ ...build,
+      parts: build.parts.map(({ price, description, ...part }) => part) }));
+    return plain({ builds, arena,
+      surfaces: [0, 3.1, 5.9, this.arena.wallRadius].map(r => surfaceAt(r)) });
+  }
+
+  // Lossless local recovery format, deliberately separate from the rounded HUD
+  // snapshot and legacy binary network codec.
+  exportState() {
+    const topState = top => {
+      const { build, obstacleContacts, ...fields } = top;
+      return { ...plain(fields), obstacleContacts: [...obstacleContacts].sort((a, b) => a-b) };
+    };
+    return {
+      schema: 1, simulationVersion: SIMULATION_VERSION, context: this._stateContext(),
+      seed: this.seed, tuning: plain(this.tuning), launchers: plain(this.launchers),
+      maintenance: plain(this.maintenance), phase: this.phase, frame: this.frame, time: this.time,
+      result: plain(this.result), events: plain(this.events), collisionLog: plain(this.collisionLog),
+      contactActive: this.contactActive, lastZoneKey: this.lastZoneKey,
+      driveZone: plain(this.driveZone),
+      zoneOccupants: this.zoneOccupants.map(t => t === this.player ? "player" : "enemy"),
+      player: topState(this.player), enemy: topState(this.enemy),
+    };
+  }
+
+  restoreState(state) {
+    const fail = () => { throw new Error("战斗恢复数据损坏，或规则／装配／场地版本不匹配"); };
+    const fields = ["seed", "tuning", "launchers", "maintenance", "phase", "frame", "time",
+      "result", "events", "collisionLog", "contactActive", "lastZoneKey", "driveZone"];
+    const valid = v => typeof v === "number" ? Number.isFinite(v) : v == null ||
+      typeof v !== "object" || Object.values(v).every(valid);
+    if (!state || fields.some(k => state[k] === undefined) || !valid(state) ||
+      state.schema !== 1 || state.simulationVersion !== SIMULATION_VERSION ||
+      canonical(state.context) !== canonical(this._stateContext()) ||
+      !["ready", "running", "finished"].includes(state.phase) ||
+      !Number.isInteger(state.seed) || state.seed < 0 || state.seed > 0xffffffff ||
+      !Number.isInteger(state.frame) || state.frame < 0 || !(state.time >= 0) ||
+      !hasStateShape(state, { time: 0, contactActive: false, lastZoneKey: "",
+        tuning: this.tuning, launchers: this.launchers, maintenance: this.maintenance }) ||
+      !Array.isArray(state.zoneOccupants) || state.zoneOccupants.some(s => !["player", "enemy"].includes(s)) ||
+      !Array.isArray(state.events) ||
+      !Array.isArray(state.collisionLog) || !state.tuning || !state.launchers || !state.maintenance) fail();
+    const restored = {};
+    for (const side of ["player", "enemy"]) {
+      const d = state[side];
+      const template = createTop(this[`${side}Build`], { x: 0, y: 0 });
+      delete template.build;
+      template.obstacleContacts = [];
+      template.oil = this.maintenance[side];
+      if (!hasStateShape(d, template) || !(d.spin >= 0) ||
+        ![-1, 1].includes(d.spinDirection)) fail();
+      restored[side] = { ...plain(d), build: this[`${side}Build`],
+        obstacleContacts: new Set(d.obstacleContacts) };
+    }
+    // Validate first: a failed restore leaves the live match untouched.
+    for (const key of fields) {
+      this[key] = plain(state[key]);
+    }
+    this.player = restored.player;
+    this.enemy = restored.enemy;
+    this.zoneOccupants = state.zoneOccupants.map(side => this[side]);
+    return this;
+  }
+
+  launch(options = {}) {
     this.reset();
     this.phase = "running";
-    const launchPower = clamp(power, 0.35, 1);
-    const launchHeight = clamp(height, 0, 1);
-    const launchAngle = clamp(angle, -1, 1);
-    const playerSpeed =
-      (3.4 + this.playerBuild.launchForwardImpulse * launchPower) *
-      (0.94 + launchHeight * 0.12) *
-      this.tuning.speedScale;
+    Object.assign(this.player, launcherLaunchState(this.playerBuild, this.launchers.player,
+      { ...options, speedScale: this.tuning.speedScale }, this.player.oil));
     const enemyPower = 0.78 + this._seedUnit(3) * 0.16;
-    const enemySpeed =
-      (3.4 + this.enemyBuild.launchForwardImpulse * enemyPower) *
-      this.tuning.speedScale;
-
-    this.player.velocity = {
-      x: Math.sin(direction) * playerSpeed + launchAngle * 0.72,
-      y: -Math.cos(direction) * playerSpeed,
-    };
-    const enemyDirection = (this._seedUnit(5) - 0.5) * 0.24;
-    this.enemy.velocity = {
-      x: Math.sin(enemyDirection) * enemySpeed,
-      y: Math.cos(enemyDirection) * enemySpeed,
-    };
-    this.player.spin =
-      this.playerBuild.maxSpinSpeed *
-      launchPower *
-      (1 - Math.abs(launchAngle) * 0.08) *
-      (1 - launchHeight * 0.035);
-    this.enemy.spin = this.enemyBuild.maxSpinSpeed * enemyPower;
-    this.player.tilt =
-      Math.abs(launchAngle) * 0.18 + Math.max(launchHeight - 0.55, 0) * 0.08;
-    this.enemy.tilt = this._seedUnit(7) * 0.08;
+    Object.assign(this.enemy, launcherLaunchState(this.enemyBuild, this.launchers.enemy, {
+      power: enemyPower, height: 0, direction: Math.PI + (this._seedUnit(5) - .5) * .24,
+      angle: this._seedUnit(7) * .3, speedScale: this.tuning.speedScale }, this.enemy.oil));
     this.events.push({
       type: "launch",
-      power: launchPower,
-      height: launchHeight,
+      power: clamp(options.power ?? .86, .35, 1),
+      height: clamp(options.height ?? .45, 0, 1),
     });
   }
 
-  _applyLaunchToTop(top, build, power, height, direction, angle) {
+  _applyLaunchToTop(top, build, power, height, direction, angle, side = 0, spinDirection = 1) {
     const launchPower = clamp(0.35 + (power / 255) * 0.65, 0.35, 1);
     const launchHeight = clamp(height / 255, 0, 1);
-    const launchDir = direction / 10;
+    const launchDir = direction / 10 + side;
     const launchAngle = clamp(angle / 127, -1, 1);
-    const speed =
-      (3.4 + build.launchForwardImpulse * launchPower) *
-      (0.94 + launchHeight * 0.12) *
-      this.tuning.speedScale;
-    top.velocity = {
-      x: Math.sin(launchDir) * speed + launchAngle * 0.72,
-      y: -Math.cos(launchDir) * speed,
-    };
-    top.spin =
-      build.maxSpinSpeed *
-      launchPower *
-      (1 - Math.abs(launchAngle) * 0.08) *
-      (1 - launchHeight * 0.035);
-    top.tilt = Math.abs(launchAngle) * 0.18 + Math.max(launchHeight - 0.55, 0) * 0.08;
+    Object.assign(top, launcherLaunchState(build, this.launchers[top === this.player ? "player" : "enemy"],
+      { power: launchPower, height: launchHeight, direction: launchDir, angle: launchAngle,
+        spinDirection, speedScale: this.tuning.speedScale }, top.oil));
   }
 
   launchExplicit(playerCmd, enemyCmd) {
     this.reset();
     this.phase = "running";
-    this._applyLaunchToTop(this.player, this.playerBuild, playerCmd.power_q ?? playerCmd.p, playerCmd.height_q ?? playerCmd.h, playerCmd.direction_q ?? playerCmd.d, playerCmd.angle_q ?? playerCmd.a);
-    this._applyLaunchToTop(this.enemy, this.enemyBuild, enemyCmd.power_q ?? enemyCmd.p, enemyCmd.height_q ?? enemyCmd.h, enemyCmd.direction_q ?? enemyCmd.d, enemyCmd.angle_q ?? enemyCmd.a);
-    this.enemy.velocity.y = -this.enemy.velocity.y;
+    this._applyLaunchToTop(this.player, this.playerBuild, playerCmd.power_q ?? playerCmd.p, playerCmd.height_q ?? playerCmd.h, playerCmd.direction_q ?? playerCmd.d, playerCmd.angle_q ?? playerCmd.a, 0, playerCmd.spinDirection);
+    this._applyLaunchToTop(this.enemy, this.enemyBuild, enemyCmd.power_q ?? enemyCmd.p, enemyCmd.height_q ?? enemyCmd.h, enemyCmd.direction_q ?? enemyCmd.d, enemyCmd.angle_q ?? enemyCmd.a, Math.PI, enemyCmd.spinDirection);
     this.events.push({ type: "launch", power: 0.86, height: 0.45 });
   }
 
@@ -197,13 +269,36 @@ export class BattleSimulation {
     if (this.phase !== "running") return;
 
     const dt = clamp(delta, 0, 1 / 30);
-    this.time += dt;
+    if (!Number.isFinite(dt) || dt === 0) return;
     this.frame = (this.frame | 0) + 1;
-    this.collisionCooldown = Math.max(this.collisionCooldown - dt, 0);
+    for (const top of [this.player, this.enemy]) {
+      top.spinBudget = { before: top.spin, supply: 0, natural: 0, scrape: 0, ground: 0, contact: 0 };
+    }
+    // At the speed cap, a microstep travels less than a minimum-size contact
+    // radius. Thin obstacle faces and rapidly varying rim slopes stay resolved.
+    const count = Math.ceil(dt / (1 / 120));
+    const start = this.time;
+    for (let i = 0; i < count && this.phase === "running"; i++) {
+      this._substep(dt / count, playerControl, enemyControl);
+    }
+    const elapsed = this.time - start;
+    for (const top of [this.player, this.enemy]) {
+      const budget = top.spinBudget;
+      budget.after = top.spin;
+      budget.contact = budget.before + budget.supply - budget.natural -
+        budget.scrape - budget.ground - budget.after;
+      top.spinLossRate = (budget.before - budget.after) / elapsed;
+      top.zone.status = !top.zone.id ? "outside" : top.zone.gain === 0 ? "capped"
+        : top.spinLossRate < -1e-6 ? "gaining" : "draining";
+    }
+  }
+
+  _substep(dt, playerControl, enemyControl) {
+    this.time += dt;
     this.driveZone = driveZoneState(this.arena, this.time);
     // Occupancy is sampled simultaneously, before integrating either actor.
     this.zoneOccupants = [this.player, this.enemy].filter((top) =>
-      !this.driveZone.cooling && top.spin > MIN_ACTIVE_SPIN &&
+      !this.driveZone.cooling && !top.edge.falling && top.spin > MIN_ACTIVE_SPIN &&
       insideDriveZone(top, this.driveZone.active));
     const zoneKey = `${this.driveZone.active?.id}:${this.driveZone.cooling}`;
     if (zoneKey !== this.lastZoneKey) {
@@ -231,8 +326,24 @@ export class BattleSimulation {
     const radius = length(top.position);
     const currentSurface = this.arena.surfaceAt(radius);
     top.surfaceName = currentSurface.name;
-    const spinBefore = top.spin;
-    top.spinPhase = (top.spinPhase + top.spin * dt * 0.32) % (Math.PI * 2);
+    top.terrain = sampleArenaContact(this.arena, top.position);
+    if (top.edge.falling || !top.terrain.supported) {
+      if (!top.edge.falling) {
+        top.edge.falling = true;
+        top.edge.height = top.terrain.height;
+      }
+      top.edge.velocity += CONTACT_GRAVITY * dt;
+      top.edge.drop += top.edge.velocity * dt;
+      top.position.x += top.velocity.x * dt;
+      top.position.y += top.velocity.y * dt;
+      top.ground = { state: "airborne", slip: 0, traction: 0, radius: 0 };
+      top.controlInput = { x: 0, y: 0 };
+      top.controlInfluence = 0;
+      top.zone = { id: null, contested: false, gain: 0 };
+      top.spinPhase = (top.spinPhase + signedSpin(top) * dt) % (Math.PI * 2);
+      return;
+    }
+    top.spinPhase = (top.spinPhase + signedSpin(top) * dt) % (Math.PI * 2);
     const inZone = this.zoneOccupants.includes(top);
     const contested = this.zoneOccupants.length > 1;
     // Torque / live inertia; motor never repairs damage or revives a stopped top.
@@ -247,21 +358,20 @@ export class BattleSimulation {
       top.stats.spinHarvested += gain * dt;
     }
 
-    top.spin = Math.max(
-      top.spin + gain * dt -
-        (top.build.spinDecayPerSecond *
-          currentSurface.spinDamping *
-          this.tuning.spinScale + top.structure.spinDrag) *
-          dt,
-      0,
-    );
+    top.spin += gain * dt;
+    if (top.spinBudget) top.spinBudget.supply += gain * dt;
+    const torques = lossTorques(top, currentSurface, this.tuning.spinScale);
+    // Only the ground share changes; structural/scrape loss is never lubricated away.
+    torques.natural *= 1 + .35 * (top.oil.groundSpin - 1);
+    loseSpin(top, torques.natural / top.structure.momentOfInertia * dt, "natural");
+    loseSpin(top, torques.scrape / top.structure.momentOfInertia * dt, "scrape");
+    const tractionAcceleration = applyGroundContact(top, { ...currentSurface,
+      friction: currentSurface.friction * top.oil.traction,
+      linearDrag: currentSurface.linearDrag * top.oil.traction }, dt);
     // Supply may only oppose drag, never exceed the motor's configured ceiling.
 
     const spinRatio = clamp(top.spin / top.build.maxSpinSpeed, 0, 1);
-    const rawControl = {
-      x: clamp(input.x ?? 0, -1, 1),
-      y: clamp(input.y ?? 0, -1, 1),
-    };
+    const rawControl = controlResponse(input);
     const controlMagnitude = clamp(length(rawControl), 0, 1);
     const control = normalize(rawControl);
     const mobility = smoothstep(0.02, 0.55, spinRatio);
@@ -271,12 +381,14 @@ export class BattleSimulation {
       0.35,
       1,
     );
-    const controlAcceleration =
+    const requestedAcceleration =
       (top.build.controlForce / top.structure.totalMass) *
       currentSurface.control *
       this.tuning.controlScale *
       mobility *
       balanceControl * controlMagnitude * top.structure.stiffness;
+    // Player assistance is an external force, bounded by the current tip's grip.
+    const controlAcceleration = Math.min(requestedAcceleration, tractionAcceleration * mobility);
     top.velocity.x += control.x * controlAcceleration * dt;
     top.velocity.y += control.y * controlAcceleration * dt;
     top.controlInput = scale(control, controlMagnitude);
@@ -284,34 +396,17 @@ export class BattleSimulation {
       controlMagnitude *
         mobility *
         currentSurface.control *
+        top.oil.traction *
         top.build.controlResponse *
         balanceControl,
       0,
       1,
     );
 
-    if (radius > 0.01) {
-      const inward = scale(top.position, -1 / radius);
-      const bowlAcceleration =
-        this.arena.bowlForce * (0.4 + radius / this.arena.wallRadius);
-      top.velocity.x += inward.x * bowlAcceleration * dt;
-      top.velocity.y += inward.y * bowlAcceleration * dt;
-    }
-
-    const eccentricity = Math.hypot(
-      top.structure.centerOfMass[0],
-      top.structure.centerOfMass[2],
-    );
-    if (eccentricity > 0.005 && spinRatio > 0.05) {
-      const phase =
-        this.time * (5.2 + spinRatio * 3.1) +
-        (isEnemy ? 2.1 : 0.4) +
-        this.seed * 0.0001;
-      const wobble = eccentricity * 6.5 * Math.max(0.05, 1.2 - top.structure.stability) +
-        top.structure.imbalance * 0.85;
-      top.velocity.x += Math.cos(phase) * wobble * dt;
-      top.velocity.y += Math.sin(phase) * wobble * dt;
-    }
+    const gradient = top.terrain.gradient;
+    const slopeFactor = CONTACT_GRAVITY / (1 + gradient.x ** 2 + gradient.y ** 2);
+    top.velocity.x -= gradient.x * slopeFactor * dt;
+    top.velocity.y -= gradient.y * slopeFactor * dt;
 
     if (currentSurface.noise > 0) {
       const noise =
@@ -321,25 +416,7 @@ export class BattleSimulation {
       top.velocity.y -= noise * 0.7 * dt;
     }
 
-    if (scrapeRatio > 0) {
-      const scrapeSpinLoss =
-        (1.25 + top.build.friction * currentSurface.friction * 1.8) *
-        scrapeRatio *
-        dt;
-      top.spin = Math.max(top.spin - scrapeSpinLoss, 0);
-      const scrapePhase =
-        this.time * 12.7 + this.seed * 0.0007 + (isEnemy ? 1.9 : 0.2);
-      const scrapeDrift = scrapeRatio * (0.3 + top.imbalance * 0.9) * dt;
-      top.velocity.x += Math.cos(scrapePhase) * scrapeDrift;
-      top.velocity.y += Math.sin(scrapePhase) * scrapeDrift;
-    }
-
-    const drag =
-      0.17 *
-      top.build.friction *
-      currentSurface.friction *
-      currentSurface.linearDrag +
-      (1 - mobility) * 8;
+    const drag = (1 - mobility) * 8;
     const dragFactor = Math.exp(-drag * dt);
     top.velocity.x *= dragFactor;
     top.velocity.y *= dragFactor;
@@ -353,61 +430,26 @@ export class BattleSimulation {
     }
     top.position.x += top.velocity.x * dt;
     top.position.y += top.velocity.y * dt;
-    this._resolveArenaRim(top, currentSurface);
     this._resolveObstacles(top);
-    top.spinLossRate = (spinBefore - top.spin) / Math.max(dt, 1e-6);
-  }
-
-  _resolveArenaRim(top, surface) {
-    if (this.arena.boundary === "square") {
-      for (const axis of ["x", "y"]) {
-        const value = top.position[axis];
-        if (Math.abs(value) <= this.arena.wallRadius || Math.abs(value) >= this.arena.ringOutRadius) continue;
-        const sign = Math.sign(value);
-        const outward = top.velocity[axis] * sign;
-        if (outward >= 9.2) continue;
-        top.position[axis] = sign * (this.arena.wallRadius - .03);
-        if (outward > 0) {
-          top.velocity[axis] -= sign * outward * (1 + surface.bounce * .52);
-          top.spin = Math.max(0, top.spin - outward * .24);
-        }
-      }
-      return;
-    }
-    const radius = length(top.position);
-    if (
-      radius <= this.arena.wallRadius ||
-      radius >= this.arena.ringOutRadius
-    ) {
-      return;
-    }
-    const normal = scale(top.position, 1 / radius);
-    const outwardSpeed = dot(top.velocity, normal);
-    const ringOutThreshold = 9.2;
-    if (outwardSpeed >= ringOutThreshold) return;
-
-    top.position = scale(normal, this.arena.wallRadius - 0.03);
-    if (outwardSpeed > 0) {
-      const rebound = outwardSpeed * (1 + surface.bounce * 0.52);
-      top.velocity.x -= normal.x * rebound;
-      top.velocity.y -= normal.y * rebound;
-      top.spin = Math.max(top.spin - outwardSpeed * 0.24, 0);
-    }
   }
 
   _boundaryDistance(position) {
-    return this.arena.boundary === "square"
-      ? Math.max(Math.abs(position.x), Math.abs(position.y)) : length(position);
+    return boundaryDistance(this.arena, position);
   }
 
   _resolveObstacles(top) {
-    for (const obstacle of this.arena.blockers ?? []) {
+    if (top.edge.falling) return;
+    const blockers = this.arena.blockers ?? [];
+    for (const [index, obstacle] of blockers.entries()) {
       const px=top.position.x, py=top.position.y;
       const nearestX=clamp(px,obstacle.x-obstacle.hx,obstacle.x+obstacle.hx);
       const nearestY=clamp(py,obstacle.z-obstacle.hz,obstacle.z+obstacle.hz);
       let dx=px-nearestX, dy=py-nearestY, distance=Math.hypot(dx,dy);
       const radius = this._contactRadius(top);
+      if (distance > radius + .04) top.obstacleContacts.delete(index);
       if (distance>=radius) continue;
+      const entering = !top.obstacleContacts.has(index);
+      top.obstacleContacts.add(index);
       let depth=radius-distance;
       if (distance<1e-8) {
         const gapX=obstacle.hx-Math.abs(px-obstacle.x);
@@ -422,14 +464,14 @@ export class BattleSimulation {
       top.position.y+=ny*(depth+.001);
       const approach=top.velocity.x*nx+top.velocity.y*ny;
       if (approach>=0) continue;
-      top.velocity.x-=nx*approach*1.52;
-      top.velocity.y-=ny*approach*1.52;
-      top.spin=Math.max(0,top.spin+approach*.24);
-      if (approach<-.4) {
-        const impulse = -approach * top.structure.totalMass * 1.52;
+      const contact = resolveDiskContact(top, null, { x: -nx, y: -ny }, radius, 0, .52);
+      if (entering && approach<-.4) {
+        const impulse = contact.normal;
         applyStructuralImpact(top, impulse * 0.75 * this.tuning.damageScale, Math.atan2(-ny, -nx));
+        this._applyCollisionImbalance(top, 1, this.arena.surfaceAt(length(top.position)), impulse, { x: nx, y: ny });
         this.events.push({type:"obstacle",
-        position:{x:nearestX,y:nearestY}, intensity:clamp(-approach/10,.1,1), impulse:-approach});
+        position:{x:nearestX,y:nearestY}, intensity:clamp(-approach/10,.1,1), impulse,
+        tangentImpulse: contact.tangent});
       }
     }
   }
@@ -488,13 +530,20 @@ export class BattleSimulation {
   }
 
   _resolveCollision() {
+    if (this.player.edge.falling || this.enemy.edge.falling) {
+      this.contactActive = false;
+      return;
+    }
     const delta = {
       x: this.enemy.position.x - this.player.position.x,
       y: this.enemy.position.y - this.player.position.y,
     };
     const distance = length(delta);
     const minimumDistance = this._contactRadius(this.player) + this._contactRadius(this.enemy);
+    if (distance > minimumDistance + .04) this.contactActive = false;
     if (distance >= minimumDistance) return;
+    const entering = !this.contactActive;
+    this.contactActive = true;
 
     const normal = distance > 0.00001 ? scale(delta, 1 / distance) : { x: 1, y: 0 };
     const relativeVelocity = {
@@ -503,10 +552,12 @@ export class BattleSimulation {
     };
     const normalSpeed = dot(relativeVelocity, normal);
     const overlap = minimumDistance - distance;
-    this.player.position.x -= normal.x * overlap * 0.5;
-    this.player.position.y -= normal.y * overlap * 0.5;
-    this.enemy.position.x += normal.x * overlap * 0.5;
-    this.enemy.position.y += normal.y * overlap * 0.5;
+    const totalMass = this.player.structure.totalMass + this.enemy.structure.totalMass;
+    const playerShare = this.enemy.structure.totalMass / totalMass;
+    this.player.position.x -= normal.x * overlap * playerShare;
+    this.player.position.y -= normal.y * overlap * playerShare;
+    this.enemy.position.x += normal.x * overlap * (1 - playerShare);
+    this.enemy.position.y += normal.y * overlap * (1 - playerShare);
     if (normalSpeed >= 0.2) return;
 
     const playerSurface = this.arena.surfaceAt(length(this.player.position));
@@ -520,34 +571,39 @@ export class BattleSimulation {
       ((playerSurface.bounce + enemySurface.bounce) * 0.5);
     const inversePlayerMass = 1 / this.player.structure.totalMass;
     const inverseEnemyMass = 1 / this.enemy.structure.totalMass;
-    const normalImpulse =
-      (-(1 + restitution) * Math.min(normalSpeed, 0)) /
-      (inversePlayerMass + inverseEnemyMass);
+    const collisionBefore = {
+      player: this._collisionTopState(this.player),
+      enemy: this._collisionTopState(this.enemy),
+    };
+    const contact = resolveDiskContact(this.player, this.enemy, normal,
+      this._contactRadius(this.player), this._contactRadius(this.enemy), restitution);
+    const normalImpulse = contact.normal;
     // Rotating rim teeth can separate a sustained contact. Debit the resulting
     // translational energy from spin; this avoids motionless pushing in a zone.
-    const canStrike = this.collisionCooldown <= 0;
     const lobeFactor = 0.65 + (this.player.build.parts[0].customization?.shape ?? 0) / 200 +
       (this.enemy.build.parts[0].customization?.shape ?? 0) / 200;
-    const toothImpulse = canStrike
+    const requestedToothImpulse = entering
       ? Math.min(1.8, Math.min(this.player.spin, this.enemy.spin) * 0.045) * lobeFactor : 0;
     const inverseMass = inversePlayerMass + inverseEnemyMass;
-    const transferEnergy = Math.max(0, toothImpulse * (normalSpeed + normalImpulse * inverseMass) +
+    const energy = [this.player, this.enemy].map(top => .5 * top.structure.momentOfInertia * top.spin ** 2);
+    const available = energy[0] + energy[1];
+    const separatingSpeed = Math.max(0, normalSpeed + normalImpulse * inverseMass);
+    const affordable = (Math.sqrt(separatingSpeed ** 2 + 2 * inverseMass * available) - separatingSpeed) / inverseMass;
+    const toothImpulse = Math.min(requestedToothImpulse, affordable);
+    const transferEnergy = Math.max(0, toothImpulse * separatingSpeed +
       0.5 * toothImpulse ** 2 * inverseMass);
-    for (const top of [this.player, this.enemy]) {
-      top.spin = Math.sqrt(Math.max(0, top.spin ** 2 - transferEnergy / top.structure.momentOfInertia));
+    for (const [index, top] of [this.player, this.enemy].entries()) {
+      const debit = transferEnergy * energy[index] / Math.max(available, 1e-12);
+      top.spin = Math.sqrt(Math.max(0, top.spin ** 2 - 2 * debit / top.structure.momentOfInertia));
     }
     const impulse = normalImpulse + toothImpulse;
 
-    this.player.velocity.x -= normal.x * impulse * inversePlayerMass;
-    this.player.velocity.y -= normal.y * impulse * inversePlayerMass;
-    this.enemy.velocity.x += normal.x * impulse * inverseEnemyMass;
-    this.enemy.velocity.y += normal.y * impulse * inverseEnemyMass;
+    this.player.velocity.x -= normal.x * toothImpulse * inversePlayerMass;
+    this.player.velocity.y -= normal.y * toothImpulse * inversePlayerMass;
+    this.enemy.velocity.x += normal.x * toothImpulse * inverseEnemyMass;
+    this.enemy.velocity.y += normal.y * toothImpulse * inverseEnemyMass;
 
-    if (this.collisionCooldown <= 0 && impulse > MIN_DAMAGE_IMPULSE) {
-      const collisionBefore = {
-        player: this._collisionTopState(this.player),
-        enemy: this._collisionTopState(this.enemy),
-      };
+    if (entering && impulse > MIN_DAMAGE_IMPULSE) {
       const baseDamage =
         (impulse - MIN_DAMAGE_IMPULSE) *
         DAMAGE_PER_IMPULSE *
@@ -563,21 +619,22 @@ export class BattleSimulation {
         top.stats.hits += 1;
         top.stats.peakImpulse = Math.max(top.stats.peakImpulse, impulse);
       }
-      this.player.spin = Math.max(this.player.spin - impulse * 0.19, 0);
-      this.enemy.spin = Math.max(this.enemy.spin - impulse * 0.19, 0);
+      loseSpin(this.player, impulse * .19 * .89 / this.player.structure.momentOfInertia);
+      loseSpin(this.enemy, impulse * .19 * .89 / this.enemy.structure.momentOfInertia);
       this._applyCollisionImbalance(
         this.player,
         this.enemy.build.attackPower,
         playerSurface,
         impulse,
+        scale(normal, -1),
       );
       this._applyCollisionImbalance(
         this.enemy,
         this.player.build.attackPower,
         enemySurface,
         impulse,
+        normal,
       );
-      this.collisionCooldown = 0.12;
       const telemetry = this._createCollisionTelemetry(
         impulse,
         collisionBefore,
@@ -590,6 +647,8 @@ export class BattleSimulation {
       );
       telemetry.player.parts = playerParts;
       telemetry.enemy.parts = enemyParts;
+      telemetry.tangentImpulse = contact.tangent;
+      telemetry.contactSlip = contact.slip;
       this.collisionLog.push(telemetry);
       if (this.collisionLog.length > MAX_COLLISION_LOGS) {
         this.collisionLog.shift();
@@ -616,7 +675,7 @@ export class BattleSimulation {
       (1 + (part.customization?.shape ?? 0) * 0.0006);
   }
 
-  _applyCollisionImbalance(top, incomingAttack, surface, impulse) {
+  _applyCollisionImbalance(top, incomingAttack, surface, impulse, direction = { x: 1, y: 0 }) {
     const spinRatio = clamp(top.spin / top.build.maxSpinSpeed, 0, 1);
     const effectiveStability = Math.max(
       top.structure.stability * surface.stability,
@@ -632,13 +691,19 @@ export class BattleSimulation {
       0.5,
     );
     top.imbalance = clamp(top.imbalance + gain, 0, 1);
-    top.tilt = clamp(top.tilt + gain * 0.28, 0, MAX_TILT);
+    const momentumSupport = 1 + top.structure.momentOfInertia * top.spin / 58;
+    top.tiltVector.x += direction.x * gain * .28 / momentumSupport;
+    top.tiltVector.y += direction.y * gain * .28 / momentumSupport;
+    top.tiltRate.x += direction.x * gain * 3 / momentumSupport;
+    top.tiltRate.y += direction.y * gain * 3 / momentumSupport;
+    top.tilt = clamp(length(top.tiltVector), 0, MAX_TILT);
   }
 
   _collisionTopState(top) {
     return {
       tilt: round(top.tilt),
       spin: round(top.spin),
+      launcherTelemetry: top.launcherTelemetry ? { ...top.launcherTelemetry } : null,
       imbalance: round(top.imbalance),
       durability: round(top.durability),
       structuralImbalance: round(top.structure.imbalance),
@@ -686,24 +751,10 @@ export class BattleSimulation {
   }
 
   _updateTilt(top, dt) {
-    const speed = length(top.velocity);
     const spinRatio = clamp(top.spin / top.build.maxSpinSpeed, 0, 1);
     const surface = this.arena.surfaceAt(length(top.position));
     const effectiveStability = top.structure.stability * surface.stability;
-    const instability = clamp(
-      1.15 - effectiveStability + top.imbalance * 0.72,
-      0,
-      1.25,
-    );
-    const targetTilt = clamp(
-      instability * 0.48 +
-        speed * 0.012 +
-        (1 - spinRatio) * 0.32 +
-        top.imbalance * 0.2,
-      0,
-      MAX_TILT,
-    );
-    top.tilt += (targetTilt - top.tilt) * Math.min(dt * 4, 1);
+    updateAxis(top, surface, dt);
     const recovery =
       (0.1 + effectiveStability * 0.16) * (0.55 + spinRatio * 0.45);
     top.imbalance = Math.max(top.imbalance - recovery * dt, top.structure.imbalance);
@@ -791,23 +842,15 @@ export class BattleSimulation {
   }
 
   _checkResult() {
-    const candidates = [
-      [this.player, "enemy"],
-      [this.enemy, "player"],
-    ];
-    for (const [loser, winnerId] of candidates) {
-      if (loser.durability <= 0 || loser.structure.failed) {
-        this._finish(winnerId, BATTLE_RESULT.BREAK);
-        return;
-      }
-      if (this._boundaryDistance(loser.position) > this.arena.ringOutRadius) {
-        this._finish(winnerId, BATTLE_RESULT.RING_OUT);
-        return;
-      }
-      if (loser.spin <= MIN_ACTIVE_SPIN) {
-        this._finish(winnerId, BATTLE_RESULT.SPIN_OUT);
-        return;
-      }
+    const failure = top => top.durability <= 0 || top.structure.failed ? BATTLE_RESULT.BREAK
+      : top.edge.drop > .3 || this._boundaryDistance(top.position) > this.arena.ringOutRadius ? BATTLE_RESULT.RING_OUT
+        : top.spin <= MIN_ACTIVE_SPIN ? BATTLE_RESULT.SPIN_OUT : null;
+    const eliminations = { player: failure(this.player), enemy: failure(this.enemy) };
+    if (eliminations.player || eliminations.enemy) {
+      const both = eliminations.player && eliminations.enemy;
+      this._finish(both ? "draw" : eliminations.player ? "enemy" : "player",
+        both ? BATTLE_RESULT.DRAW : eliminations.player ?? eliminations.enemy, eliminations);
+      return;
     }
 
     if (this.time >= MAX_BATTLE_TIME) {
@@ -817,20 +860,22 @@ export class BattleSimulation {
       const enemyScore =
         this.enemy.spin +
         (this.enemy.durability / this.enemy.build.durability) * 20;
-      this._finish(playerScore >= enemyScore ? "player" : "enemy", BATTLE_RESULT.TIME);
+      this._finish(Math.abs(playerScore - enemyScore) <= 1e-6 ? "draw"
+        : playerScore > enemyScore ? "player" : "enemy", BATTLE_RESULT.TIME);
     }
   }
 
-  _finish(winner, reason) {
+  _finish(winner, reason, eliminations = {}) {
     this.phase = "finished";
     const loser = winner === "player" ? this.enemy : this.player;
     const weakest = [...loser.structure.parts].sort((a, b) => b.worst - a.worst)[0];
-    this.result = { winner, reason, time: this.time,
-      cause: reason === BATTLE_RESULT.SPIN_OUT &&
+    this.result = { winner, reason, time: this.time, eliminations,
+      cause: winner === "draw" ? "draw" : reason === BATTLE_RESULT.SPIN_OUT &&
         (loser.structure.imbalance > 0.2 || loser.structure.spinDrag > loser.build.spinDecayPerSecond * 0.35)
         ? "structural_spin_out" : reason,
-      weakestPart: weakest.slot, weakestPartName: weakest.name,
-      loserImbalance: loser.structure.imbalance,
+      weakestPart: winner === "draw" ? null : weakest.slot,
+      weakestPartName: winner === "draw" ? null : weakest.name,
+      loserImbalance: winner === "draw" ? null : loser.structure.imbalance,
       stats: { player: { ...this.player.stats }, enemy: { ...this.enemy.stats } },
     };
     this.events.push({ type: "result", ...this.result });
@@ -856,6 +901,14 @@ export class BattleSimulation {
       },
       spin: round(top.spin),
       spinPhase: round(top.spinPhase),
+      spinDirection: top.spinDirection,
+      tiltVector: { ...top.tiltVector },
+      tiltRate: { ...top.tiltRate },
+      axis: { ...top.axis },
+      ground: { ...top.ground },
+      terrain: top.terrain ? structuredClone(top.terrain) : null,
+      edge: { ...top.edge },
+      spinBudget: top.spinBudget ? { ...top.spinBudget } : null,
       structure: JSON.parse(JSON.stringify(top.structure, (key, value) =>
         typeof value === "number" ? round(value) : value)),
       zone: { ...top.zone, gain: round(top.zone.gain) },
@@ -876,6 +929,8 @@ export class BattleSimulation {
       phase: this.phase,
       time: round(this.time),
       frame: this.frame,
+      simulationVersion: SIMULATION_VERSION,
+      launchers: structuredClone(this.launchers),
       driveZone: this.driveZone,
       result: this.result
         ? {

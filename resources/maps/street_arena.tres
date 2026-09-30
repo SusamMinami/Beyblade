@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ArenaMapResource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/maps/arena_map_resource.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/terrain_surfaces/standard_surface.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+map_id = &"street"
+map_name = "放学后的街头"
+scene_path = "res://scenes/battle/BattleScreen.tscn"
+default_surface = ExtResource("2")
+description = "标准碗的均衡材料与连续低护圈。利用坡面回转，抢占轮流启用的驱动区。"

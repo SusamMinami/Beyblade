@@ -1,0 +1,34 @@
+{
+  "measurements": {
+    "ruins": {
+      "materialCount": 10,
+      "physicalCount": 6,
+      "physicalDefines": true,
+      "reflectionPixels": 2135,
+      "reliefPixels": 694,
+      "localLightPixels": 46202,
+      "dayPixels": 229957,
+      "reducedMotion": true,
+      "pauseStable": true,
+      "noExtraShadows": true
+    },
+    "street": {
+      "materialCount": 22,
+      "physicalCount": 7,
+      "physicalDefines": true,
+      "reflectionPixels": 53106,
+      "reliefPixels": 9719,
+      "localLightPixels": 218294,
+      "dayPixels": 230396,
+      "reducedMotion": true,
+      "pauseStable": true,
+      "noExtraShadows": true
+    },
+    "releaseStable": true,
+    "baseline": {
+      "geometries": 49,
+      "textures": 19
+    }
+  },
+  "errors": []
+}

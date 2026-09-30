@@ -22,6 +22,12 @@ colors:
   childhood-progress: "#227aa2"
   championship-ground: "#0c1c25"
   championship-accent: "#8ed8e7"
+  championship-titanium: "#687780"
+  championship-enamel: "#27333b"
+  championship-graphite: "#1a252d"
+  championship-brushed: "#627881"
+  championship-polished: "#b1c4cc"
+  championship-acrylic: "#a2c1cc"
   street-ground: "#142635"
   street-accent: "#e7b66e"
   ruins-ground: "#25394d"
@@ -40,13 +46,45 @@ colors:
   campaign-disclosure-hover-paper: "#e6f2f7"
   flow-coach-ink: "#234d5e"
   flow-separator: "#b2bbb9"
+  assembly-blue: "#238cff"
+typography:
+  assembly-tool-body:
+    fontFamily: "Bahnschrift, Microsoft YaHei UI, sans-serif"
+    fontSize: "13px"
+    lineHeight: 1.5
+rounded:
+  assembly-control: "3px"
+components:
+  maintenance-save:
+    backgroundColor: "{colors.assembly-blue}"
+    textColor: "{colors.campaign-ink}"
+    typography: "{typography.assembly-tool-body}"
+    rounded: "{rounded.assembly-control}"
+    padding: "6px 9px"
+  maintenance-control:
+    backgroundColor: "{colors.campaign-white}"
+    textColor: "{colors.campaign-ink}"
+    typography: "{typography.assembly-tool-body}"
+    rounded: "{rounded.assembly-control}"
+    padding: "6px 9px"
+  maintenance-control-selected:
+    backgroundColor: "{colors.assembly-blue}"
+    textColor: "{colors.campaign-ink}"
+    typography: "{typography.assembly-tool-body}"
+    rounded: "{rounded.assembly-control}"
+    padding: "6px 9px"
 ---
 
 # Web visual conventions
 
 ## Overview
+**Creative North Star: "Original assembly, growing laboratory, distinct stage worlds"**
+
 Web is the first implementation and review target. Assembly retains its incumbent
-visual system; battle retains its portrait controls while expanding its worlds.
+paper/ink/blue visual system, three-loadout carousel, five-part picker and DIY.
+Launcher outfit and care are tools inside that original assembly, not independent
+workbench pages. Its actual room grows with the story; the controls keep their
+minimal style. Battle retains its portrait controls while expanding its worlds.
 The precision test lab remains a distinct silver, graphite, cyan, and yellow-green
 instrument environment based on the user's reference, now available at LV.2.
 The reference's planned systems are present even when their service is pending.
@@ -54,20 +92,43 @@ The separate collection route follows the two new user references: a cyan
 holographic chamber and a gold-lit arena rig. Dark tonal variations, tinted
 text/borders and opaque instrument overlays are intentional for those stages.
 
-The beginner lab now opens on a sunny childhood desk: honey oak, a green cutting
-mat, an ivory toy dish, a blue task lamp, stationery and a paper-colored whiteboard.
+New players begin in the shared minimal space. With story following enabled,
+chapter one introduces the sunny childhood desk: honey oak, a green cutting mat,
+an ivory toy dish, a blue task lamp, stationery and a paper-colored whiteboard.
+Chapter two recommends the precision room through the existing LV.2 progression.
 The metal arena is a detailed sci-fi competition apparatus with segmented service
 plates, stepped cooling-equipment banks and synchronized moving lighting.
 The rainy cafe street with its toy bowl and square floating ruins extend the
 existing map selection. These are distinct
 stylized real-time worlds, not a replacement global skin or photo-identical copies.
-Godot and external-server collision/protocol integration have not been migrated
-for these additions.
+The unified assembly/tool UI and complete Web scene-art integration are not a
+full native port. Concurrent shared-physics v6 is implemented in Godot local
+battle; its status and external-network limits remain governed by
+[the v6 implementation notes](../docs/physics_v6_implementation.md).
 
 ## Colors
-Silver enclosures and graphite frames establish the room. Cyan belongs to
+Assembly uses the existing paper, ink and electric-blue controls across minimal,
+childhood and advanced rooms. In the laboratory instruments, silver enclosures
+and graphite frames establish the room. Cyan belongs to
 instrumentation and specimen selection; yellow-green identifies the main test
 command and current navigation item. Diamonds use their own violet icon.
+
+### Assembly application
+- Primary: `assembly-blue` identifies filled part/tool selection, Save and the
+  thin selected-tab underline. Filled labels use `campaign-ink`, not white;
+  the final review records 5.46:1 contrast for this pair.
+- Neutral: reuse `campaign-white`, `campaign-ink`, `campaign-text` and
+  `flow-separator` for paper, text and separators; do not duplicate their values
+  under maintenance-only color names. Upgraded-room gesture hints use opaque
+  paper and secondary ink, with 7.45:1 contrast in the final review.
+- Interaction: reuse `campaign-disclosure-hover-ink` for focus and selected-tab
+  text, and `campaign-disclosure-hover-paper` for enabled hover. Hover uses pale
+  paper even on filled controls; dark selected/Save labels and semantic pressed
+  state remain intact.
+
+**The Assembly Continuity Rule.** Keep the original paper/ink/blue controls in
+every assembly tool mode and room. Room upgrades change the actual scene, not
+the assembly UI skin.
 
 ### World-specific application
 - Childhood: warm wood, plaster and paper surround cobalt enamel, green matting
@@ -99,8 +160,9 @@ command and current navigation item. Diamonds use their own violet icon.
   and `battle-critical-energy` for critical spin or ring-out risk. These are
   transient state cues, not replacement world palettes.
 
-**The Local Palette Rule.** Warm paper labels belong to the childhood room;
-dark instrument glass belongs to the precision room. Color-detector findings
+**The Local Palette Rule.** Warm paper labels belong to childhood lab instruments;
+dark instrument glass belongs to precision lab instruments. Assembly tools keep
+their own paper/ink/blue controls in both rooms. Color-detector findings
 are advisories to inspect in context, not authority to homogenize these worlds.
 Authored Blender material values and rendered lighting remain the material truth;
 the CSS/renderer colors above are not claimed as exact final pixel colors.
@@ -115,7 +177,28 @@ the readout's ink and paper, not its typography or calculation model. Keep tabul
 numerals, Chinese-first labels and compact English secondary labels; do not
 introduce a new display face for the added worlds.
 
+Assembly tools use the inherited body voice (13px/1.5), compact headings
+(21px/1.25), measured values (18px, weight 600), control labels (12px) and
+secondary labels (11px). Tabular numerals remain on prices and telemetry.
+These are local tool roles, not a new global display scale.
+
 ## Layout
+Assembly keeps the original centered 9:16 shell and model-first composition.
+The compact toolbar switches top, launcher outfit and care, with a room disclosure
+at the right. Top mode retains the three-loadout carousel, five-part picker and
+DIY; DIY hides the toolbar while editing. Tool overlays leave the central canvas
+available for direct pointer interaction.
+
+**The Visible Save Rule.** Scroll only the lower tool console; keep Save outside
+it in the fixed footer. Tool and room changes stay on the assembly page.
+
+The tool console is inset 16px, 64px above the bottom, with a 36% maximum height;
+the footer sits 12px above the bottom. At viewport heights up to 740px, tool modes
+hide the loadout title, move the toolbar/header/focus controls to 12px/58px/104px
+and reduce the console to 32% maximum height. Top assembly retains its header.
+At widths up to 360px, toolbar insets contract to 10px and button horizontal
+padding to 7px. Scrolling reveals trial/help without moving Save offscreen.
+
 The lab keeps a 9:16 composition centered within the available viewport.
 Controls scale in container units. Title, currencies and experience occupy the
 top; utility controls follow the right edge. The active specimen and readout
@@ -145,6 +228,12 @@ life-size belongings to fit a whole building into view. Keep the complete bowl,
 tops and launch controls readable; the bowl radius remains 6.7.
 
 ## Elevation & Depth
+Assembly tool paper stays flat over real equipment and room geometry. Upgraded
+rooms give the loadout title and lower-left gesture hint opaque paper backing,
+without a room-specific maintenance gradient. The room disclosure uses a soft
+overlay shadow. Existing comic edges on assembly part cards remain local;
+they are not an elevation recipe for lab, collection or other screens.
+
 The apparatus uses actual GLB geometry, baked vertex occlusion, a room reflection
 environment, and real-time shadows. Retain the original Web specimen builder,
 including its DIY customizations and procedural surface finishes.
@@ -175,7 +264,7 @@ cups, a low-emission rear wall, interior lighting and thin transparent glazing.
 Separated ceramic tiles and recessed grout, striped awnings, upstairs curtains,
 air-conditioning louvers and pipes, bicycles, plants, benches, menus and drains
 give the quiet rainy corner its lived-in scale. Glazing, enamel and glazed tile
-use physical clearcoat (0.42, with clearcoat roughness 0.19), distinct from the
+use physical clearcoat (0.65, with clearcoat roughness 0.13), distinct from the
 ivory bowl's coating. These authored storefront details remain in the model;
 the current close framing does not require them all to be visible.
 
@@ -191,9 +280,50 @@ share one actual planar scene reflection, not a painted glow. Keep broken
 dry/wet gaps, quiet low-amplitude noise and spatially varied blur; the cool
 shutter-side reflection is dimmer and blurrier than the cafe reflection.
 
+### Outdoor surface refinement (2026-09-22)
+
+`world-surface.js` adds world-space mineral grain, normal relief, cavities,
+roughness and coating variation to the existing street/ruins GLBs. Fine grain
+fades at unresolved pixel footprints. Keep scuffs sparse: repeated fine rings
+or diagonal lines produce interference patterns on the toy dish.
+These are shader finishes, with no new raster downloads, mesh displacement
+or physics changes. The main directional shadow resolution and street's
+single planar reflection budget remain unchanged.
+
+- Ruins: slate has damp patches (roughness 0.25–0.83), worn seams and sparse
+  fissures; masonry has mineral relief and darker damp bases. Bronze combines
+  warm exposed metal with rough green patina. Faceted crystals retain reflective
+  coating, while the portal has a restrained luminous inscription instead of a
+  uniformly emissive panel. `RuinsAtmosphere` adds five point lights and two area
+  lights for crystals, central runes, portal spill and sky reflection, with no
+  additional shadow maps or reflection targets. Night fog density is 0.012;
+  day is 0.005. Day quiets energy emissions and localized colored light.
+- Street: asphalt separates exposed aggregate, dark pores and broad damp
+  patches; normal strength stays low enough to avoid glitter. Ivory plastic
+  uses a neutral ivory base, sparse scuffs, center/edge roughness 0.35/0.145
+  and varying coating 0.32/0.78. Blue clips, transparent acrylic, glazed tile,
+  brushed metal, rough clay, timber and cloth retain distinct light response.
+- Both atmosphere classes explicitly bind the current shared outdoor
+  environment to their materials, enabling per-material reflection intensity.
+  Ivory plastic then uses its existing separate day/night probe. In Three r178,
+  `envMapIntensity` alone is ignored when `envMap` is null and the scene supplies
+  the environment. Physical conversions retain both `STANDARD` and `PHYSICAL`
+  defines so the precompiled material matches the actual render.
+
+Ruins local lights follow the live energy-material tint, including existing
+impact/warning feedback; there is no new animation clock. Atmospheres release
+local lights on exit; model materials remain owned by `ThreeStage`, and shared
+outdoor probes remain renderer-owned. Desktop/mobile day/night evidence and
+pixel/resource checks are in [world-materials](../.impeccable/review/world-materials/).
+This pass does not claim photo-identical reconstruction or new geometry.
+
 ## Shapes
 Manufactured bevels and concentric measurement rings carry the scene.
 Buttons, enclosures and dialogs use restrained rounded corners.
+
+Assembly controls reuse the small `assembly-control` corner, while launcher slot
+tabs are square and underline-selected. Part cards keep their incumbent ink
+frames and comic edge treatment; compact tool buttons do not acquire that shadow.
 
 The childhood and street toy bowls keep rounded plastic rims and blue clips.
 The stadium layers concentric shells, stepped equipment banks and braced
@@ -205,6 +335,56 @@ platform, four solid inner plinths, perimeter column footings and jagged fractur
 shafts. Circular floor sigils are decoration, not a circular collision boundary.
 
 ## Components
+
+### Maintenance within original assembly (2026-09-24)
+
+`#assembly` is the only assembly/tool page. The original three-loadout carousel,
+five-part picker and DIY remain intact; the toolbar adds launcher outfit, care
+for the selected equipment, and a room disclosure. `#launcher` and `#maintenance`
+are compatibility aliases that enter their tool modes and normalize the address
+to `#assembly`. The minimal paper/ink/blue interface is retained in every room;
+neither a standalone workbench nor a dark precision-maintenance skin is current.
+
+Ordinary tool buttons use a 36px minimum height, focus buttons 32px, and toolbar
+buttons 38px. Their 2px focus outline has a 3px outside gap; the canvas outline
+is inset by 3px. Filled selected part/tool buttons and Save use dark ink on blue.
+The same lower-console/fixed-footer layout applies to outfit and care, including
+short screens. The sidecar samples this built assembly UI, not replacement rooms.
+
+`MaintenanceStage` borrows the same `LabStage.scene`, renderer/canvas,
+`roomSets` cache, lights and reflection environment. Only the current equipment's
+exploded workpiece is local. Entry hides the test specimen, scan, wind, trace and
+shield; exit restores their visibility, the previous view and canvas ownership.
+Workpiece scale and placement stay on a local parent group, preserving mesh-local
+oil samples and the existing oil/physics calculations. `workshop-room.js` shares
+the original minimal plinth with the lab; childhood and advanced reuse their
+authored rooms. Assembly, tools, lab and showroom share one WebGLRenderer.
+No duplicate room scene, extra WebGL context or new shipping raster is introduced.
+
+Keep automatic explosion, freely reversible paint, and visible draft/save state.
+No cover-opening puzzle or compulsory consumable interaction belongs here.
+The controlled trial labels its input, duration and game units. Slow mechanical
+illustration is distinct from physics telemetry and respects reduced motion.
+Named part controls focus real geometry. When the model has keyboard focus,
+the visible reticle seeks a real visible ray hit on the focused part rather than
+empty space between exploded pieces. Enter paints or wipes at that same reticle;
+arrows orbit and plus/minus zoom. The canvas accessible label and
+[Web instructions](README.md) describe this path.
+
+Save commits oil and launcher equipment/color drafts and stays in the current
+mode. Cancel/revert discards unsaved tool edits and returns to original top
+assembly. Same-page tool and room changes retain these drafts; leaving assembly
+discards them. Purchases persist ownership immediately and survive discarding.
+Save failure retains drafts and restores the previous in-memory equipment.
+These rules do not replace the original top picker or DIY save/cancel behavior.
+
+The [original maintenance review](../.impeccable/review/maintenance/finish-review.md)
+and [independent-workbench handoff](../.impeccable/review/launcher-integration/verdict.md)
+are historical. The current assembly-merge review and two-fix verdict are linked
+below.
+
+### Laboratory and collection controls
+
 - Measurement command: idle, scanning, complete and asset-error states.
 - Mode selector: pressed state; locked during scanning.
 - Configuration carousel: real canvas-rendered specimens and current selection.
@@ -222,6 +402,111 @@ shafts. Circular floor sigils are decoration, not a circular collision boundary.
   220 ms total under reduced motion, with repeated selection blocked.
 - Stage selection: default hologram, LV.2 arena unlock, honest locked state,
   temporary preview and persistent equip. Selection never changes battle stats.
+
+### Launcher outfit extension (2026-09-24)
+
+Launcher outfit is the original assembly's `outfit` mode, with the same paper,
+ink, blue selection/Save, Chinese system typography and tabular numbers.
+The legacy `#launcher` link is an alias, not a separate page.
+
+- Keep the actual eight modules exposed, without a cover/access puzzle.
+  Rack, transmission and coupler offer three authored variants each; three
+  independent shell/accent/grip color inputs and the red-black preset are free
+  and cosmetic. Model clicks and named slot buttons select the same real parts.
+- Retain the centered 9:16 shell and scrollable lower console. Trial and help
+  can extend below the initial mobile console view; Save stays fixed outside it.
+  Close-view controls
+  enlarge the selected mechanism without replacing it with an illustration.
+- Slot and variant buttons persist through asynchronous swaps; refresh their
+  labels and pressed state in place. Use `aria-disabled` with an activation guard
+  while loading, preserving focus; equipping returns focus to the selected part.
+  Buttons and inputs have a 2px blue focus outline separated by a 3px outside
+  gap. Selected buttons use blue at rest and pale paper on enabled hover, retaining
+  dark ink and `aria-pressed`. The canvas retains its separate inset focus treatment.
+- Distinguish preview, ownership and draft equipment. Unowned previews never
+  equip or purchase; buying uses existing coins and immediately saves ownership.
+  Equipping edits the draft. Combine equipment/color and oil dirty status across
+  outfit and both care targets, with preview labeled separately. Save commits
+  both drafts without changing mode, never an uninstalled preview. Tool/room
+  changes retain drafts; cancel or leaving assembly discards unsaved edits but
+  retains completed purchases.
+- Swap the old part out, then the new part in along its authored direction,
+  retaining housing and orbit; reduced motion jumps to the completed swap.
+  Trial and battle share the finite-energy launch calculation. Keep controlled
+  input and game-unit labels; the fork, cam and three dogs demonstrate release,
+  not mechanical contact-force simulation.
+
+Sources: `src/ui/maintenance-screen.js`, `src/ui/maintenance.css`,
+`src/render/maintenance-stage.js` and `src/render/launcher-model.js`.
+[Runtime boundaries](../docs/launcher_runtime.md) remain the technical reference.
+Models are Blender-authored GLBs; no new shipping raster assets are introduced.
+
+The [earlier launcher verdict](../.impeccable/review/launcher-integration/verdict.md)
+was **SHIP for its F1-F3 fixes only**. Its independent-workbench appearance and
+whole-page scrolling are historical, not current UI guidance. Retained mechanism
+and purchase/draft behavior is described above; current finish evidence is the
+[assembly-merge verdict](../.impeccable/review/assembly-merge/verdict.md).
+
+### Home and shared laboratory integration (2026-09-24)
+
+This is an implemented local merge into original assembly, not a new identity
+or a design proposal. Top assembly, outfit and care borrow the actual selected
+laboratory while preserving the same paper controls. No room-specific tool skin
+or return-to-entry behavior remains.
+
+The display homepage is titled **我的陀螺基地** and reuses the existing holographic
+chamber and arena stages with the actual equipped top. `#home` and no hash follow
+the existing two-match tutorial before collection; completed/skipped tutorial or
+existing story progress resolves to collection. `#collection` remains a direct
+entry, while `#assembly` remains an explicit assembly deep link.
+
+New players start in `minimal`. With `followStory` enabled, chapter one's
+`rival-arrives` recommends `childhood`; chapter two's `choose-a-line` recommends
+`advanced` and raises existing lab XP to a floor of 120. This never adds repeatable
+XP, coins or a parallel progression model. Existing LV.2 rules unlock `arena`
+and `advanced`. Assembly and testing share the lab room preference; the display
+stage has its own `followStory` control. Manual selection sets only the relevant
+switch to false; re-enabling follows the story again. Players can always return
+to minimal. Existing test XP can still unlock advanced selection early.
+Locked stage previews never equip or change ownership.
+
+Lab and collection/home maintenance actions enter the same `#assembly` tools.
+Save stays in the current mode; cancel returns to top assembly on that same page.
+Changing tools or rooms retains oil and equipment/color drafts; leaving assembly
+discards unsaved edits. Completed purchases remain owned. Room preference save
+failure restores the previous preference rather than committing the scene early.
+
+Sources: `src/ui/maintenance.css`, `src/ui/maintenance-screen.js`,
+`src/render/maintenance-stage.js`, `src/main.js`, `src/render/workshop-room.js`,
+`src/core/home-progression.js`,
+[implementation overview](../docs/home_lab_integration.md) and the
+[surface contract](.impeccable/surfaces/src-ui-maintenance-screen-js.md).
+
+The [home/lab handoff](../.impeccable/review/home-lab/verdict.md) is historical
+independent-tool-entry evidence. Its keyboard-targeting fix remains in the build,
+but its room-specific overlay and return behavior are superseded here.
+
+Current [independent full finish review](../.impeccable/review/assembly-merge/finish-review.md):
+all nine supplied captures, the direction brief and primary CSS were inspected.
+It found two material issues and made persistence conditional on this targeted
+documentation merge. The [final verdict](../.impeccable/review/assembly-merge/verdict.md)
+is **SHIP for both scored fixes**: opaque upgraded-room hint backing and dark
+selected/Save labels. A fresh scoring agent confirmed those two fixes against
+same-path recaptures; it did not conduct a second defect hunt or certify that
+the whole surface has no possible defects.
+
+Final evidence in [assembly-merge](../.impeccable/review/assembly-merge/):
+`top-desktop.png`, `diy-desktop.png`, `launcher-desktop.png`,
+`launcher-mobile.png`, `care-mobile.png`, `care-small.png`,
+`childhood-launcher.png`, `advanced-top.png` and `room-mobile.png`.
+This documenter inspected `launcher-mobile.png` and `advanced-top.png` against
+the current code. The supplied [detector](../.impeccable/review/assembly-merge/detector.json)
+has seven advisory findings for the inherited blue and 3px corners, not a reason
+to alter the pinned appearance to match the older DESIGN.
+No tests, browser execution or new detector were run for this documentation-only
+merge. Static evidence does not independently verify strokes, swap motion,
+real-device performance, Safari or a native UI port. Runtime verification remains
+separate in the [assembly verification record](../.impeccable/review/assembly-merge/verification.md).
 
 ### Scene routes and inspection
 For the scene surfaces reached through `#collection`, `#lab` and `#map` into
@@ -243,16 +528,20 @@ surfaces only, not a global application mode or a new runtime mode switch.
   Necessary part-selection and test feedback remain available.
 
 ### Laboratory rooms
-`childhood` is the default room. Settings retains the original `advanced`
-precision lab as an explicit LV.2 choice (120 laboratory XP), disabled below the
-unlock. The room choice persists in the existing save; reaching LV.2 does not
-automatically replace the childhood desk. This room unlock is implemented and
-is separate from the still-pending equipment-upgrade services.
+`minimal` is the initial shared room. `childhood` remains manually selectable
+before its chapter-one recommendation; the original `advanced` precision lab
+requires LV.2 (120 laboratory XP). Story following recommends the rooms at the
+chapter milestones above; earning LV.2 through testing unlocks manual advanced
+selection without replacing the room by itself. Manual choice disables room
+story following and can always restore minimal. The preference persists in the
+existing save and is shared by assembly/tools and testing. These room unlocks
+are implemented, separate from still-pending equipment-upgrade services.
 
 The whiteboard displays the same computed metrics, status, progress and accessible
-live text as the precision monitor. Room appearance does not change measurement,
-wind demonstration, rewards or XP. Front/overhead inspection, quality controls
-and explicit test-driven spin continue to work in both rooms.
+live text as the precision monitor. Selecting a room does not change measurement,
+wind demonstration or rewards; chapter two's XP floor is a progression rule,
+not a room-selection reward. Front/overhead inspection, quality controls and
+explicit test-driven spin remain available across the shared rooms.
 
 ### Battle worlds and feedback
 Five maps are selectable: the existing standard and composite arenas, the upgraded
@@ -334,6 +623,31 @@ local lights, heads, cones and runners, releasing their shared geometry and
 materials once; `ThreeStage` owns disposal of the upgraded model materials.
 Stale asynchronous arena loads are discarded before mounting. No per-frame
 geometry, additional spotlight shadow maps or reflection targets are introduced.
+
+### Championship materials and hardware (2026-09-23)
+The supplied metal/glass/cyan concept refines the existing competition apparatus.
+Six material families now use physical shading with explicit PHYSICAL definitions:
+satin titanium, graphite enamel, graphite housings, brushed aluminium, polished
+aluminium and acrylic. The six `championship-*` material colors above are
+surface albedos, not UI colors. Each material explicitly binds the current scene
+environment so its reflection intensity actually applies in Three r178.
+
+`world-surface.js` shades restrained radial machining, peripheral panel joins,
+fine central hexagonal etching and light scuffs without changing the bowl shape.
+Coating grain and the bright polished reveals contrast with dark equipment shells.
+Transparent acrylic has Fresnel opacity, edge/seam accents and clearcoat; it does
+not allocate a transmission target. Two side-rig area lights create broad metal
+highlights, with intensities 2.1 at night and 1.25 by day. They share Three's LTC
+lookup textures and add no shadows or reflection passes. The six moving spots
+and two runner rings retain their existing timing and pause behavior.
+
+Blender adds twelve guard saddles with gaskets, clamp caps and captive screws;
+twelve external service housings with bracing; outer foundation cassettes and
+recessed channels; flush perimeter indices and inward chevrons. These are visual
+details at the existing apparatus scale. Radius 6.9, all collision surfaces,
+the real A/B/C supply zones and the battle solver retain their definitions.
+Fresh desktop/mobile day/night evidence is in
+[championship material verification](../.impeccable/review/championship-materials/verification.md).
 
 ### Street day/night atmosphere
 The warm cafe and closed bicycle shop follow the local
@@ -622,7 +936,7 @@ as a scene background.
 Championship authoring lives in `tools/build_championship_scene.py`, also called
 by `tools/build_battle_worlds.py` for full rebuilds. It preserves editable
 `tools/art_source/championship.blend` and exports the material-merged
-`resources/battle_worlds/championship.glb` (approximately 6.66 MB) together with
+`resources/battle_worlds/championship.glb` (approximately 8.66 MB) together with
 `championship_layout.json` for all six fixture anchors and both runner tracks.
 Runtime integration is in `src/render/championship-atmosphere.js` and
 `src/render/three-stage.js`; the shared bowl radius and metal physics are preserved.
@@ -707,6 +1021,9 @@ review sections retain their own historical scope.
 - Do read configuration and economy from the existing v2 store.
 - Do keep all results in game-balance units.
 - Do respect reduced motion and offer a lighter rendering mode.
+- Do keep assembly tools paper/ink/blue across rooms, with dark selected/Save labels.
+- Do keep the tool console scrollable and Save fixed outside it.
+- Do retain the original assembly carousel, five-part picker and DIY.
 - Don't fabricate premium-currency transactions, data history or lab experience.
 - Don't change battle physics to match the illustration.
 - Don't claim this real-time art pass is a photoreal reproduction.
@@ -721,8 +1038,10 @@ review sections retain their own historical scope.
 - Don't treat a locked stage preview as ownership or equipment selection.
 - Don't promote scene-level Experience into a global mode for task overlays.
 - Don't treat color advisories as defects without inspecting the intended world.
-- Don't claim the new worlds or their collision model have shipped in Godot or
-  external multiplayer services.
+- Don't turn local assembly comic edges into a global screen style.
+- Don't reintroduce a separate launcher/maintenance page or room-specific tool skin.
+- Don't equate shared-physics v6 in Godot with a full native Web UI/art port or
+  external multiplayer compatibility.
 
 ## Collection composition
 The actual top occupies the center above a modeled circular lift well. The
@@ -735,3 +1054,28 @@ dark panels and cyan/gold lighting.
 The .blend sources preserve editable objects; runtime assets merge them by
 material. Hologram lines and spotlight cones are shaders/geometry. No reference
 image is shipped as a background. Both display routes share the lab renderer.
+
+## Physics feedback v5 (2026-09-24)
+
+Preserve the incumbent battle and collection palettes. Battle controls are
+screen-relative at the input boundary; the arrow consumes the resulting world
+force. Preview and released motion share the same launch calculation, including
+launcher and maintenance settings. Compose tilt before local-axis spin, keeping
+the tip on its support point. Trail brightness ages over 0.55 seconds.
+
+Draws use the existing result sheet with explicit reasons and a visible rematch
+action, including first training. They grant no coins or progression. Stop,
+ring-out and time endings retain distinct motion; reserve the extra impact for
+structural break. Audio failures cannot stop the game.
+
+The existing ground label adds sliding/gripping/scraping state. Supply copy
+distinguishes the speed cap, net gain, continued drain and contested supply.
+Do not infer damage merely from a negative net spin change.
+
+Stamina and durability scores now derive from fixed-condition solver trials;
+the other three remain attribute conversions. Assembly exposes a native
+measurement disclosure inside the existing comparison panel, reachable without
+selecting a part; collection reuses its existing dialog. Conditions use
+the base launcher and no maintenance. Keep the current compact typography,
+keyboard focus and world-specific colors. See
+[model and validation boundaries](../docs/physics_v5_implementation.md).

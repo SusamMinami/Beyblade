@@ -1,4 +1,9 @@
 import * as THREE from "three";
+import { calculateBuild } from "../core/assembly-calculator.js";
+import { launcherLaunchState } from "../core/launcher-physics.js";
+import { applyBattlePose, screenControlToWorld } from "./battle-pose.js";
+import { arenaHeightAt } from "../core/arena-contact.js";
+import { BATTLE_MODEL_SCALE } from "../core/assembly-geometry.js";
 import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
 import championshipUrl from "../../../resources/battle_worlds/championship.glb?url";
 import streetUrl from "../../../resources/battle_worlds/street.glb?url";
@@ -13,8 +18,11 @@ import { applySurfaceFinish } from "./surface-finish.js";
 import { addArenaArchitecture } from "./arena-details.js";
 import { BattleEffects } from "./battle-effects.js";
 import { StreetAtmosphere } from "./street-atmosphere.js";
+import { RuinsAtmosphere } from "./ruins-atmosphere.js";
 import { ChampionshipAtmosphere } from "./championship-atmosphere.js";
 import { prepareScene } from "./prepare-scene.js";
+import { createLauncherModel, poseLauncher, launcherMotion } from "./launcher-model.js";
+import { normalizeLauncher, launcherKey, getLauncherPart } from "../core/launcher-state.js";
 import { loadoutVisualKey } from "./loadout-visual-key.js";
 import { createOutdoorEnvironment, normalizeSceneTime, resolveSceneTime } from "./scene-time.js";
 import { createDriveZoneModel, updateDriveZoneModel } from "./drive-zone-model.js";
@@ -42,28 +50,6 @@ function disposeGroup(group) {
     }
   });
   group.clear();
-}
-
-function arenaHeightAt(arena, radius, angle = 0) {
-  if (arena.groundHeight !== undefined) return arena.groundHeight;
-  const normalized = THREE.MathUtils.clamp(radius / arena.wallRadius, 0, 1);
-  if (arena.id === "metal") {
-    return (
-      -0.46 +
-      normalized ** 1.5 * 0.76 +
-      Math.sin(angle * 6 + normalized * 8) * normalized * 0.012
-    );
-  }
-  if (arena.id === "composite") {
-    if (normalized < 0.46) {
-      return -0.52 + normalized ** 2 * 0.34;
-    }
-    if (normalized < 0.86) {
-      return -0.448 + (normalized - 0.46) * 0.72;
-    }
-    return -0.16 + (normalized - 0.86) * 3.25;
-  }
-  return -0.5 + normalized ** 2 * 0.82;
 }
 
 function createBowlGeometry(arena) {
@@ -230,78 +216,6 @@ function createArenaModel(arena) {
   return group;
 }
 
-function createPedestal() {
-  const group = new THREE.Group();
-  const baseMaterial = new THREE.MeshStandardMaterial({
-    color: 0xf5f1e8,
-    metalness: 0.08,
-    roughness: 0.72,
-  });
-  const accentMaterial = new THREE.MeshBasicMaterial({
-    color: 0x11151a,
-    transparent: true,
-    opacity: 0.86,
-  });
-  const base = new THREE.Mesh(
-    new THREE.CylinderGeometry(1.6, 1.86, 0.34, 64),
-    baseMaterial,
-  );
-  base.position.y = -0.78;
-  base.receiveShadow = true;
-  group.add(base);
-  const line = new THREE.Mesh(
-    new THREE.TorusGeometry(1.62, 0.024, 6, 64),
-    accentMaterial,
-  );
-  line.rotation.x = Math.PI * 0.5;
-  line.position.y = -0.59;
-  group.add(line);
-  return group;
-}
-
-function createLauncherModel() {
-  const group = new THREE.Group();
-  const bodyMaterial = new THREE.MeshPhysicalMaterial({
-    color: 0x20282d,
-    metalness: 0.62,
-    roughness: 0.28,
-    clearcoat: 0.5,
-  });
-  const accentMaterial = new THREE.MeshStandardMaterial({
-    color: 0xffd23f,
-    metalness: 0.35,
-    roughness: 0.32,
-  });
-  const body = new THREE.Mesh(
-    new RoundedBoxGeometry(1.6, 0.34, 0.9, 3, 0.08),
-    bodyMaterial,
-  );
-  body.castShadow = true;
-  group.add(body);
-  const rail = new THREE.Mesh(
-    new RoundedBoxGeometry(0.24, 0.18, 2.2, 2, 0.035),
-    accentMaterial,
-  );
-  rail.position.set(0, 0.25, -0.92);
-  rail.castShadow = true;
-  group.add(rail);
-  const grip = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.18, 0.24, 1.15, 20),
-    bodyMaterial,
-  );
-  grip.rotation.z = -0.28;
-  grip.position.set(0.62, -0.62, 0.12);
-  grip.castShadow = true;
-  group.add(grip);
-  const socket = new THREE.Mesh(
-    new THREE.CylinderGeometry(0.58, 0.52, 0.16, 40),
-    accentMaterial,
-  );
-  socket.position.set(0, -0.22, -0.42);
-  group.add(socket);
-  return group;
-}
-
 export class ThreeStage {
   constructor(container) {
     this.container = container;
@@ -356,11 +270,15 @@ export class ThreeStage {
     this.scenePulse = 0;
     this.energyMaterials = [];
     this.streetAtmosphere = null;
+    this.ruinsAtmosphere = null;
     this.championshipAtmosphere = null;
 
     this.arenaRoot = new THREE.Group();
     this.modelRoot = new THREE.Group();
     this.launcherRoot = new THREE.Group();
+    this.launcherLoadToken = 0;
+    this.launcherLoadTask = null;
+    this.launcherLoadError = null;
     this.effectRoot = new THREE.Group();
     this.scene.add(
       this.arenaRoot,
@@ -581,6 +499,7 @@ export class ThreeStage {
   _bindPreviewControls() {
     const canvas = this.renderer.domElement;
     canvas.addEventListener("pointerdown", (event) => {
+      if (this.launcherRelease) return;
       if (this.mode === "battle" && this.launcherRoot.visible) {
         this._startLaunchDrag(event);
         return;
@@ -658,6 +577,7 @@ export class ThreeStage {
       this.lastPointerY = event.clientY;
     });
     const release = (event) => {
+      if (this.mode === "maintenance") return;
       if (
         this.dragMode === "launch-vector" ||
         this.dragMode === "launch-model"
@@ -1075,6 +995,8 @@ export class ThreeStage {
       this.cancelBattleWarmup();
       this.streetAtmosphere?.dispose();
       this.streetAtmosphere = null;
+      this.ruinsAtmosphere?.dispose();
+      this.ruinsAtmosphere = null;
       this.championshipAtmosphere?.dispose();
       this.championshipAtmosphere = null;
       this.mountedArenaId = null;
@@ -1104,6 +1026,7 @@ export class ThreeStage {
     activeSlot,
     { preserveCamera = false } = {},
   ) {
+    this.releaseAssemblyRoom();
     this.mode = "assembly";
     this.preparationToken++;
     this.arenaLoadToken++;
@@ -1120,9 +1043,8 @@ export class ThreeStage {
     this._setSceneColors("#f7f3e9", 0.018);
     this._clearModels();
     disposeGroup(this.arenaRoot);
-    disposeGroup(this.launcherRoot);
+    this._clearLauncher();
     this.launcherRoot.visible = false;
-    this.arenaRoot.add(createPedestal());
     loadouts.forEach((loadout, index) => {
       const top = createTopModel(
         loadout.build,
@@ -1151,6 +1073,43 @@ export class ThreeStage {
     if (activeSlot) {
       this.focusAssemblyPart(activeSlot, !preserveCamera);
     }
+    if (this.assemblyLab) void this.setAssemblyRoom(this.assemblyLab, this.assemblyRoom).catch(() =>
+      this.container.dispatchEvent(new CustomEvent("assemblyroomerror")));
+  }
+
+  async setAssemblyRoom(base, room) {
+    this.releaseAssemblyRoom();
+    this.assemblyLab = base;
+    this.assemblyRoom = room;
+    const token = this.assemblyRoomToken;
+    base.active = false;
+    await base.setRoom(room);
+    if (token !== this.assemblyRoomToken || this.mode !== "assembly") return;
+    const nodes = [base.specimen, base.scan, base.windField, base.trace, base.monitor, ...base.advancedShield];
+    this.borrowedLab = { base, nodes, visibility: nodes.map(node => node.visible),
+      lights: [...this.scene.children, ...base.scene.children].filter(node => node.isLight)
+        .map(node => [node, node.visible]) };
+    nodes.forEach(node => { node.visible = false; });
+    for (const [light, visible] of this.borrowedLab.lights)
+      light.visible = room === "minimal" ? light.parent === this.scene && visible : light.parent === base.scene && visible;
+    this.scene.add(base.scene);
+    this.scene.background.copy(base.scene.background);
+    this.scene.fog.color.copy(base.scene.background);
+    this.scene.environment = room === "minimal" ? this.environmentTarget.texture : base.environment.texture;
+    this.scene.environmentIntensity = room === "minimal" ? .9 : base.scene.environmentIntensity;
+    this._alignPedestal();
+  }
+
+  releaseAssemblyRoom() {
+    this.assemblyRoomToken = (this.assemblyRoomToken ?? 0) + 1;
+    const borrowed = this.borrowedLab;
+    if (!borrowed) return;
+    borrowed.base.scene.removeFromParent();
+    borrowed.base.scene.position.set(0, 0, 0);
+    borrowed.nodes.forEach((node, i) => { node.visible = borrowed.visibility[i]; });
+    borrowed.lights.forEach(([light, visible]) => { light.visible = visible; });
+    this.scene.environment = this.environmentTarget.texture;
+    this.borrowedLab = null;
   }
 
   setAssemblyActive(activeSlot) {
@@ -1404,7 +1363,7 @@ export class ThreeStage {
     this._setSceneColors("#c8cecd", 0.012);
     this._clearModels({ keepArena });
     if (!keepArena) disposeGroup(this.arenaRoot);
-    disposeGroup(this.launcherRoot);
+    this._clearLauncher();
     this.launcherRoot.visible = false;
     this._mountArena(arena);
     this.camera.fov = 38;
@@ -1419,9 +1378,11 @@ export class ThreeStage {
     playerColors,
     playerCustomizations = {},
     enemyIdentity = { colors: { ring: "#ec5b45", core: "#dfe9e7" }, customizations: {} },
+    launcher,
   ) {
+    this.launcherConfig = normalizeLauncher(launcher);
     const key = this._battleVisualKey(arena, playerSelection, enemySelection,
-      playerColors, playerCustomizations, enemyIdentity);
+      playerColors, playerCustomizations, enemyIdentity, launcher);
     const warmed = this.battleWarmup?.key === key && this.battleWarmup.ready
       ? this.battleWarmup : null;
     if (warmed) this.battleWarmup = null;
@@ -1429,6 +1390,7 @@ export class ThreeStage {
     const keepArena = this.mountedArenaId === arena.id;
     this.preparationToken++;
     this.mode = "battle";
+    this.previewBuild = calculateBuild(playerSelection, playerCustomizations);
     this.finishElapsed = 0;
     this.scenePeriod = resolveSceneTime(this.sceneTime);
     this.activeArena = arena;
@@ -1442,9 +1404,23 @@ export class ThreeStage {
     this._setSceneColors(battleBackgrounds[arena.id] ?? "#11181b", 0.028);
     this._clearModels({ keepArena });
     if (!keepArena) disposeGroup(this.arenaRoot);
-    disposeGroup(this.launcherRoot);
+    this._clearLauncher();
+    if (warmed) {
+      this.launcherRoot.add(warmed.launcher);
+    } else {
+      const token = this.launcherLoadToken;
+      this.launcherLoadTask = createLauncherModel(this.launcherConfig).then(model => {
+        if (token !== this.launcherLoadToken) {
+          disposeGroup(model);
+          return;
+        }
+        this.launcherRoot.add(model);
+        this.updateLauncherPreview(this.launcherParams);
+      }).catch(error => {
+        if (token === this.launcherLoadToken) this.launcherLoadError = error;
+      });
+    }
     this._mountArena(arena);
-    this.launcherRoot.add(warmed?.launcher ?? createLauncherModel());
     this.launcherRoot.visible = true;
     this.launchVectorRoot.visible = true;
     this.playerTop = warmed?.player ?? createTopModel(
@@ -1458,6 +1434,11 @@ export class ThreeStage {
     this.battlePreparationLease = warmed?.lease;
     this.playerTop.scale.setScalar(0.92);
     this.enemyTop.scale.setScalar(0.92);
+    // The bayonet follows the actual crown, including the player's DIY height.
+    this.playerTop.updateMatrixWorld(true);
+    this.launcherCrownHeight = new THREE.Box3().setFromObject(
+      this.playerTop.userData.partGroups.coreLock,
+    ).max.y;
     this.playerTop.position.set(0, this._topHeight(this.playerTop, 0, 4.45), 4.45);
     this.enemyTop.position.set(0, this._topHeight(this.enemyTop, 0, -4.45), -4.45);
     this.modelRoot.add(this.playerTop, this.enemyTop);
@@ -1467,19 +1448,27 @@ export class ThreeStage {
     this.updateLauncherPreview(this.launcherParams);
   }
 
-  _battleVisualKey(arena, player, enemy, colors, customizations, identity) {
-    return `${arena.id}:${resolveSceneTime(this.sceneTime)}:${
-      loadoutVisualKey({ build: player, colors, customizations })}:${
-      loadoutVisualKey({ build: enemy, colors: identity.colors, customizations: identity.customizations })}`;
+  _clearLauncher() {
+    this.cancelLauncherRelease();
+    this.launcherLoadToken++;
+    this.launcherLoadTask = null;
+    this.launcherLoadError = null;
+    disposeGroup(this.launcherRoot);
   }
 
-  queueBattleWarmup(arena, player, enemy, colors, customizations, identity) {
-    const key = this._battleVisualKey(arena, player, enemy, colors, customizations, identity);
+  _battleVisualKey(arena, player, enemy, colors, customizations, identity, launcher) {
+    return `${arena.id}:${resolveSceneTime(this.sceneTime)}:${
+      loadoutVisualKey({ build: player, colors, customizations })}:${
+      loadoutVisualKey({ build: enemy, colors: identity.colors, customizations: identity.customizations })}:${launcherKey(launcher)}`;
+  }
+
+  queueBattleWarmup(arena, player, enemy, colors, customizations, identity, launcher) {
+    const key = this._battleVisualKey(arena, player, enemy, colors, customizations, identity, launcher);
     if (this.battleWarmup?.key === key) return;
     this.cancelBattleWarmup();
     this.battleWarmup = {
       key, arenaId: arena.id,
-      selection: structuredClone({ player, enemy, colors, customizations, identity }),
+      selection: structuredClone({ player, enemy, colors, customizations, identity, launcher }),
     };
     this._scheduleBattleWarmup();
   }
@@ -1537,12 +1526,13 @@ export class ThreeStage {
     // one live set of speculative models and one pending request.
     await Promise.allSettled([...this.preparations]);
     if (!current()) return;
-    const { player, enemy, colors, customizations, identity } = job.selection;
+    const { player, enemy, colors, customizations, identity, launcher } = job.selection;
     job.player = await prepareTopModel(player, colors, customizations, current);
     if (!current()) return;
     job.enemy = await prepareTopModel(enemy, identity.colors, identity.customizations, current);
     if (!current()) return;
-    job.launcher = createLauncherModel();
+    job.launcher = await createLauncherModel(launcher);
+    if (!current()) return;
     const objects = [job.player, job.enemy, job.launcher];
     // Ordinary maps switch from direct rendering to the composer's linear
     // target for battle. Compile their arena variants during reading time too.
@@ -1601,9 +1591,6 @@ export class ThreeStage {
         mesh.material.envMapIntensity=.6;
         if (mesh.material.metalness>.4) applySurfaceFinish(mesh.material,"machined",.32);
         if (/Slate|stone|asphalt|brick/i.test(mesh.material.name)) applySurfaceFinish(mesh.material,"stone",.7);
-        if (mesh.material.name.startsWith("Energy") || mesh.material.name.startsWith("Crystal")) {
-          this.energyMaterials.push({material:mesh.material,color:mesh.material.emissive.clone(),strength:mesh.material.emissiveIntensity});
-        }
       });
       this.arenaRoot.add(gltf.scene);
       if (arena.id === "street") {
@@ -1619,6 +1606,20 @@ export class ThreeStage {
           period: this.scenePeriod,
         });
       }
+      if (arena.id === "ruins") {
+        this.ruinsAtmosphere = new RuinsAtmosphere(this.scene, gltf.scene, {
+          period: this.scenePeriod,
+        });
+      }
+      // Atmospheres may replace Standard with Physical materials. Track the
+      // live replacements, not a disposed source material.
+      const energy = new Set();
+      gltf.scene.traverse(mesh => {
+        const material = mesh.material;
+        if (!mesh.isMesh || energy.has(material) || !/^(Energy|Crystal)/.test(material.name)) return;
+        energy.add(material);
+        this.energyMaterials.push({ material, color: material.emissive.clone(), strength: material.emissiveIntensity });
+      });
       this.arenaLoaded=true;
       this._prepareArena();
     }).catch(error=>{
@@ -1648,6 +1649,11 @@ export class ThreeStage {
     // compiling, and allow the loading indicator to paint.
     const task = new Promise(resolve => requestAnimationFrame(resolve)).then(async () => {
       if (!current()) return;
+      if (this.mode === "battle") {
+        await this.launcherLoadTask;
+        if (!current()) return;
+        if (this.launcherLoadError) throw this.launcherLoadError;
+      }
       if (this.mode === "battle" && this.battlePreparationLease) {
         this._renderFrame(0);
       } else {
@@ -1735,8 +1741,22 @@ export class ThreeStage {
       this.bloom.strength = day ? .12 : .26;
       this.bloom.threshold = day ? 1.65 : 1.35;
     }
-    this.spotlights.forEach(light => { light.visible = !street && !championship && !day; });
+    if (ruins) {
+      this._setSceneColors(day ? "#7695ad" : "#172938", day ? .005 : .012);
+      this.keyLight.color.set(day ? 0xffebca : 0xbacfea);
+      this.keyLight.position.set(-7, 11, -4);
+      this.keyLight.intensity = day ? 2.5 : 1.65;
+      this.ambientLight.intensity = day ? .85 : .36;
+      this.edgeLight.intensity = day ? .3 : .48;
+      this.scene.environmentIntensity = day ? .8 : .65;
+      this.renderer.toneMappingExposure = day ? .97 : 1.04;
+      this.bloom.enabled = true;
+      this.bloom.strength = day ? .10 : .23;
+      this.bloom.threshold = day ? 1.8 : 1.25;
+    }
+    this.spotlights.forEach(light => { light.visible = !street && !ruins && !championship && !day; });
     this.streetAtmosphere?.setPeriod(this.scenePeriod);
+    this.ruinsAtmosphere?.setPeriod(this.scenePeriod);
     this.championshipAtmosphere?.setPeriod(this.scenePeriod);
   }
 
@@ -1748,25 +1768,56 @@ export class ThreeStage {
   }
 
   updateLauncherPreview(params = {}) {
+    if (this.launcherRelease) return;
     Object.assign(this.launcherParams, params);
-    if (this.mode !== "battle" || !this.playerTop) return;
-    const { height, direction, angle } = this.launcherParams;
-    const topHeight = this._topHeight(this.playerTop, 0, 4.45, Math.abs(angle));
-    const launcherHeight = topHeight + 0.56 + height * 0.22;
-    this.launcherRoot.position.set(
-      0,
-      launcherHeight,
-      4.92,
-    );
-    this.launcherRoot.rotation.set(angle, direction, 0);
-    this.playerTop.position.set(0, topHeight, 4.45);
-    this.playerTop.rotation.set(angle, direction, 0);
+    if (this.mode !== "battle" || !this.playerTop || !this.launcherRoot.visible) return;
+    const { height } = this.launcherParams;
+    const initial = launcherLaunchState(this.previewBuild, this.launcherParams.launcher,
+      this.launcherParams, this.launcherParams.oil);
+    this._positionTop(this.playerTop, { ...initial, position: { x: 0, y: 4.45 }, spinPhase: 0 });
+    this.launcherRoot.quaternion.copy(this.playerTop.quaternion);
+    const mount = this.launcherRoot.children[0]?.userData.topMount;
+    if (mount) {
+      const crown = new THREE.Vector3(0, this.launcherCrownHeight + .012 + height * .022, 0);
+      this.launcherRoot.position.copy(crown.sub(mount)
+        .applyQuaternion(this.playerTop.quaternion).add(this.playerTop.position));
+    }
     this._updateLaunchVectorPreview();
   }
 
   launchBattleVisual() {
-    this.launcherRoot.visible = false;
     this.launchVectorRoot.visible = false;
+    this.activePointers.clear(); this.dragMode = null; this.dragging = false;
+    return new Promise(resolve => {
+      this.launcherRelease = { elapsed: 0, resolve,
+        heldQuaternion: this.playerTop.quaternion.clone(),
+        releaseMs: getLauncherPart(this.launcherConfig.build.coupler).releaseMs };
+      if (matchMedia("(prefers-reduced-motion: reduce)").matches) this._advanceLauncherRelease(1);
+    });
+  }
+
+  cancelLauncherRelease() {
+    this.launcherRelease?.resolve(false);
+    this.launcherRelease = null;
+  }
+
+  _advanceLauncherRelease(dt) {
+    const r = this.launcherRelease;
+    if (!r) return;
+    r.elapsed += dt;
+    const motion = launcherMotion(r.elapsed, r.releaseMs);
+    const model = this.launcherRoot.children[0];
+    if (model) poseLauncher(model, motion);
+    // The held top follows the output rotor until all three dogs clear.
+    if (this.playerTop) {
+      this.playerTop.quaternion.copy(r.heldQuaternion);
+      this.playerTop.rotateY(model?.userData.outputAngle ?? 0);
+    }
+    if (motion.done) {
+      this.launcherRoot.visible = false;
+      this.launcherRelease = null;
+      r.resolve(true);
+    }
   }
 
   _launchVectorAnchor() {
@@ -1782,11 +1833,9 @@ export class ThreeStage {
       return;
     }
     const anchor = this._launchVectorAnchor();
-    const direction = new THREE.Vector3(
-      Math.sin(this.launcherParams.direction),
-      0,
-      -Math.cos(this.launcherParams.direction),
-    ).normalize();
+    const initial = launcherLaunchState(this.previewBuild, this.launcherParams.launcher,
+      this.launcherParams, this.launcherParams.oil);
+    const direction = new THREE.Vector3(initial.velocity.x, 0, initial.velocity.y).normalize();
     const normalizedPower =
       (this.launcherParams.power - LAUNCH_MIN_POWER) /
       (1 - LAUNCH_MIN_POWER);
@@ -1819,8 +1868,13 @@ export class ThreeStage {
     };
   }
 
+  screenControlToWorld(input) {
+    return screenControlToWorld(this.camera, input);
+  }
+
   update(delta, simulation = null, paused = false) {
     const battleDelta = paused ? 0 : delta;
+    if (this.launcherRelease && !document.hidden) this._advanceLauncherRelease(battleDelta);
     if (simulation && this.playerTop && this.enemyTop) {
       updateDriveZoneModel(this.driveZoneModel, simulation);
       if (simulation.phase === "finished") {
@@ -1833,12 +1887,15 @@ export class ThreeStage {
         this._applyTopState(this.playerTop, simulation.player, battleDelta);
         this._applyTopState(this.enemyTop, simulation.enemy, battleDelta);
         if (simulation.phase === "finished") {
-          const won = simulation.result.winner === "player";
-          const winner = won ? this.playerTop : this.enemyTop;
-          const loser = won ? this.enemyTop : this.playerTop;
-          const state = won ? simulation.player : simulation.enemy;
-          winner.rotation.y = state.spinPhase + this.finishElapsed * (this.reducedMotion ? .4 : 2.6);
-          loser.rotation.z += Math.min(this.finishElapsed * 1.8, .85);
+          for (const [id, model] of [["player", this.playerTop], ["enemy", this.enemyTop]]) {
+            const state = simulation[id];
+            const lost = simulation.result.winner !== "draw" && simulation.result.winner !== id;
+            const ended = simulation.result.eliminations?.[id] ?? (lost ? simulation.result.reason : null);
+            const phase = state.spinPhase + (ended === "spin_out" ? 0
+              : state.spinDirection * Math.min(state.spin, 6) * this.finishElapsed);
+            this._positionTop(model, state, phase);
+            if (ended === "ring_out") model.position.y -= Math.min(this.finishElapsed ** 2 * 3, 4);
+          }
         }
         this._updateBattleCamera(simulation);
       }
@@ -1867,9 +1924,10 @@ export class ThreeStage {
       if (!this.reducedMotion && (warning || this.scenePulse>.06)) {
         material.emissive.lerp(new THREE.Color(warning ? 0xff4934 : 0xffad45),warning ? .72 : this.scenePulse);
       }
-      const periodStrength = this.activeArena?.id === "metal" && this.scenePeriod === "day" ? .28 : 1;
+      const periodStrength = ["metal", "ruins"].includes(this.activeArena?.id) && this.scenePeriod === "day" ? .28 : 1;
       material.emissiveIntensity=strength*periodStrength*(1+(this.reducedMotion ? 0 : this.scenePulse*.8+Math.sin(this.visualTime*.8)*.08));
     });
+    this.ruinsAtmosphere?.update();
     this.battleEffects.update(battleDelta, [this.playerTop, this.enemyTop],
       this.mode === "battle" && simulation?.phase === "running", this.reducedMotion);
     if (!this.reducedMotion && this.mode !== "assembly") {
@@ -2044,20 +2102,29 @@ export class ThreeStage {
 
   _applyTopState(model, state, delta) {
     model.userData.spinRatio=THREE.MathUtils.clamp(state.spin/state.build.maxSpinSpeed,0,1);
-    model.position.set(state.position.x,
-      this._topHeight(model, state.position.x, state.position.y, state.tilt),
-      state.position.y);
-    model.rotation.y = state.spinPhase;
     applyTopDamage(model, state.structure);
-    const direction = Math.atan2(state.velocity.y, state.velocity.x);
-    model.rotation.x = Math.cos(direction) * state.tilt;
-    model.rotation.z = -Math.sin(direction) * state.tilt;
-    model.scale.setScalar(0.92);
+    this._positionTop(model, state);
+  }
+
+  _positionTop(model, state, phase = state.spinPhase) {
+    model.scale.setScalar(BATTLE_MODEL_SCALE);
+    applyBattlePose(model, state, phase);
+    // State position is the support point. The model origin moves with its axis,
+    // so the local tip stays on that point throughout a complete spin cycle.
+    const offset = new THREE.Vector3(0, model.userData.contactOffset * BATTLE_MODEL_SCALE, 0)
+      .applyQuaternion(model.quaternion);
+    model.userData.groundHeight = state.edge?.falling
+      ? state.edge.height - state.edge.drop : this._groundHeight(state.position.x, state.position.y);
+    model.position.set(state.position.x + offset.x, model.userData.groundHeight + offset.y + .012,
+      state.position.y + offset.z);
   }
 
   _updateBattleCamera(simulation) {
     if (simulation.phase === "finished") {
-      const winner = simulation[simulation.result.winner].position;
+      const winner = simulation.result.winner === "draw"
+        ? { x: (simulation.player.position.x + simulation.enemy.position.x) / 2,
+          y: (simulation.player.position.y + simulation.enemy.position.y) / 2 }
+        : simulation[simulation.result.winner].position;
       this.desiredCameraPosition.set(winner.x * .55 + 6.5, 10.5, winner.y * .55 + 9);
       this.desiredCameraTarget.set(winner.x * .55, -.2, winner.y * .55);
       return;
@@ -2096,6 +2163,7 @@ export class ThreeStage {
   }
 
   finishBattleVisual(simulation) {
+    if (simulation.result.winner === "draw" || simulation.result.reason !== "break") return;
     const loser = simulation.result.winner === "player" ? simulation.enemy : simulation.player;
     this.spawnImpact(loser.position, 1);
   }
@@ -2247,11 +2315,11 @@ export class ThreeStage {
   }
 
   _alignPedestal() {
-    const pedestal = this.arenaRoot.children[0];
+    const pedestal = this.borrowedLab?.base.scene;
     if (!pedestal || !this.assemblyTop || this.mode !== "assembly") return;
     const bottom = this.assemblyTop.position.y
       - this.assemblyTop.userData.contactOffset * this.assemblyTop.scale.y;
-    pedestal.position.y = bottom + 0.59;
+    pedestal.position.y = bottom - .47;
   }
 
   _fitArenaCamera() {
@@ -2263,6 +2331,7 @@ export class ThreeStage {
   }
 
   resize() {
+    if (this.mode === "maintenance" || this.renderer.domElement.parentElement !== this.container) return;
     const width = Math.max(this.container.clientWidth, 1);
     const height = Math.max(this.container.clientHeight, 1);
     this.camera.aspect = width / height;
@@ -2284,7 +2353,7 @@ export class ThreeStage {
     this.resizeObserver.disconnect();
     this._clearModels();
     disposeGroup(this.arenaRoot);
-    disposeGroup(this.launcherRoot);
+    this._clearLauncher();
     disposeGroup(this.effectRoot);
     this.battleEffects.dispose();
     this.environmentTarget.dispose();

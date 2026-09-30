@@ -1,0 +1,235 @@
+{
+  "status": "proposal",
+  "size": [
+    1080,
+    1920
+  ],
+  "operations": "crop, uniform resize, text composition; gameplay images unchanged",
+  "sourceSha256": {
+    "raw/01-battle.png": "2c57ddd4b3021968649b9f3bd287f11deb7bfc19a6bc7a8e267314d8a11ff982",
+    "raw/02-assembly.png": "131247fa20ca619c789b43a9f724bb7c2a34d3edb1e3c15a12f318c79edb8934",
+    "raw/02-diy.png": "165e95ccfaf1bb096e9c39384394c52a2990fdf602d6c90a03638f2d3f41300f",
+    "raw/03-launcher.png": "9b004c7678775a08b7ec6e9f6012f05e0b85841c6d01673279dbb4e8aab96adb",
+    "raw/04-maintenance.png": "0a2e511d26c249045761c8a87a7b4a670dd2389c692ef152554b229a3a24b58a",
+    "raw/05-street.png": "209b0915fa7ad3e2b08fa61909f28bd2128f764f43409fa4b3bd81cdc6305bfc",
+    "raw/05-ruins.png": "08617c559b08aa3d49a6651cd7ecf8f3e099d14e3dfb9dd0ea8229c4d133c04d",
+    "raw/05-journey.png": "c9858e8d2324e19fe58d791365ecb517907a1b0293f814bc2270651158db059c"
+  },
+  "posters": [
+    {
+      "file": "posters/01-battle.png",
+      "regions": [
+        {
+          "source": "raw/01-battle.png",
+          "sourceBox": [
+            65,
+            450,
+            1015,
+            1492
+          ],
+          "outputBox": [
+            48,
+            500,
+            1032,
+            1579
+          ]
+        },
+        {
+          "source": "raw/01-battle.png",
+          "sourceBox": [
+            355,
+            932,
+            700,
+            1190
+          ],
+          "outputBox": [
+            540,
+            1430,
+            1028,
+            1795
+          ]
+        }
+      ],
+      "headline": "这一撞，够痛快",
+      "subtitle": "物理驱动的 3D 陀螺对战"
+    },
+    {
+      "file": "posters/02-assembly.png",
+      "regions": [
+        {
+          "source": "raw/02-assembly.png",
+          "sourceBox": [
+            30,
+            690,
+            1050,
+            1490
+          ],
+          "outputBox": [
+            30,
+            500,
+            1050,
+            1300
+          ]
+        },
+        {
+          "source": "raw/02-diy.png",
+          "sourceBox": [
+            0,
+            0,
+            1080,
+            218
+          ],
+          "outputBox": [
+            48,
+            1410,
+            1032,
+            1609
+          ]
+        },
+        {
+          "source": "raw/02-diy.png",
+          "sourceBox": [
+            20,
+            1700,
+            1060,
+            1905
+          ],
+          "outputBox": [
+            48,
+            1650,
+            1032,
+            1844
+          ]
+        }
+      ],
+      "headline": "你的陀螺，你来造",
+      "subtitle": "五大部件自由组装，造型性能一起改"
+    },
+    {
+      "file": "posters/03-launcher.png",
+      "regions": [
+        {
+          "source": "raw/03-launcher.png",
+          "sourceBox": [
+            120,
+            576,
+            942,
+            1148
+          ],
+          "outputBox": [
+            48,
+            500,
+            1032,
+            1185
+          ]
+        },
+        {
+          "source": "raw/03-launcher.png",
+          "sourceBox": [
+            32,
+            1148,
+            1048,
+            1714
+          ],
+          "outputBox": [
+            48,
+            1300,
+            1032,
+            1848
+          ]
+        }
+      ],
+      "headline": "这一拉，也有门道",
+      "subtitle": "换装发射器，配出你的起手优势"
+    },
+    {
+      "file": "posters/04-maintenance.png",
+      "regions": [
+        {
+          "source": "raw/04-maintenance.png",
+          "sourceBox": [
+            20,
+            564,
+            1060,
+            1254
+          ],
+          "outputBox": [
+            48,
+            500,
+            1032,
+            1153
+          ]
+        },
+        {
+          "source": "raw/04-maintenance.png",
+          "sourceBox": [
+            32,
+            1254,
+            1048,
+            1605
+          ],
+          "outputBox": [
+            48,
+            1240,
+            1032,
+            1580
+          ]
+        }
+      ],
+      "headline": "亲手保养，越玩越懂",
+      "subtitle": "直接滴油、擦拭，观察性能变化"
+    },
+    {
+      "file": "posters/05-journey.png",
+      "regions": [
+        {
+          "source": "raw/05-street.png",
+          "sourceBox": [
+            0,
+            410,
+            1080,
+            1490
+          ],
+          "outputBox": [
+            48,
+            500,
+            528,
+            980
+          ]
+        },
+        {
+          "source": "raw/05-ruins.png",
+          "sourceBox": [
+            0,
+            410,
+            1080,
+            1490
+          ],
+          "outputBox": [
+            552,
+            500,
+            1032,
+            980
+          ]
+        },
+        {
+          "source": "raw/05-journey.png",
+          "sourceBox": [
+            32,
+            650,
+            1048,
+            1210
+          ],
+          "outputBox": [
+            48,
+            1220,
+            1032,
+            1762
+          ]
+        }
+      ],
+      "headline": "从街头，迎战宿敌",
+      "subtitle": "五章十战，带上你的改装一路出发"
+    }
+  ]
+}

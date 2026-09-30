@@ -38,14 +38,20 @@ func set_enemy_input_source(source: BattleInputSource) -> void:
 
 
 func start() -> void:
+	if not _rules_supported():
+		_set_phase(BattleProtocol.PHASE_CLOSED)
+		error_occurred.emit(-6,"异步验证服务仍使用旧规则；请使用 v6 本地对战。")
+		return
 	_set_phase(BattleProtocol.PHASE_READY)
 
 
 func submit_ready() -> void:
+	if not _rules_supported(): return
 	_set_phase(BattleProtocol.PHASE_LAUNCH_WINDOW)
 
 
 func submit_launch(power: float, height: float, direction: float, angle: float) -> void:
+	if not _rules_supported(): return
 	local_input.set_launch(power, height, direction, angle)
 	player_launch_cmd = local_input.get_launch_command(my_slot)
 	enemy_launch_cmd = enemy_input_source.get_launch_command(1 - my_slot)
@@ -65,6 +71,7 @@ func set_local_input(control: Vector2, flags: int = 0) -> void:
 
 
 func poll(delta: float) -> Dictionary:
+	if not _rules_supported(): return sim.snapshot() if sim else {}
 	_tick_accumulator += delta
 	if phase != BattleProtocol.PHASE_RUNNING:
 		return sim.snapshot() if sim else {}
@@ -148,3 +155,7 @@ func _set_phase(new_phase: StringName) -> void:
 		return
 	phase = new_phase
 	emit_signal("phase_changed", new_phase)
+
+
+func _rules_supported() -> bool:
+	return sim!=null and sim.SIMULATION_VERSION==BattleProtocol.SIMULATION_VERSION

@@ -37,20 +37,13 @@ func rebuild() -> void:
 		add_child(_boundary_root)
 
 	var vertices := PackedVector3Array()
+	var normals := PackedVector3Array()
 	var colors := PackedColorArray()
-	var radial_segments := maxi(map_resource.radial_segments, 1)
+	var radial_segments := 56 if map_resource.shared_v6 else maxi(map_resource.radial_segments, 1)
 	var angular_segments := maxi(map_resource.angular_segments, 3)
 	for radial_index in range(radial_segments):
-		var inner_radius := (
-			map_resource.terrain_radius
-			* float(radial_index)
-			/ float(radial_segments)
-		)
-		var outer_radius := (
-			map_resource.terrain_radius
-			* float(radial_index + 1)
-			/ float(radial_segments)
-		)
+		var inner_radius := _mesh_radius(radial_index,radial_segments)
+		var outer_radius := _mesh_radius(radial_index+1,radial_segments)
 		for angular_index in range(angular_segments):
 			var start_angle := TAU * float(angular_index) / float(angular_segments)
 			var end_angle := TAU * float(angular_index + 1) / float(angular_segments)
@@ -67,6 +60,8 @@ func rebuild() -> void:
 				inner_end
 			])
 			vertices.append_array(quad_vertices)
+			for point in quad_vertices:
+				normals.append(map_resource.get_surface_normal_at(point))
 			colors.append_array(PackedColorArray([
 				get_surface_color_at_radius(inner_radius),
 				get_surface_color_at_radius(outer_radius),
@@ -80,6 +75,7 @@ func rebuild() -> void:
 	var arrays := []
 	arrays.resize(Mesh.ARRAY_MAX)
 	arrays[Mesh.ARRAY_VERTEX] = vertices
+	arrays[Mesh.ARRAY_NORMAL] = normals
 	arrays[Mesh.ARRAY_COLOR] = colors
 	array_mesh.add_surface_from_arrays(Mesh.PRIMITIVE_TRIANGLES, arrays)
 	var material := StandardMaterial3D.new()
@@ -122,8 +118,18 @@ func get_surface_color_at_radius(radius: float) -> Color:
 
 func _surface_point(radius: float, angle: float) -> Vector3:
 	var point := Vector3(cos(angle) * radius, 0.0, sin(angle) * radius)
+	if map_resource.boundary=="square":
+		point /= maxf(absf(cos(angle)),absf(sin(angle)))
 	point.y = map_resource.get_height_at(point)
 	return point
+
+
+func _mesh_radius(index: int, count: int) -> float:
+	if map_resource.shared_v6 and map_resource.boundary!="square":
+		# Eight rings resolve the narrow, continuous low rim.
+		return map_resource.wall_radius*index/(count-8.0) if index<=count-8 else (
+			map_resource.wall_radius+.24*(index-(count-8))/8.0)
+	return map_resource.terrain_radius*index/float(count)
 
 
 func _apply_surface_material() -> void:
@@ -140,6 +146,8 @@ func _rebuild_boundary() -> void:
 	for child in _boundary_root.get_children():
 		_boundary_root.remove_child(child)
 		child.queue_free()
+	if map_resource.shared_v6:
+		return # The sampled surface already contains the low rim; ruins are open.
 
 	var segment_count := 48
 	var segment_length := (

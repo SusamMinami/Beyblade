@@ -1,0 +1,492 @@
+{
+  "status": "design-study-not-integrated",
+  "source": "tools\\art_source\\launcher.blend",
+  "sourceMeshCount": 193,
+  "units": "Web visual units",
+  "palettes": {
+    "blue_white": {
+      "primary": [
+        35,
+        65,
+        112
+      ],
+      "secondary": [
+        224,
+        230,
+        225
+      ],
+      "chassis": [
+        30,
+        38,
+        43
+      ],
+      "grip": [
+        24,
+        38,
+        55
+      ],
+      "accent": [
+        244,
+        158,
+        46
+      ],
+      "window": [
+        69,
+        94,
+        113
+      ]
+    },
+    "red_black": {
+      "primary": [
+        184,
+        55,
+        34
+      ],
+      "secondary": [
+        52,
+        57,
+        61
+      ],
+      "chassis": [
+        27,
+        31,
+        34
+      ],
+      "grip": [
+        24,
+        27,
+        30
+      ],
+      "accent": [
+        232,
+        171,
+        67
+      ],
+      "window": [
+        69,
+        94,
+        113
+      ]
+    }
+  },
+  "topMount": [
+    0,
+    -0.474,
+    -0.12
+  ],
+  "modules": [
+    {
+      "id": "housing",
+      "label": "机身外壳",
+      "anchor": [
+        0,
+        -0.03,
+        -0.12
+      ],
+      "explode": [
+        0,
+        0,
+        0
+      ],
+      "role": "cosmetic",
+      "note": "上下壳、护肩、固定导轨",
+      "number": "01",
+      "partId": "launcher.housing.stock",
+      "meshCount": 22,
+      "objects": [
+        "Lower gearbox pan",
+        "Continuous dark parting seam",
+        "Ivory upper shell",
+        "Cobalt nose armour",
+        "Shoulder bumper",
+        "Moulded side rib",
+        "Moulded side rib.001",
+        "Moulded side rib.002",
+        "Shoulder bumper.001",
+        "Moulded side rib.003",
+        "Moulded side rib.004",
+        "Moulded side rib.005",
+        "Lid support boss",
+        "Recessed fastener well",
+        "Stainless captive screw",
+        "Screw slot",
+        "Lid support boss.001",
+        "Recessed fastener well.001",
+        "Stainless captive screw.001",
+        "Screw slot.001",
+        "Rack guide entrance",
+        "Rack guide trim"
+      ],
+      "paintZones": [
+        "chassis",
+        "fixed",
+        "primary",
+        "secondary"
+      ],
+      "interfaceNote": "Fixed output axis and shared mounting envelope; shell-specific geometry may vary"
+    },
+    {
+      "id": "cover",
+      "label": "检修上盖",
+      "anchor": [
+        0,
+        0.25,
+        -0.12
+      ],
+      "explode": [
+        -0.4,
+        2.8,
+        -0.4
+      ],
+      "role": "cosmetic",
+      "note": "盖板、边框、加强筋与螺丝",
+      "number": "02",
+      "partId": "launcher.cover.stock",
+      "meshCount": 24,
+      "objects": [
+        "Lid side keeper",
+        "Lid side keeper.001",
+        "Raised lid gasket",
+        "Smoke polycarbonate inspection lid",
+        "Clear lid stiffening rib",
+        "Clear lid stiffening rib.001",
+        "Recessed fastener well.002",
+        "Stainless captive screw.002",
+        "Screw slot.002",
+        "Recessed fastener well.003",
+        "Stainless captive screw.003",
+        "Screw slot.003",
+        "Recessed fastener well.004",
+        "Stainless captive screw.004",
+        "Screw slot.004",
+        "Recessed fastener well.005",
+        "Stainless captive screw.005",
+        "Screw slot.005",
+        "Mould marking GEAR DRIVE  /  01",
+        "Direction datum",
+        "Direction datum.001",
+        "Direction datum.002",
+        "Direction datum.003",
+        "Direction datum.004"
+      ],
+      "paintZones": [
+        "fixed",
+        "primary",
+        "window"
+      ],
+      "interfaceNote": "Four lid screws and gearbox opening perimeter"
+    },
+    {
+      "id": "grip",
+      "label": "主握柄",
+      "anchor": [
+        0,
+        0,
+        0.7
+      ],
+      "explode": [
+        -1.3,
+        -0.25,
+        1.8
+      ],
+      "role": "handling_candidate",
+      "note": "握柄骨架、胶垫、防滑纹",
+      "number": "03",
+      "partId": "launcher.grip.stock",
+      "meshCount": 32,
+      "objects": [
+        "Tapered grip chassis",
+        "Ivory grip rail",
+        "Ivory grip rail.001",
+        "Rubber palm insert",
+        "Chevron grip tread",
+        "Chevron grip tread.001",
+        "Finger edge tread",
+        "Finger edge tread.001",
+        "Chevron grip tread.002",
+        "Chevron grip tread.003",
+        "Finger edge tread.002",
+        "Finger edge tread.003",
+        "Chevron grip tread.004",
+        "Chevron grip tread.005",
+        "Finger edge tread.004",
+        "Finger edge tread.005",
+        "Chevron grip tread.006",
+        "Chevron grip tread.007",
+        "Finger edge tread.006",
+        "Finger edge tread.007",
+        "Chevron grip tread.008",
+        "Chevron grip tread.009",
+        "Finger edge tread.008",
+        "Finger edge tread.009",
+        "Chevron grip tread.010",
+        "Chevron grip tread.011",
+        "Finger edge tread.010",
+        "Finger edge tread.011",
+        "Heel bumper",
+        "Heel inset",
+        "Ivory neck bridge",
+        "Mould marking SPIN / CORE"
+      ],
+      "paintZones": [
+        "chassis",
+        "fixed",
+        "grip",
+        "primary",
+        "secondary"
+      ],
+      "interfaceNote": "Neck plane at visual Z=0.70; hidden plug/screws still to author"
+    },
+    {
+      "id": "pull_handle",
+      "label": "抽拉柄",
+      "anchor": [
+        1.95,
+        0.055,
+        -0.85
+      ],
+      "explode": [
+        2.65,
+        0.25,
+        0
+      ],
+      "role": "handling_candidate",
+      "note": "T 形手柄、端盖与连接头",
+      "number": "04",
+      "partId": "launcher.pull_handle.stock",
+      "meshCount": 9,
+      "objects": [
+        "Pull handle collar",
+        "T pull handle shell",
+        "T handle central thumb pad",
+        "T handle grip pad",
+        "T handle grip pad.001",
+        "T handle grip pad.002",
+        "T handle grip pad.003",
+        "T handle ivory end cap",
+        "T handle ivory end cap.001"
+      ],
+      "paintZones": [
+        "grip",
+        "primary",
+        "secondary"
+      ],
+      "interfaceNote": "Rack end at visual X=1.95; replaceable pin joint still to author"
+    },
+    {
+      "id": "rack",
+      "label": "驱动齿条",
+      "anchor": [
+        0.875,
+        0.055,
+        -0.85
+      ],
+      "explode": [
+        1.3,
+        1,
+        0
+      ],
+      "role": "performance_candidate",
+      "note": "贯穿壳体的整条齿条",
+      "number": "05",
+      "partId": "launcher.rack.stock",
+      "meshCount": 51,
+      "objects": [
+        "Internal rack rail",
+        "Internal rack tooth",
+        "Internal rack tooth.001",
+        "Internal rack tooth.002",
+        "Internal rack tooth.003",
+        "Internal rack tooth.004",
+        "Internal rack tooth.005",
+        "Internal rack tooth.006",
+        "Internal rack tooth.007",
+        "Internal rack tooth.008",
+        "Internal rack tooth.009",
+        "Internal rack tooth.010",
+        "Internal rack tooth.011",
+        "Internal rack tooth.012",
+        "Internal rack tooth.013",
+        "Internal rack tooth.014",
+        "Internal rack tooth.015",
+        "Internal rack tooth.016",
+        "Internal rack tooth.017",
+        "Internal rack tooth.018",
+        "Internal rack tooth.019",
+        "Internal rack tooth.020",
+        "Internal rack tooth.021",
+        "Internal rack tooth.022",
+        "Internal rack tooth.023",
+        "Internal rack tooth.024",
+        "Internal rack tooth.025",
+        "Internal rack tooth.026",
+        "Reinforced toothed rack",
+        "Rack centre bead",
+        "Rack drive tooth",
+        "Rack drive tooth.001",
+        "Rack drive tooth.002",
+        "Rack drive tooth.003",
+        "Rack drive tooth.004",
+        "Rack drive tooth.005",
+        "Rack drive tooth.006",
+        "Rack drive tooth.007",
+        "Rack drive tooth.008",
+        "Rack drive tooth.009",
+        "Rack drive tooth.010",
+        "Rack drive tooth.011",
+        "Rack drive tooth.012",
+        "Rack drive tooth.013",
+        "Rack drive tooth.014",
+        "Rack drive tooth.015",
+        "Rack drive tooth.016",
+        "Rack drive tooth.017",
+        "Rack drive tooth.018",
+        "Rack drive tooth.019",
+        "Rack drive tooth.020"
+      ],
+      "paintZones": [
+        "fixed"
+      ],
+      "interfaceNote": "Common guide cross-section and tooth module; visible teeth are illustrative"
+    },
+    {
+      "id": "transmission",
+      "label": "传动芯组",
+      "anchor": [
+        0,
+        0.055,
+        -0.12
+      ],
+      "explode": [
+        0,
+        1.4,
+        0
+      ],
+      "role": "performance_candidate",
+      "note": "三组齿轮、轴座、回位弹簧",
+      "number": "06",
+      "partId": "launcher.transmission.stock",
+      "meshCount": 32,
+      "objects": [
+        "Inner mechanical tray",
+        "Output crown / 24 teeth",
+        "Output crown / 24 teeth recessed face",
+        "Output crown / 24 teeth hub",
+        "Output crown / 24 teeth axle",
+        "Output crown / 24 teeth face dimple",
+        "Output crown / 24 teeth face dimple.001",
+        "Output crown / 24 teeth face dimple.002",
+        "Output crown / 24 teeth face dimple.003",
+        "Output crown / 24 teeth face dimple.004",
+        "Output crown / 24 teeth face dimple.005",
+        "Transfer pinion / 12 teeth",
+        "Transfer pinion / 12 teeth recessed face",
+        "Transfer pinion / 12 teeth hub",
+        "Transfer pinion / 12 teeth axle",
+        "Transfer pinion / 12 teeth face dimple",
+        "Transfer pinion / 12 teeth face dimple.001",
+        "Transfer pinion / 12 teeth face dimple.002",
+        "Transfer pinion / 12 teeth face dimple.003",
+        "Transfer pinion / 12 teeth face dimple.004",
+        "Transfer pinion / 12 teeth face dimple.005",
+        "Return pinion / 10 teeth",
+        "Return pinion / 10 teeth recessed face",
+        "Return pinion / 10 teeth hub",
+        "Return pinion / 10 teeth axle",
+        "Return pinion / 10 teeth face dimple",
+        "Return pinion / 10 teeth face dimple.001",
+        "Return pinion / 10 teeth face dimple.002",
+        "Return pinion / 10 teeth face dimple.003",
+        "Return pinion / 10 teeth face dimple.004",
+        "Return pinion / 10 teeth face dimple.005",
+        "Exposed spiral return spring"
+      ],
+      "paintZones": [
+        "fixed"
+      ],
+      "interfaceNote": "Output axis X=0,Z=-0.12; swap the whole matched gear cassette"
+    },
+    {
+      "id": "coupler",
+      "label": "陀螺连接头",
+      "anchor": [
+        0,
+        -0.25,
+        -0.12
+      ],
+      "explode": [
+        0,
+        -1,
+        0
+      ],
+      "role": "performance_candidate",
+      "note": "输出套筒、卡口、锁定爪",
+      "number": "07",
+      "partId": "launcher.coupler.stock",
+      "meshCount": 18,
+      "objects": [
+        "Underside drive housing",
+        "Coupling machined shoulder",
+        "Bayonet socket",
+        "Locking dog",
+        "Locking dog.001",
+        "Locking dog.002",
+        "Coupling radial grip",
+        "Coupling radial grip.001",
+        "Coupling radial grip.002",
+        "Coupling radial grip.003",
+        "Coupling radial grip.004",
+        "Coupling radial grip.005",
+        "Coupling radial grip.006",
+        "Coupling radial grip.007",
+        "Coupling radial grip.008",
+        "Coupling radial grip.009",
+        "Coupling radial grip.010",
+        "Coupling radial grip.011",
+        "TopMount"
+      ],
+      "paintZones": [
+        "fixed"
+      ],
+      "interfaceNote": "TopMount unchanged at [0,-0.474,-0.12]; upper quick-change joint still to author"
+    },
+    {
+      "id": "release",
+      "label": "释放开关",
+      "anchor": [
+        0.9,
+        0.04,
+        0.39
+      ],
+      "explode": [
+        1.6,
+        -0.3,
+        0.3
+      ],
+      "role": "incomplete_mechanism",
+      "note": "现有滑钮；内部释放机构待补",
+      "number": "08",
+      "partId": "launcher.release.stock",
+      "meshCount": 5,
+      "objects": [
+        "Recessed lock surround",
+        "Amber release slider",
+        "Release slider ridges",
+        "Release slider ridges.001",
+        "Release slider ridges.002"
+      ],
+      "paintZones": [
+        "accent",
+        "chassis",
+        "primary"
+      ],
+      "interfaceNote": "Slider only; latch/cam/spring and its motion are not yet modeled"
+    }
+  ],
+  "runtime": {
+    "meshCount": 29,
+    "triangles": 27560,
+    "bytes": 779372,
+    "moduleRoots": 8
+  }
+}

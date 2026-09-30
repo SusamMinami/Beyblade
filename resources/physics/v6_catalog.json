@@ -1,0 +1,469 @@
+{
+  "version": "2026.09.24-shared-v6+launcher-v1",
+  "arenas": {
+    "standard": {
+      "id": "standard",
+      "number": "01",
+      "name": "标准碗形竞技场",
+      "shortName": "标准碗",
+      "tag": "均衡",
+      "description": "中等摩擦与柔和回中心力，适合验证基础移动、碰撞和停转。",
+      "accent": "#f1b84b",
+      "ringOutRadius": 7.2,
+      "wallRadius": 6.7,
+      "bowlForce": 0.86,
+      "surfaces": [
+        {
+          "radius": 0,
+          "name": "标准地面",
+          "friction": 1,
+          "spinDamping": 1,
+          "linearDrag": 1,
+          "bounce": 1,
+          "stability": 1,
+          "damage": 1,
+          "control": 1,
+          "noise": 0
+        },
+        {
+          "radius": 3.1,
+          "name": "标准地面",
+          "friction": 1,
+          "spinDamping": 1,
+          "linearDrag": 1,
+          "bounce": 1,
+          "stability": 1,
+          "damage": 1,
+          "control": 1,
+          "noise": 0
+        },
+        {
+          "radius": 5.9,
+          "name": "标准地面",
+          "friction": 1,
+          "spinDamping": 1,
+          "linearDrag": 1,
+          "bounce": 1,
+          "stability": 1,
+          "damage": 1,
+          "control": 1,
+          "noise": 0
+        }
+      ]
+    },
+    "metal": {
+      "id": "metal",
+      "scene": "championship",
+      "number": "02",
+      "name": "冠军科幻竞技场",
+      "shortName": "冠军竞技场",
+      "tag": "高速",
+      "description": "低摩擦、高回弹、长续航，碰撞后滑移与撞飞风险明显。",
+      "accent": "#8ed8e7",
+      "ringOutRadius": 7.45,
+      "wallRadius": 6.9,
+      "bowlForce": 0.68,
+      "surfaces": [
+        {
+          "radius": 0,
+          "name": "低摩擦金属",
+          "friction": 0.45,
+          "spinDamping": 0.72,
+          "linearDrag": 0.65,
+          "bounce": 1.15,
+          "stability": 0.92,
+          "damage": 1.08,
+          "control": 0.75,
+          "noise": 0.02
+        },
+        {
+          "radius": 3.1,
+          "name": "低摩擦金属",
+          "friction": 0.45,
+          "spinDamping": 0.72,
+          "linearDrag": 0.65,
+          "bounce": 1.15,
+          "stability": 0.92,
+          "damage": 1.08,
+          "control": 0.75,
+          "noise": 0.02
+        },
+        {
+          "radius": 5.9,
+          "name": "低摩擦金属",
+          "friction": 0.45,
+          "spinDamping": 0.72,
+          "linearDrag": 0.65,
+          "bounce": 1.15,
+          "stability": 0.92,
+          "damage": 1.08,
+          "control": 0.75,
+          "noise": 0.02
+        }
+      ]
+    },
+    "composite": {
+      "id": "composite",
+      "number": "03",
+      "name": "复合材质竞技场",
+      "shortName": "复合材质",
+      "tag": "策略",
+      "description": "中央金属、外圈橡胶与边缘减速带组合，验证路线选择。",
+      "accent": "#ef6b4f",
+      "ringOutRadius": 7.3,
+      "wallRadius": 6.8,
+      "bowlForce": 0.78,
+      "surfaces": [
+        {
+          "radius": 0,
+          "name": "低摩擦金属",
+          "friction": 0.45,
+          "spinDamping": 0.72,
+          "linearDrag": 0.65,
+          "bounce": 1.15,
+          "stability": 0.92,
+          "damage": 1.08,
+          "control": 0.75,
+          "noise": 0.02
+        },
+        {
+          "radius": 3.1,
+          "name": "高抓地橡胶",
+          "friction": 1.35,
+          "spinDamping": 1.28,
+          "linearDrag": 1.22,
+          "bounce": 0.72,
+          "stability": 1.08,
+          "damage": 0.86,
+          "control": 1.2,
+          "noise": 0
+        },
+        {
+          "radius": 5.9,
+          "name": "边缘减速带",
+          "friction": 1.55,
+          "spinDamping": 1.46,
+          "linearDrag": 1.45,
+          "bounce": 0.68,
+          "stability": 0.9,
+          "damage": 0.92,
+          "control": 1.08,
+          "noise": 0.035
+        }
+      ]
+    },
+    "street": {
+      "id": "street",
+      "scene": "street",
+      "number": "04",
+      "name": "放学后的街头",
+      "shortName": "街头对决",
+      "tag": "童年",
+      "description": "雨后亮着暖灯的小店、湿润街道与放学后的玩具盘。沿用标准碗的均衡材料与回中心力。",
+      "accent": "#e7b66e",
+      "ringOutRadius": 7.2,
+      "wallRadius": 6.7,
+      "bowlForce": 0.86,
+      "surfaces": [
+        {
+          "radius": 0,
+          "name": "标准地面",
+          "friction": 1,
+          "spinDamping": 1,
+          "linearDrag": 1,
+          "bounce": 1,
+          "stability": 1,
+          "damage": 1,
+          "control": 1,
+          "noise": 0
+        },
+        {
+          "radius": 3.1,
+          "name": "标准地面",
+          "friction": 1,
+          "spinDamping": 1,
+          "linearDrag": 1,
+          "bounce": 1,
+          "stability": 1,
+          "damage": 1,
+          "control": 1,
+          "noise": 0
+        },
+        {
+          "radius": 5.9,
+          "name": "标准地面",
+          "friction": 1,
+          "spinDamping": 1,
+          "linearDrag": 1,
+          "bounce": 1,
+          "stability": 1,
+          "damage": 1,
+          "control": 1,
+          "noise": 0
+        }
+      ]
+    },
+    "ruins": {
+      "id": "ruins",
+      "scene": "floating_ruins",
+      "number": "05",
+      "name": "浮空古代遗迹",
+      "shortName": "浮空遗迹",
+      "tag": "障碍",
+      "description": "方形石台与四座实体石墩。绕开障碍抢占路线，越过边缘将出界。",
+      "accent": "#b194ed",
+      "ringOutRadius": 8.25,
+      "wallRadius": 6.94,
+      "bowlForce": 0,
+      "boundary": "square",
+      "groundHeight": -0.33,
+      "blockers": [
+        {
+          "x": -2.9,
+          "z": -2.2,
+          "hx": 0.85,
+          "hz": 0.4
+        },
+        {
+          "x": -2.9,
+          "z": 2.2,
+          "hx": 0.85,
+          "hz": 0.4
+        },
+        {
+          "x": 2.9,
+          "z": -2.2,
+          "hx": 0.85,
+          "hz": 0.4
+        },
+        {
+          "x": 2.9,
+          "z": 2.2,
+          "hx": 0.85,
+          "hz": 0.4
+        },
+        {
+          "x": -6.7,
+          "z": -6.7,
+          "hx": 0.45,
+          "hz": 0.45
+        },
+        {
+          "x": -6.7,
+          "z": -2.4,
+          "hx": 0.45,
+          "hz": 0.45
+        },
+        {
+          "x": -6.7,
+          "z": 2.4,
+          "hx": 0.45,
+          "hz": 0.45
+        },
+        {
+          "x": -6.7,
+          "z": 6.7,
+          "hx": 0.45,
+          "hz": 0.45
+        },
+        {
+          "x": 6.7,
+          "z": -6.7,
+          "hx": 0.45,
+          "hz": 0.45
+        },
+        {
+          "x": 6.7,
+          "z": -2.4,
+          "hx": 0.45,
+          "hz": 0.45
+        },
+        {
+          "x": 6.7,
+          "z": 2.4,
+          "hx": 0.45,
+          "hz": 0.45
+        },
+        {
+          "x": 6.7,
+          "z": 6.7,
+          "hx": 0.45,
+          "hz": 0.45
+        }
+      ],
+      "driveZones": [
+        {
+          "id": "A",
+          "x": -2.35,
+          "y": 0,
+          "radius": 1
+        },
+        {
+          "id": "B",
+          "x": 2.35,
+          "y": 0,
+          "radius": 1
+        },
+        {
+          "id": "C",
+          "x": 0,
+          "y": 2.35,
+          "radius": 1
+        }
+      ],
+      "surfaces": [
+        {
+          "radius": 0,
+          "name": "标准地面",
+          "friction": 1,
+          "spinDamping": 1,
+          "linearDrag": 1,
+          "bounce": 1,
+          "stability": 1,
+          "damage": 1,
+          "control": 1,
+          "noise": 0
+        },
+        {
+          "radius": 3.1,
+          "name": "标准地面",
+          "friction": 1,
+          "spinDamping": 1,
+          "linearDrag": 1,
+          "bounce": 1,
+          "stability": 1,
+          "damage": 1,
+          "control": 1,
+          "noise": 0
+        },
+        {
+          "radius": 5.9,
+          "name": "标准地面",
+          "friction": 1,
+          "spinDamping": 1,
+          "linearDrag": 1,
+          "bounce": 1,
+          "stability": 1,
+          "damage": 1,
+          "control": 1,
+          "noise": 0
+        }
+      ]
+    }
+  },
+  "slotY": {
+    "attackRing": 0.24,
+    "coreLock": 0.42,
+    "weightDisc": 0.02,
+    "driverShaft": -0.22,
+    "tip": -0.56
+  },
+  "launcherParts": [
+    {
+      "id": "launcher.rack.r01",
+      "slot": "rack",
+      "code": "R01",
+      "name": "循衡",
+      "price": 0,
+      "mass": 1,
+      "flex": 1,
+      "note": "连续背梁，抽拉负担与刚性均衡。"
+    },
+    {
+      "id": "launcher.rack.r02",
+      "slot": "rack",
+      "code": "R02",
+      "name": "轻羽",
+      "price": 140,
+      "mass": 0.58,
+      "flex": 2.8,
+      "note": "起拉更轻快；高载挠曲和回弹储能更多。"
+    },
+    {
+      "id": "launcher.rack.r03",
+      "slot": "rack",
+      "code": "R03",
+      "name": "刚脊",
+      "price": 180,
+      "mass": 1.5,
+      "flex": 0.3,
+      "note": "金属背脊抗挠；往复质量更大。"
+    },
+    {
+      "id": "launcher.transmission.t01",
+      "slot": "transmission",
+      "code": "T01",
+      "name": "恒比",
+      "price": 0,
+      "ratio": 1,
+      "inertia": 0.04,
+      "note": "32 : 32，转速与输出扭矩均衡。"
+    },
+    {
+      "id": "launcher.transmission.t02",
+      "slot": "transmission",
+      "code": "T02",
+      "name": "超越",
+      "price": 220,
+      "ratio": 1.2857142857142858,
+      "inertia": 0.032,
+      "note": "36 : 28，提高同抽速的转速上限；更费力。"
+    },
+    {
+      "id": "launcher.transmission.t03",
+      "slot": "transmission",
+      "code": "T03",
+      "name": "厚积",
+      "price": 220,
+      "ratio": 0.7777777777777778,
+      "inertia": 0.053,
+      "note": "28 : 36，高载更省力；转速上限较低。"
+    },
+    {
+      "id": "launcher.coupler.c01",
+      "slot": "coupler",
+      "code": "C01",
+      "name": "直联",
+      "price": 0,
+      "inertia": 0.04,
+      "drag": 0.01,
+      "releaseMs": 160,
+      "alignment": 1,
+      "note": "单支承、标准退出行程。"
+    },
+    {
+      "id": "launcher.coupler.c02",
+      "slot": "coupler",
+      "code": "C02",
+      "name": "瞬脱",
+      "price": 160,
+      "inertia": 0.022,
+      "drag": 0.004,
+      "releaseMs": 95,
+      "alignment": 1.65,
+      "note": "退出更快、转子更轻；偏载支承较弱。"
+    },
+    {
+      "id": "launcher.coupler.c03",
+      "slot": "coupler",
+      "code": "C03",
+      "name": "定轴",
+      "price": 200,
+      "inertia": 0.07,
+      "drag": 0.018,
+      "releaseMs": 210,
+      "alignment": 0.4,
+      "note": "双支承抑制偏载；阻力与惯量增加。"
+    }
+  ],
+  "defaultLauncherBuild": {
+    "rack": "launcher.rack.r01",
+    "transmission": "launcher.transmission.t01",
+    "coupler": "launcher.coupler.c01"
+  },
+  "defaultLauncherColors": {
+    "shell": "#eee9dc",
+    "accent": "#1761c4",
+    "grip": "#202733"
+  }
+}

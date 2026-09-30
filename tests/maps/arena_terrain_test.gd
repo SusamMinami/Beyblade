@@ -33,13 +33,17 @@ func _test_height_profiles() -> void:
 	var north_height := speed_slope.get_height_at(Vector3(0.0, 0.0, -3.0))
 	var south_height := speed_slope.get_height_at(Vector3(0.0, 0.0, 3.0))
 	_expect(
-		north_height > south_height,
-		"金属高速地图必须形成由北向南的下坡"
+		is_equal_approx(north_height, south_height),
+		"金属高速地图必须与 Web 共用径向碗形轮廓"
 	)
 	var normal := speed_slope.get_surface_normal_at(Vector3.ZERO)
 	_expect(
-		not normal.is_equal_approx(Vector3.UP),
-		"带方向倾角的地图中心法线不能完全竖直"
+		normal.is_equal_approx(Vector3.UP),
+		"径向碗形地图中心法线必须竖直"
+	)
+	_expect(
+		speed_slope.get_surface_normal_at(Vector3(3, 0, 0)).x < 0,
+		"离心坡面的法线必须朝向碗内"
 	)
 
 
@@ -65,8 +69,8 @@ func _test_slope_acceleration() -> void:
 	body.add_child(collision)
 	root.add_child(body)
 	body.global_position = Vector3(
-		0.0,
-		arena_map.get_height_at(Vector3.ZERO) + 0.35,
+		3.0,
+		arena_map.get_height_at(Vector3(3, 0, 0)) + 0.35,
 		0.0
 	)
 
@@ -74,8 +78,8 @@ func _test_slope_acceleration() -> void:
 		await physics_frame
 
 	_expect(
-		body.global_position.z > 0.15,
-		"刚体必须在重力作用下沿实际坡面向南加速"
+		body.global_position.x < 2.85,
+		"刚体必须在重力作用下沿实际坡面向碗内加速"
 	)
 	_expect(
 		Vector2(body.linear_velocity.x, body.linear_velocity.z).length() > 0.1,
@@ -118,14 +122,12 @@ func _test_composite_visual_regions() -> void:
 			"每个地形顶点必须具有对应颜色"
 		)
 	var boundary := terrain.get_node_or_null("Boundary")
-	_expect(boundary != null and boundary.get_child_count() > 0, "地形必须生成护圈")
-	if boundary != null and boundary.get_child_count() > 0:
-		var wall_position: Vector3 = boundary.get_child(0).position
-		var wall_radius := Vector2(wall_position.x, wall_position.z).length()
-		_expect(
-			is_equal_approx(wall_radius, arena_map.wall_radius + 0.12),
-			"护圈几何必须使用规则层 wall_radius"
-		)
+	_expect(boundary != null and boundary.get_child_count() == 0, "v6 地形不能保留旧式隐形高墙")
+	var rim_start := arena_map.get_height_at(Vector3(arena_map.wall_radius, 0, 0))
+	var rim_peak := arena_map.get_height_at(Vector3(arena_map.wall_radius+0.12, 0, 0))
+	var rim_end := arena_map.get_height_at(Vector3(arena_map.wall_radius+0.24, 0, 0))
+	_expect(rim_peak > rim_start and is_equal_approx(rim_end, rim_start),
+		"护圈必须由共享高度函数中的连续圆顶低边沿表达")
 	terrain.free()
 	await process_frame
 

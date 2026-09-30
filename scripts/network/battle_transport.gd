@@ -11,11 +11,11 @@ func connect_to_room(url: String, ticket: Dictionary = {}) -> void:
 	push_error("BattleTransport.connect_to_room must be overridden")
 
 
-func disconnect() -> void:
-	push_error("BattleTransport.disconnect must be overridden")
+func close_connection() -> void:
+	push_error("BattleTransport.close_connection must be overridden")
 
 
-func is_connected() -> bool:
+func is_room_connected() -> bool:
 	return false
 
 

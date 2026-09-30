@@ -1,0 +1,72 @@
+00:01.860  blend            | Read blend: "C:\Users\Admin\Downloads\战斗陀螺\tools\art_source\launcher.blend"
+Info: Saved as "launcher_modular.blend"
+INFO Draco is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_draco_bridge.dll
+INFO MeshOptimizer is available, use library at C:\Program Files\Blender Foundation\Blender 5.2\5.2\scripts\addons_core\io_scene_gltf2\bf_intern_meshopt_bridge.dll
+10:51:59 | INFO: Starting glTF 2.0 export
+10:51:59 | INFO: Extracting primitive: Coupling machined shoulder.001
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cube.142
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Underside drive housing.001
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cylinder.042
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cylinder.041
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Text.002
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cube.092
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Smoke polycarbonate inspection lid.001
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Text.003
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Tapered grip chassis.001
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Rubber palm insert.001
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cube.105
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Ivory grip rail.002
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cylinder.037
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cylinder.035
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Lower gearbox pan.001
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cobalt nose armour.001
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Ivory upper shell.001
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cube.132
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cube.131
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cube.137
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cube.141
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cube.139
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cube.158
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cube.157
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Cube.159
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Output crown / 24 teeth hub.001
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Output crown / 24 teeth.001
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Extracting primitive: Inner mechanical tray.001
+10:51:59 | INFO: Primitives created: 1
+10:51:59 | INFO: Finished glTF 2.0 export in 0.12004590034484863 s
+00:12.797  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-modules\assembled-blue.png'
+00:22.422  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-modules\assembled-red.png'
+00:41.438  render           | Saved: 'C:\Users\Admin\Downloads\战斗陀螺\docs\assets\launcher-modules\exploded.png'
+
+MODULES_READY {"modules": [["housing", 22], ["cover", 24], ["grip", 32], ["pull_handle", 9], ["rack", 51], ["transmission", 32], ["coupler", 18], ["release", 5]], "runtime": {"meshCount": 29, "triangles": 27560, "bytes": 779372, "moduleRoots": 8}}
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

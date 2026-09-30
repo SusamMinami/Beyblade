@@ -1,0 +1,416 @@
+{
+  "capturedAt": "2026-09-30T13:53:31.901Z",
+  "base": "http://127.0.0.1:5173",
+  "viewport": {
+    "width": 540,
+    "height": 960,
+    "deviceScaleFactor": 2
+  },
+  "source": "Current local Web prototype; actual UI and renderer",
+  "isolation": "Disposable browser context; tutorial completed, canonical starter equipment, 1000 local fixture coins; no user save access",
+  "captures": [
+    {
+      "file": "raw/02-assembly-overview.png",
+      "description": "Current three-loadout assembly overview; canonical starter parts",
+      "route": "#assembly",
+      "screen": "assembly",
+      "mode": "top",
+      "arena": "metal",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      }
+    },
+    {
+      "file": "raw/02-assembly.png",
+      "description": "Attack ring selected through real model hit testing; three real variants visible",
+      "route": "#assembly",
+      "screen": "assembly",
+      "mode": "top",
+      "arena": "metal",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      }
+    },
+    {
+      "file": "raw/02-diy.png",
+      "description": "Current equipped attack ring in the actual DIY editor",
+      "route": "#assembly",
+      "screen": "assembly",
+      "mode": "top",
+      "arena": "metal",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      }
+    },
+    {
+      "file": "raw/03-launcher.png",
+      "description": "Actual exploded launcher with three canonical performance slots",
+      "route": "#assembly",
+      "screen": "assembly",
+      "mode": "outfit",
+      "arena": "metal",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      }
+    },
+    {
+      "file": "raw/03-launcher-red.png",
+      "description": "Built-in free red/black color preset, unsaved draft",
+      "route": "#assembly",
+      "screen": "assembly",
+      "mode": "outfit",
+      "arena": "metal",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      }
+    },
+    {
+      "file": "raw/04-maintenance.png",
+      "description": "Real pointer stroke on the transmission; rendered oil film and current effect readings",
+      "route": "#assembly",
+      "screen": "assembly",
+      "mode": "launcher",
+      "arena": "metal",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      }
+    },
+    {
+      "file": "raw/04-maintenance-trial.png",
+      "description": "Actual fixed-input comparison after the oil stroke",
+      "route": "#assembly",
+      "screen": "assembly",
+      "mode": "launcher",
+      "arena": "metal",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      }
+    },
+    {
+      "file": "raw/05-journey.png",
+      "description": "First authored story mission, actual dialogue, opponent and street map",
+      "route": "#journey",
+      "screen": "map",
+      "mode": "launcher",
+      "arena": "street",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      }
+    },
+    {
+      "file": "raw/05-journey-story.png",
+      "description": "Expanded first mission dialogue and actual goal",
+      "route": "#journey",
+      "screen": "map",
+      "mode": "launcher",
+      "arena": "street",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      }
+    },
+    {
+      "file": "raw/05-worlds.png",
+      "description": "Five real arena choices, championship preview",
+      "route": "#map",
+      "screen": "map",
+      "mode": "launcher",
+      "arena": "metal",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      }
+    },
+    {
+      "file": "raw/01-launch.png",
+      "description": "Actual launch preparation and current mechanical launcher",
+      "route": "#battle",
+      "screen": "battle",
+      "mode": "launcher",
+      "arena": "metal",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      },
+      "battleTime": 0
+    },
+    {
+      "file": "raw/01-battle.png",
+      "description": "Natural solver collision; animation clock frozen 65 ms after contact, with no changes to physics, geometry or effects",
+      "route": "#battle",
+      "screen": "battle",
+      "mode": "launcher",
+      "arena": "metal",
+      "loadout": {
+        "id": "loadout-1",
+        "name": "主力",
+        "build": {
+          "attackRing": "attack_ring.balance_six",
+          "coreLock": "core_lock.standard",
+          "weightDisc": "weight_disc.standard",
+          "driverShaft": "driver_shaft.standard",
+          "tip": "tip.rubber_balance"
+        },
+        "colors": {
+          "ring": "#27c9b3",
+          "core": "#efbd3c"
+        },
+        "customizations": {}
+      },
+      "battleTime": 0.7166666666666666,
+      "impact": {
+        "type": "collision",
+        "impulse": 6.861326309690275,
+        "intensity": 0.9801894728128965,
+        "position": {
+          "x": -0.23559840270689641,
+          "y": -0.17736890775406933
+        },
+        "telemetry": {
+          "time": 0.658333,
+          "impulse": 6.861326,
+          "intensity": 0.980189,
+          "position": {
+            "x": -0.235598,
+            "y": -0.177369
+          },
+          "player": {
+            "tiltBefore": 0.055628,
+            "tiltAfter": 0.131778,
+            "tiltDelta": 0.07615,
+            "spinBefore": 53.018854,
+            "spinAfter": 50.612827,
+            "spinDelta": -2.406027,
+            "imbalanceBefore": 0,
+            "imbalanceAfter": 0.5,
+            "imbalanceDelta": 0.5,
+            "durabilityBefore": 101,
+            "durabilityAfter": 99.706586,
+            "damage": 1.293414,
+            "impactLoad": 9.978738,
+            "structuralImbalanceBefore": 0,
+            "structuralImbalanceAfter": 0.02279,
+            "inertiaBefore": 0.89,
+            "inertiaAfter": 0.89,
+            "parts": [
+              {
+                "slot": "attackRing",
+                "sector": 3,
+                "dose": 0.2660996745633745
+              },
+              {
+                "slot": "coreLock",
+                "sector": 3,
+                "dose": 0.05585555919198427
+              },
+              {
+                "slot": "weightDisc",
+                "sector": 3,
+                "dose": 0.0642570236871785
+              },
+              {
+                "slot": "driverShaft",
+                "sector": 3,
+                "dose": 0.038669233286758344
+              },
+              {
+                "slot": "tip",
+                "sector": 3,
+                "dose": 0.01925311908639964
+              }
+            ]
+          },
+          "enemy": {
+            "tiltBefore": 0.044288,
+            "tiltAfter": 0.116793,
+            "tiltDelta": 0.072505,
+            "spinBefore": 50.731774,
+            "spinAfter": 48.558873,
+            "spinDelta": -2.172901,
+            "imbalanceBefore": 0,
+            "imbalanceAfter": 0.5,
+            "imbalanceDelta": 0.5,
+            "durabilityBefore": 101.95,
+            "durabilityAfter": 100.993726,
+            "damage": 0.956274,
+            "impactLoad": 7.696778,
+            "structuralImbalanceBefore": 0,
+            "structuralImbalanceAfter": 0.013079,
+            "inertiaBefore": 0.986587,
+            "inertiaAfter": 0.986587,
+            "parts": [
+              {
+                "slot": "attackRing",
+                "sector": 5,
+                "dose": 0.18658856673048457
+              },
+              {
+                "slot": "coreLock",
+                "sector": 5,
+                "dose": 0.04279873475786503
+              },
+              {
+                "slot": "weightDisc",
+                "sector": 5,
+                "dose": 0.05192271127767949
+              },
+              {
+                "slot": "driverShaft",
+                "sector": 5,
+                "dose": 0.03220640575424626
+              },
+              {
+                "slot": "tip",
+                "sector": 5,
+                "dose": 0.01346755830580105
+              }
+            ]
+          },
+          "tangentImpulse": -1.3659183143256661,
+          "contactSlip": 65.22177224196169
+        }
+      }
+    }
+  ],
+  "errors": []
+}

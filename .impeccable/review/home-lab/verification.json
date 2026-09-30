@@ -1,0 +1,41 @@
+{
+  "checks": [
+    "Second chapter uses existing 120 XP floor and upgrades both scenes",
+    "Migration and repeated saves cannot farm XP or duplicate ownership",
+    "High XP saves keep their experience",
+    "Malformed out-of-order campaign cannot unlock rooms",
+    "Home resumes the correct phase",
+    "Story synchronization preserves manual scene choices",
+    "Empty save retains original tutorial opening",
+    "Returning player opens existing holographic home",
+    "Locked stage preview does not unlock, equip or award XP",
+    "Discard restores the original top assembly in place",
+    "Legacy story save upgrades automatically on load",
+    "Maintenance borrows exact room, renderer and cached assets with test overlays hidden",
+    "Mobile save is visible and reachable without scrolling",
+    "Switching maintenance modes preserves the launcher world scale",
+    "Saving stays in unified assembly",
+    "Manual room and opening choices survive reload without losing XP",
+    "Follow-story control restores upgraded opening",
+    "Shared lab resources stay stable through repeated rapid navigation",
+    "Canvas and specimen return to their active owner",
+    "Failed save leaves progression in memory unchanged",
+    "Explicit assembly deep link still resumes modification",
+    "No browser or shader errors: "
+  ],
+  "memory": [
+    {
+      "geometries": 137,
+      "textures": 5
+    },
+    {
+      "geometries": 137,
+      "textures": 5
+    },
+    {
+      "geometries": 137,
+      "textures": 5
+    }
+  ],
+  "errors": []
+}

@@ -4,7 +4,7 @@ import { resolve } from "node:path";
 
 // Test-only instrumentation; no timing hooks or app API are shipped.
 const label = process.argv[2] ?? "current";
-const out = resolve("../.impeccable/review/gpu-preparation");
+const out = resolve(process.env.QA_OUTPUT_DIR ?? "../.impeccable/review/gpu-preparation");
 await mkdir(out, { recursive: true });
 const browser = await chromium.launch({
   executablePath: process.env.CHROME_PATH ?? "C:/Program Files/Google/Chrome/Application/chrome.exe",

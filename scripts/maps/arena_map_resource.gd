@@ -1,6 +1,11 @@
 class_name ArenaMapResource
 extends Resource
 
+const V6 = preload("res://scripts/battle/v6_data.gd")
+var shared_v6 := false
+var boundary := "round"
+var blockers: Array = []
+
 @export var map_id: StringName = &"standard"
 @export var map_name: String = ""
 @export var scene_path: String = ""
@@ -38,6 +43,8 @@ func get_surface_at_radius(radius: float) -> TerrainSurfaceResource:
 
 
 func get_height_at(local_position: Vector3) -> float:
+	if shared_v6:
+		return V6.height_xy(get_v6_record(),float(local_position.x),float(local_position.z))
 	var radial_distance := Vector2(local_position.x, local_position.z).length()
 	var radial_ratio := clampf(
 		radial_distance / maxf(terrain_radius, 0.001),
@@ -58,6 +65,9 @@ func get_height_at(local_position: Vector3) -> float:
 
 
 func get_surface_normal_at(local_position: Vector3) -> Vector3:
+	if shared_v6:
+		var normal = V6.sample(get_v6_record(),V6.vec(local_position.x,local_position.z)).normal
+		return Vector3(normal.x,normal.y,normal.z)
 	var sample_step := 0.02
 	var height_x_minus := get_height_at(
 		local_position - Vector3(sample_step, 0.0, 0.0)
@@ -77,6 +87,27 @@ func get_surface_normal_at(local_position: Vector3) -> Vector3:
 
 
 func get_max_incline_degrees() -> float:
+	if shared_v6:
+		var maximum := 0.0
+		for i in 120:
+			var contact = V6.sample(get_v6_record(),V6.vec((wall_radius+.24)*i/119.0,0))
+			maximum = maxf(maximum,rad_to_deg(atan(V6.length(contact.gradient))))
+		return maximum
 	var bowl_edge_gradient := bowl_depth * bowl_curve / maxf(terrain_radius, 0.001)
 	var directional_gradient := absf(tan(deg_to_rad(directional_slope_degrees)))
 	return rad_to_deg(atan(bowl_edge_gradient + directional_gradient))
+
+
+func get_v6_record() -> Dictionary:
+	return V6.catalog().arenas[str(map_id)]
+
+
+func configure_v6() -> void:
+	var data = get_v6_record()
+	shared_v6 = true
+	wall_radius = data.wallRadius
+	ring_out_radius = data.ringOutRadius
+	bowl_force = data.bowlForce
+	boundary = data.get("boundary","round")
+	terrain_radius = wall_radius+(0 if boundary=="square" else .24)
+	blockers = data.get("blockers",[])

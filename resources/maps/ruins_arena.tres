@@ -1,0 +1,12 @@
+[gd_resource type="Resource" script_class="ArenaMapResource" load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/maps/arena_map_resource.gd" id="1"]
+[ext_resource type="Resource" path="res://resources/terrain_surfaces/standard_surface.tres" id="2"]
+
+[resource]
+script = ExtResource("1")
+map_id = &"ruins"
+map_name = "浮空古代遗迹"
+scene_path = "res://scenes/battle/BattleScreen.tscn"
+default_surface = ExtResource("2")
+description = "开放边缘的方形石台与四座实体石墩。绕开障碍争夺驱动区，失去地面支撑后会坠落出界。"

@@ -56,12 +56,69 @@ def championship():
     amber = mat("Championship amber status", (.98, .45, .08), .2, .34, 1.3)
     display = mat("Championship display ink", (.016, .038, .058), .35, .22)
     ice = mat("Championship ice lettering", (.37, .69, .78), .25, .28, .8)
+    etch = mat("Championship etched markers", (.035, .24, .30), .3, .45, .35)
     world.bowl(6.9, 0)
     bpy.data.objects["Combat dish"].data.materials[0] = titanium
+    # Guard saddles sit on the existing clips, outside the 6.9 combat radius.
+    # Keep the clear panels open; fine segmentation is shaded at runtime.
+    for i in range(12):
+        a = i * math.tau / 12
+        radial = lambda r, y: (r*math.cos(a), y, r*math.sin(a))
+        for name, r, y, size, material, bevel in [
+            ("Guard gasket", 7.075, .64, (.07, .55, .13), rubber, .012),
+            ("Guard clamp spine", 7.14, .66, (.10, .52, .09), silver, .015),
+            ("Guard clamp cap", 7.10, .94, (.24, .055, .24), silver, .014),
+            ("Rim service housing", 7.53, -.27, (.63, .44, .70), dark, .045),
+            ("Service housing reveal", 7.86, -.27, (.04, .28, .51), panel, .018),
+            ("Service status lens", 7.886, -.20, (.017, .06, .30), cyan, .006),
+            ("Support footing", 7.93, -.83, (.72, .16, .67), dark, .04),
+        ]:
+            o = box(name, radial(r,y), size, material, bevel)
+            o.rotation_euler.z = -a
+        for tangent in [-.075, .075]:
+            x, y, z = radial(7.10, .976)
+            cyl("Clamp captive screw", (x-math.sin(a)*tangent,y,z+math.cos(a)*tangent),
+                .024,.02,dark,6)
+        for tangent in [-.26,.26]:
+            x0,y0,z0 = radial(7.49,-.42)
+            x1,y1,z1 = radial(7.92,-.73)
+            rod("Module angled brace",
+                (x0-math.sin(a)*tangent,y0,z0+math.cos(a)*tangent),
+                (x1-math.sin(a)*tangent,y1,z1+math.cos(a)*tangent),.045,steel)
+    # Quiet calibration marks follow the authored bowl exactly. A/B/C drive
+    # zones remain the only gameplay claims; these do not add collision.
+    dish_height = lambda r: -.46+(r/6.9)**1.5*.76
+    for i in range(48):
+        a = i*math.tau/48
+        r0, r1 = (6.25,6.48) if i%4 == 0 else (6.38,6.48)
+        rod("Perimeter index",
+            (r0*math.cos(a),dish_height(r0)+.009,r0*math.sin(a)),
+            (r1*math.cos(a),dish_height(r1)+.009,r1*math.sin(a)),.008,etch)
+    for i in range(4):
+        a = i*math.tau/4
+        for offset in [0,.22,.44]:
+            for side in [-1,1]:
+                r0, r1 = 5.66+offset,5.83+offset
+                rod("Etched inward chevron",
+                    (r0*math.cos(a),dish_height(r0)+.009,r0*math.sin(a)),
+                    (r1*math.cos(a)-side*.15*math.sin(a),
+                     dish_height(math.hypot(r1,.15))+.009,
+                     r1*math.sin(a)+side*.15*math.cos(a)),.014,etch)
     cyl("Foundation", (0, -1.30, 0), 13.5, .44, dark, 128)
     ring("Rubber isolation seam", (0, -.97, 0), 7.68, 7.42, .12, rubber)
     ring("Polished outer reveal", (0, -.84, 0), 7.73, 7.68, .13, silver)
     ring("Outer equipment rail", (0, -.93, 0), 12.3, 12.18, .2, steel)
+    for i in range(32):
+        a = i*math.tau/32
+        panel_arc("Outer foundation cassette", 10.78, 12.03,
+                  a+.018,a+math.tau/32-.018,-1.065,panel)
+        # Shallow paired channels give the large foreground plinth scale.
+        for r in [11.05,11.73]:
+            panel_arc("Cassette recessed seam",r,r+.026,
+                      a+.042,a+math.tau/32-.042,-1.061,rubber)
+        if i%4 == 0:
+            panel_arc("Cassette status light",11.42,11.46,
+                      a+.068,a+.128,-1.056,ice)
     for i in range(32):
         a = i * math.tau / 32
         panel_arc("Removable deck plate", 7.82, 10.45, a+.012, a+math.tau/32-.012, -.91,

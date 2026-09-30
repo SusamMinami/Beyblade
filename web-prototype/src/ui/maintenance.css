@@ -1,0 +1,150 @@
+/* Assembly owns navigation, canvas, paper/ink palette and the three-card picker. */
+.workshop-toolbar {
+  position: absolute; z-index: 16; top: 83px; left: 16px; right: 16px;
+  display: flex; gap: 4px; align-items: center;
+  color: #12151a; font-size: 12px;
+}
+.workshop-toolbar button, .workshop-room summary {
+  padding: 8px 10px; min-height: 38px; border: 0; border-radius: 3px;
+  color: #4d555d; background: #fffdf7; cursor: pointer;
+}
+.workshop-toolbar button[aria-pressed="true"] { color: #145888; box-shadow: inset 0 -2px #238cff; }
+.workshop-toolbar button:hover, .workshop-room summary:hover { background: #e6f2f7; }
+.workshop-room { margin-left: auto; }
+.workshop-room summary { list-style-position: inside; }
+.workshop-room[open] { z-index: 18; }
+.workshop-room[open]::before {
+  content: ""; position: absolute; top: 38px; left: 0; right: 0; bottom: 0;
+  z-index: -1; background: #fffdf7;
+}
+.workshop-room[open] {
+  position: absolute; top: 0; right: 0; width: min(320px, 100%);
+  background: #fffdf7; border: 1px solid #b2bbb9; padding: 0 12px 12px;
+  box-shadow: 0 8px 20px #12151a26;
+}
+.workshop-room label { display: flex; align-items: center; gap: 8px; margin-top: 12px; }
+.workshop-room select { min-width: 0; flex: 1; padding: 8px; font: inherit; background: #fffdf7; color: #12151a; }
+.workshop-room p, #workshop-room-status { color: #4d555d; font-size: 12px; line-height: 1.6; }
+.workshop-room input { accent-color: #238cff; }
+.workshop-toolbar :focus-visible, .maintenance-view :focus-visible {
+  outline: 2px solid #145888; outline-offset: 3px;
+}
+.game-shell[data-screen="assembly"] .part-heading { top: 160px; }
+.game-shell[data-screen="assembly"] #assembly-comparison { top: 128px; }
+.game-shell[data-screen="assembly"]:not([data-workshop-mode="top"]) #assembly-comparison,
+.game-shell[data-screen="assembly"]:not([data-workshop-mode="top"]) .assembly-customizer,
+.game-shell[data-screen="assembly"]:not([data-workshop-mode="top"]) .assembly-view-tools,
+.game-shell[data-screen="assembly"]:not([data-workshop-mode="top"]) [data-panel="assembly"] > .action-row,
+.game-shell[data-screen="assembly"]:not([data-workshop-mode="top"]) .loadout-status button,
+.game-shell[data-screen="assembly"]:not([data-workshop-mode="top"]) .loadout-dots,
+.game-shell[data-screen="assembly"]:not([data-workshop-mode="top"]) .tutorial-card { display: none; }
+.game-shell[data-screen="assembly"][data-workshop-room="advanced"] .stage-vignette,
+.game-shell[data-screen="assembly"][data-workshop-room="childhood"] .stage-vignette { display: none; }
+.game-shell[data-screen="assembly"]:not([data-workshop-mode="top"]) .stage-shell::before,
+.game-shell[data-screen="assembly"]:not([data-workshop-mode="top"]) .stage-shell::after,
+.game-shell[data-screen="assembly"]:not([data-workshop-room="minimal"]) .stage-shell::before,
+.game-shell[data-screen="assembly"]:not([data-workshop-room="minimal"]) .stage-shell::after { display: none; }
+.game-shell[data-screen="assembly"]:not([data-workshop-room="minimal"]) .loadout-status > div {
+  display: inline-block; padding: 3px 16px; background: #fffdf7; border-radius: 3px;
+}
+.game-shell[data-screen="assembly"]:not([data-workshop-room="minimal"]) .loadout-status button {
+  background: #fffdf7; opacity: 1;
+}
+.game-shell[data-screen="assembly"]:not([data-workshop-room="minimal"]) .drag-hint {
+  background: #fffdf7; color: #4d555d; opacity: 1; border-radius: 3px;
+}
+.game-shell[data-diy-editing="true"] .workshop-toolbar { display: none; }
+.game-shell[data-screen="assembly"] [data-panel="assembly"] > .maintenance-view {
+  position: absolute; inset: 0; pointer-events: none;
+  color: #12151a; font: 13px/1.5 Bahnschrift, "Microsoft YaHei UI", sans-serif;
+  font-variant-numeric: tabular-nums;
+}
+.maintenance-view[hidden], .maintenance-overlays[hidden], .maintenance-view [hidden] { display: none !important; }
+.maintenance-view > * { pointer-events: auto; }
+.maintenance-view button {
+  min-height: 36px; padding: 6px 9px; border: 1px solid #b2bbb9;
+  border-radius: 3px; background: #fffdf7; color: #12151a; font: inherit;
+}
+.maintenance-view button:hover:not(:disabled):not([aria-disabled="true"]) { background: #e6f2f7; }
+.maintenance-view button:disabled, .maintenance-view button[aria-disabled="true"] { opacity: .5; cursor: default; }
+.maintenance-view button[aria-pressed="true"] { background: #238cff; color: #12151a; border-color: #12151a; }
+.maintenance-header {
+  position: absolute; top: 136px; left: 16px; right: 16px;
+  display: flex; align-items: start; justify-content: space-between; gap: 8px;
+}
+.maintenance-header h1 { font-size: 21px; margin: 0; line-height: 1.25; }
+.maintenance-header > div { padding: 6px 9px; background: #fffdf7; }
+.maintenance-header p { display: none; }
+.maintenance-header button { font-size: 11px; }
+.maintenance-focus {
+  position: absolute; top: 182px; left: 16px; right: 16px; display: flex; gap: 4px;
+}
+.maintenance-focus button { flex: 1; padding-inline: 3px; font-size: 12px; min-height: 32px; }
+.maintenance-console {
+  position: absolute; bottom: 64px; left: 16px; right: 16px;
+  max-height: 36%; overflow-y: auto; overscroll-behavior: contain;
+  padding: 10px 1px; background: #fffdf7;
+  scrollbar-width: thin; scrollbar-color: #b2bbb9 #fffdf7;
+}
+.maintenance-console > :not(.launcher-outfit) { margin-inline: 10px; }
+.launcher-slots, .launcher-parts { display: flex; gap: 7px; margin: 0 9px; }
+.launcher-slots button { flex: 1; border: 0; border-radius: 0; }
+.maintenance-view .launcher-slots button[aria-pressed="true"] { background: transparent; color: #145888; box-shadow: inset 0 -2px #238cff; }
+.launcher-parts { margin-top: 8px; padding-bottom: 4px; }
+.maintenance-view .launcher-parts button {
+  flex: 1; min-width: 0; min-height: 64px; padding: 8px 4px;
+  border: 2px solid #12151a; box-shadow: 2px 2px 0 #12151a;
+}
+.launcher-parts b, .launcher-parts span { display: block; }
+.launcher-parts b { font-size: 12px; }
+.launcher-parts span { font-size: 11px; margin-top: 4px; }
+.launcher-part-note { margin: 8px 10px; font-size: 12px; color: #4d555d; }
+.launcher-equip-row { margin: 8px 10px 0; display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+.launcher-wallet { font-size: 11px; color: #4d555d; }
+.launcher-paints { display: flex; align-items: center; gap: 8px; padding: 10px; }
+.launcher-paints label { display: flex; align-items: center; gap: 4px; flex: 1; font-size: 11px; }
+.launcher-paints input { width: 26px; height: 28px; border: 1px solid #b2bbb9; padding: 0; background: transparent; }
+.launcher-paints button { font-size: 11px; }
+.maintenance-tools { display: flex; gap: 4px; }
+.maintenance-tools button { flex: 1; padding-inline: 4px; font-size: 12px; }
+.maintenance-dose { display: flex; gap: 12px; align-items: center; padding-top: 10px; }
+.maintenance-dose input { flex: 1; min-width: 0; accent-color: #238cff; }
+.maintenance-dose output { min-width: 28px; }
+.maintenance-feedback { min-height: 18px; color: #145888; margin-block: 8px; font-size: 12px; }
+.maintenance-readings { display: flex; gap: 10px; border-block: 1px solid #b2bbb9; padding: 8px 0; }
+.maintenance-readings span { flex: 1; font-size: 11px; color: #4d555d; }
+.maintenance-readings b { display: block; font-size: 18px; color: #12151a; font-weight: 600; }
+.maintenance-test-row { display: flex; gap: 10px; align-items: center; margin-top: 10px; }
+.maintenance-test-row p { font-size: 10px; color: #4d555d; margin: 0; }
+.maintenance-test-row button { white-space: nowrap; }
+.maintenance-help { font-size: 11px; color: #4d555d; margin-top: 10px; }
+.maintenance-help summary { cursor: pointer; min-height: 32px; padding-block: 8px; }
+.maintenance-trial table { width: 100%; border-collapse: collapse; font-size: 12px; }
+.maintenance-trial caption { padding-top: 8px; text-align: left; color: #4d555d; }
+.maintenance-trial th, .maintenance-trial td { border-bottom: 1px solid #b2bbb9; text-align: right; padding: 4px 0; font-weight: 400; }
+.maintenance-trial th:first-child { text-align: left; }
+.maintenance-footer {
+  position: absolute; bottom: 12px; left: 16px; right: 16px;
+  display: flex; gap: 10px; align-items: center; justify-content: space-between;
+  background: #fffdf7; padding: 4px 8px;
+}
+.maintenance-draft { color: #4d555d; font-size: 11px; }
+.maintenance-view .maintenance-save { background: #238cff; color: #12151a; border: 2px solid #12151a; min-width: 100px; }
+.maintenance-overlays { position: absolute; inset: 0; pointer-events: none; }
+.maintenance-loading { position: absolute; top: 34%; left: 16px; right: 16px; padding: 12px; text-align: center; background: #fffdf7; color: #12151a; }
+.maintenance-retry { position: absolute; top: 45%; left: 25%; width: 50%; min-height: 40px; pointer-events: auto; color: #12151a; background: #fffdf7; }
+.maintenance-cross { display: none; position: absolute; width: 18px; height: 18px; border: 1px solid #145888; border-radius: 50%; }
+#three-stage:has(canvas:focus-visible) .maintenance-cross { display: block; }
+#three-stage canvas:focus-visible { outline: 2px solid #145888; outline-offset: -3px; }
+@media (max-height: 740px) {
+  .game-shell[data-screen="assembly"]:not([data-workshop-mode="top"]) .loadout-status { display: none; }
+  .game-shell[data-screen="assembly"]:not([data-workshop-mode="top"]) .workshop-toolbar { top: 12px; }
+  .maintenance-header { top: 58px; }
+  .maintenance-focus { top: 104px; }
+  .maintenance-console { max-height: 32%; }
+}
+@media (max-width: 360px) {
+  .workshop-toolbar { left: 10px; right: 10px; }
+  .workshop-toolbar button, .workshop-room summary { padding-inline: 7px; }
+  .launcher-paints { gap: 4px; }
+}

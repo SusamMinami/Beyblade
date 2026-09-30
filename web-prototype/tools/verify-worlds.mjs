@@ -21,7 +21,9 @@ check(sim.phase==="running","Square corners are playable, not circular ring-outs
 sim.player.position={x:ARENAS.ruins.wallRadius+.02,y:0};
 sim.player.velocity={x:3,y:0};
 sim.step(1/60,{x:0,y:0},{x:0,y:0});
-check(sim.player.velocity.x<0,"Square balustrade rebounds outward movement");
+check(sim.player.velocity.x>0 && sim.player.edge.falling &&
+  sim.player.controlInfluence===0,"Open square edge loses support without an invisible rebound");
+sim.launch({power:.86,height:.45,direction:0,angle:0});
 sim.player.position={x:2.9,y:3.30};
 sim.player.velocity={x:0,y:-5};
 sim.step(1/60,{x:0,y:0},{x:0,y:0});
@@ -41,16 +43,16 @@ const a=battle(),b=battle();
 for (const s of [a,b]) s.launch({power:.86,height:.45,direction:.3,angle:0});
 for(let i=0;i<600;i++){a.step(1/60,{x:1,y:-.4});b.step(1/60,{x:1,y:-.4});}
 check(JSON.stringify(a.player)===JSON.stringify(b.player),"New map simulation remains deterministic");
-check(normalizeLabState({settings:{room:"advanced"}}).settings.room==="childhood","Starter save cannot equip advanced room");
+check(normalizeLabState({settings:{room:"advanced"}}).settings.room==="minimal","Starter save cannot equip advanced room");
 check(normalizeLabState({xp:120,settings:{room:"advanced"}}).settings.room==="advanced","Earned LV2 restores advanced room");
 
-const out=resolve("../.impeccable/review/worlds");
+const out=resolve(process.env.QA_OUTPUT_DIR ?? "../.impeccable/review/worlds");
 await mkdir(out,{recursive:true});
 const browser=await chromium.launch({executablePath:process.env.CHROME_PATH??"C:/Program Files/Google/Chrome/Application/chrome.exe",headless:true});
 const context=await browser.newContext({viewport:{width:1440,height:1000}});
 const key="spin-core-web-prototype-v2";
 await context.addInitScript(key=>{
-  if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify({version:2,tutorial:{completed:true,stage:"complete"},lab:{xp:120}}));
+  if(!localStorage.getItem(key))localStorage.setItem(key,JSON.stringify({version:2,tutorial:{completed:true,stage:"complete"},lab:{xp:120,settings:{room:"childhood",followStory:false}}}));
 },key);
 const page=await context.newPage();
 const errors=[];
@@ -87,7 +89,7 @@ try {
   await page.setViewportSize({width:1440,height:1000});
   await page.locator('[data-collection="lab"]').click();
   await page.waitForFunction(()=>!document.querySelector(".lab-start")?.disabled);
-  check(await page.locator('.lab-view[data-room="childhood"]').count()===1,"Childhood desk is default");
+  check(await page.locator('.lab-view[data-room="childhood"]').count()===1,"Selected childhood desk is restored");
   await screenshot("childhood-desktop");
   await page.setViewportSize({width:390,height:844});
   await screenshot("childhood-mobile");

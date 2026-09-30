@@ -1,0 +1,363 @@
+{
+  "metrics": [
+    {
+      "id": "metal",
+      "period": "night",
+      "render": {
+        "frame": 498,
+        "calls": 167,
+        "triangles": 761148,
+        "points": 0,
+        "lines": 211
+      },
+      "materials": [
+        {
+          "name": "Acrylic guard",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.14000000059604645,
+          "metalness": 0.10000000149011612,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Arena satin titanium",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.3400000035762787,
+          "metalness": 0.8199999928474426,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "arena",
+              "scale": 0.6
+            }
+          },
+          "env": 0.8
+        },
+        {
+          "name": "Brushed aluminium",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.30000001192092896,
+          "metalness": 0.800000011920929,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Championship amber status",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.3400000035762787,
+          "metalness": 0.20000000298023224,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Championship display ink",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.2199999988079071,
+          "metalness": 0.3499999940395355,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Championship ice lettering",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.2800000011920929,
+          "metalness": 0.25,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Deck graphite enamel",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.3199999928474426,
+          "metalness": 0.5600000023841858,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.6
+            }
+          },
+          "env": 0.8
+        },
+        {
+          "name": "Edge polished aluminium",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.23000000417232513,
+          "metalness": 0.8999999761581421,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.6
+            }
+          },
+          "env": 0.8
+        },
+        {
+          "name": "Energy_cyan",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.2800000011920929,
+          "metalness": 0.20000000298023224,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Graphite",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.3799999952316284,
+          "metalness": 0.6499999761581421,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Isolator rubber",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8299999833106995,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Surface hairlines",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.949999988079071,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        }
+      ]
+    },
+    {
+      "id": "metal",
+      "period": "day",
+      "render": {
+        "frame": 1175,
+        "calls": 159,
+        "triangles": 760732,
+        "points": 0,
+        "lines": 211
+      },
+      "materials": [
+        {
+          "name": "Acrylic guard",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.14000000059604645,
+          "metalness": 0.10000000149011612,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Arena satin titanium",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.3400000035762787,
+          "metalness": 0.8199999928474426,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "arena",
+              "scale": 0.6
+            }
+          },
+          "env": 0.8
+        },
+        {
+          "name": "Brushed aluminium",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.30000001192092896,
+          "metalness": 0.800000011920929,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Championship amber status",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.3400000035762787,
+          "metalness": 0.20000000298023224,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Championship display ink",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.2199999988079071,
+          "metalness": 0.3499999940395355,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Championship ice lettering",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.2800000011920929,
+          "metalness": 0.25,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Deck graphite enamel",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.3199999928474426,
+          "metalness": 0.5600000023841858,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.6
+            }
+          },
+          "env": 0.8
+        },
+        {
+          "name": "Edge polished aluminium",
+          "type": "MeshPhysicalMaterial",
+          "roughness": 0.23000000417232513,
+          "metalness": 0.8999999761581421,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.6
+            }
+          },
+          "env": 0.8
+        },
+        {
+          "name": "Energy_cyan",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.2800000011920929,
+          "metalness": 0.20000000298023224,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Graphite",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.3799999952316284,
+          "metalness": 0.6499999761581421,
+          "finish": {
+            "surfaceFinish": {
+              "finish": "machined",
+              "scale": 0.32
+            }
+          },
+          "env": 0.6
+        },
+        {
+          "name": "Isolator rubber",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.8299999833106995,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "Surface hairlines",
+          "type": "MeshStandardMaterial",
+          "roughness": 0.949999988079071,
+          "metalness": 0,
+          "finish": {},
+          "env": 0.6
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        },
+        {
+          "name": "",
+          "type": "MeshBasicMaterial",
+          "finish": {}
+        }
+      ]
+    }
+  ],
+  "errors": []
+}

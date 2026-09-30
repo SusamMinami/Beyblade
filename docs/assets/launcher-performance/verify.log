@@ -1,0 +1,136 @@
+00:01.328  blend            | Read blend: "C:\Users\Admin\Downloads\战斗陀螺\tools\art_source\launcher_performance.blend"
+03:42:37 | INFO: Data are loaded, start creating Blender stuff
+03:42:37 | INFO: Blender create Mesh node Cube.247
+03:42:37 | INFO: Blender create Mesh node Cube.249
+03:42:37 | INFO: Blender create Mesh node Cube.248
+03:42:37 | INFO: Blender create Mesh node Cube.250
+03:42:37 | INFO: Blender create Mesh node Cylinder.121
+03:42:37 | INFO: Blender create Mesh node Cube.255
+03:42:37 | INFO: glTF import finished in 0.01s
+03:42:37 | INFO: Data are loaded, start creating Blender stuff
+03:42:37 | INFO: Blender create Mesh node Cube.256
+03:42:37 | INFO: Blender create Mesh node Cube.265
+03:42:37 | INFO: Blender create Mesh node Cube.263
+03:42:37 | INFO: Blender create Mesh node Cube.282
+03:42:37 | INFO: Blender create Mesh node Cylinder.123
+03:42:37 | INFO: Blender create Mesh node Cube.287
+03:42:37 | INFO: glTF import finished in 0.01s
+03:42:37 | INFO: Data are loaded, start creating Blender stuff
+03:42:37 | INFO: Blender create Mesh node Cube.288
+03:42:37 | INFO: Blender create Mesh node Cube.289
+03:42:37 | INFO: Blender create Mesh node Cube.296
+03:42:37 | INFO: Blender create Mesh node Cube.295
+03:42:37 | INFO: Blender create Mesh node Cube.297
+03:42:37 | INFO: Blender create Mesh node Cylinder.131
+03:42:37 | INFO: Blender create Mesh node Cube.302
+03:42:37 | INFO: glTF import finished in 0.01s
+03:42:37 | INFO: Data are loaded, start creating Blender stuff
+03:42:37 | INFO: Blender create Mesh node Cylinder.133
+03:42:37 | INFO: Blender create Mesh node Cube.303
+03:42:37 | INFO: Blender create Mesh node 32T compound drive hub.001
+03:42:37 | INFO: Blender create Mesh node 32T compound drive recessed web.001
+03:42:37 | INFO: Blender create Mesh node 32T compound drive.001
+03:42:37 | INFO: Blender create Mesh node 32T output gear hub.001
+03:42:37 | INFO: Blender create Mesh node 32T output gear recessed web.001
+03:42:37 | INFO: Blender create Mesh node 32T output gear.001
+03:42:37 | INFO: Blender create Mesh node Input return ribbon spring.003
+03:42:37 | INFO: Blender create Mesh node Cylinder.142
+03:42:37 | INFO: Blender create Mesh node Bearing support tower.006
+03:42:37 | INFO: Blender create Mesh node Cylinder.144
+03:42:37 | INFO: glTF import finished in 0.04s
+03:42:37 | INFO: Data are loaded, start creating Blender stuff
+03:42:37 | INFO: Blender create Mesh node Cylinder.146
+03:42:37 | INFO: Blender create Mesh node Cube.307
+03:42:37 | INFO: Blender create Mesh node 36T common rack pinion hub.004
+03:42:37 | INFO: Blender create Mesh node 36T compound drive.001
+03:42:37 | INFO: Blender create Mesh node 28T output gear hub.001
+03:42:37 | INFO: Blender create Mesh node 28T output gear.001
+03:42:38 | INFO: Blender create Mesh node Input return ribbon spring.004
+03:42:38 | INFO: Blender create Mesh node Cylinder.155
+03:42:38 | INFO: Blender create Mesh node Bearing support tower.008
+03:42:38 | INFO: Blender create Mesh node Cylinder.157
+03:42:38 | INFO: glTF import finished in 0.05s
+03:42:38 | INFO: Data are loaded, start creating Blender stuff
+03:42:38 | INFO: Blender create Mesh node Cylinder.159
+03:42:38 | INFO: Blender create Mesh node Cube.329
+03:42:38 | INFO: Blender create Mesh node 28T compound drive hub.001
+03:42:38 | INFO: Blender create Mesh node 28T compound drive recessed web.001
+03:42:38 | INFO: Blender create Mesh node 28T compound drive.001
+03:42:38 | INFO: Blender create Mesh node 36T output gear hub.001
+03:42:38 | INFO: Blender create Mesh node 36T output gear recessed web.001
+03:42:38 | INFO: Blender create Mesh node 36T output gear.001
+03:42:38 | INFO: Blender create Mesh node Input return ribbon spring.005
+03:42:38 | INFO: Blender create Mesh node Cylinder.168
+03:42:38 | INFO: Blender create Mesh node Bearing support tower.010
+03:42:38 | INFO: Blender create Mesh node Cylinder.170
+03:42:38 | INFO: glTF import finished in 0.05s
+03:42:38 | INFO: Data are loaded, start creating Blender stuff
+03:42:38 | INFO: Blender create Mesh node Female hex drive socket.003
+03:42:38 | INFO: Blender create Mesh node Cube.336
+03:42:38 | INFO: Blender create Mesh node Coupler machined shoulder.003
+03:42:38 | INFO: Blender create Mesh node Cube.339
+03:42:38 | INFO: Blender create Mesh node Stationary alignment skirt.003
+03:42:38 | INFO: glTF import finished in 0.02s
+03:42:38 | INFO: Data are loaded, start creating Blender stuff
+03:42:38 | INFO: Blender create Mesh node Female hex drive socket.004
+03:42:38 | INFO: Blender create Mesh node Cube.363
+03:42:38 | INFO: Blender create Mesh node Coupler machined shoulder.004
+03:42:38 | INFO: Blender create Mesh node Cube.366
+03:42:38 | INFO: glTF import finished in 0.01s
+03:42:38 | INFO: Data are loaded, start creating Blender stuff
+03:42:38 | INFO: Blender create Mesh node Extended rotor guide.001
+03:42:38 | INFO: Blender create Mesh node Cube.387
+03:42:38 | INFO: Blender create Mesh node Coupler machined shoulder.005
+03:42:38 | INFO: Blender create Mesh node Cube.390
+03:42:38 | INFO: Blender create Mesh node Stationary alignment skirt.005
+03:42:38 | INFO: glTF import finished in 0.02s
+03:42:38 | INFO: Data are loaded, start creating Blender stuff
+03:42:38 | INFO: Blender create Mesh node Cylinder.011
+03:42:38 | INFO: Blender create Mesh node Cylinder.007
+03:42:38 | INFO: Blender create Mesh node Cube.075
+03:42:38 | INFO: Blender create Mesh node Cube.080
+03:42:38 | INFO: Blender create Mesh node Cube.073
+03:42:38 | INFO: Blender create Mesh node Text.006
+03:42:38 | INFO: Blender create Mesh node Cube.273
+03:42:38 | INFO: Blender create Mesh node Cube.260
+03:42:38 | INFO: Blender create Mesh node Cube.248
+03:42:38 | INFO: Blender create Mesh node Ivory grip rail.002
+03:42:38 | INFO: Blender create Mesh node Coupler chassis threaded seat.003
+03:42:38 | INFO: Blender create Mesh node Cylinder.001
+03:42:38 | INFO: Blender create Mesh node Continuous dark parting seam.001
+03:42:38 | INFO: Blender create Mesh node Cobalt nose armour.001
+03:42:38 | INFO: Blender create Mesh node Ivory upper shell.001
+03:42:38 | INFO: Blender create Mesh node Cube.275
+03:42:38 | INFO: Blender create Mesh node Cube.274
+03:42:38 | INFO: Blender create Mesh node Cube.280
+03:42:38 | INFO: Blender create Mesh node Cube.282
+03:42:38 | INFO: Blender create Mesh node Cube.283
+03:42:38 | INFO: Blender create Mesh node Cube.284
+03:42:38 | INFO: Blender create Mesh node Female hex drive socket.003
+03:42:38 | INFO: Blender create Mesh node Cube.303
+03:42:38 | INFO: Blender create Mesh node Coupler machined shoulder.003
+03:42:38 | INFO: Blender create Mesh node Cube.306
+03:42:38 | INFO: Blender create Mesh node Stationary alignment skirt.003
+03:42:38 | INFO: Blender create Mesh node Cube.287
+03:42:38 | INFO: Blender create Mesh node Cube.289
+03:42:38 | INFO: Blender create Mesh node Cube.288
+03:42:38 | INFO: Blender create Mesh node Cube.290
+03:42:38 | INFO: Blender create Mesh node Cylinder.015
+03:42:38 | INFO: Blender create Mesh node Cube.295
+03:42:38 | INFO: Blender create Mesh node Cylinder.017
+03:42:38 | INFO: Blender create Mesh node Cube.296
+03:42:38 | INFO: Blender create Mesh node 32T compound drive hub.001
+03:42:38 | INFO: Blender create Mesh node 32T compound drive recessed web.001
+03:42:38 | INFO: Blender create Mesh node 32T compound drive.001
+03:42:38 | INFO: Blender create Mesh node 32T output gear hub.001
+03:42:38 | INFO: Blender create Mesh node 32T output gear recessed web.001
+03:42:38 | INFO: Blender create Mesh node 32T output gear.001
+03:42:38 | INFO: Blender create Mesh node Input return ribbon spring.003
+03:42:38 | INFO: Blender create Mesh node Cylinder.052
+03:42:38 | INFO: Blender create Mesh node Bearing support tower.006
+03:42:38 | INFO: Blender create Mesh node Cylinder.054
+03:42:38 | INFO: glTF import finished in 0.10s
+PERFORMANCE_VALIDATION_OK {"meshes": 44, "triangles": 62748, "bytes": 1727108, "moduleRoots": 8, "animation": "Launcher_Explode", "durationSeconds": 2.4583332538604736, "animatedSlots": ["cover", "grip", "pull_handle", "release", "coupler", "rack", "transmission"], "topMountRestored": true}
+Blender 5.2.1 LTS (hash 9e2066aef7ef built 2026-08-25 02:38:20)
+
+Blender quit

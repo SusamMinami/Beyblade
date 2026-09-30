@@ -1,5 +1,6 @@
 import { ShowroomStage } from "../render/showroom-stage.js";
 import { calculateBuild, getBuildRatings } from "../core/assembly-calculator.js";
+import { measurementSummary, MEASUREMENT_CONDITIONS } from "../core/build-measurements.js";
 import { DISPLAY_STAGES, equipDisplayStage } from "../core/showroom-state.js";
 import { labLevel } from "../core/lab-state.js";
 import { getPart } from "../data/parts.js";
@@ -50,6 +51,7 @@ export class ShowroomScreen {
           <div class="collection-description"><h2></h2><p></p></div>
           <div class="collection-stats" aria-label="当前配置相对性能"></div>
           <div class="collection-metrics"></div>
+          <button class="measurement-link" data-collection="measurements">评分依据与实测条件</button>
           <button class="collection-use" disabled>使用中</button>
         </article>
         <nav class="lab-nav" aria-label="游戏导航">
@@ -70,6 +72,20 @@ export class ShowroomScreen {
       if (button.dataset.previewStage) this.preview(button.dataset.previewStage);
       if (button.dataset.equipStage) this.equip(button.dataset.equipStage);
       if (button.dataset.inspectPart) this.focusPart(button.dataset.inspectPart);
+    });
+    this.root.addEventListener("change", (event) => {
+      if (!event.target.matches("[data-follow-story]")) return;
+      const previous = this.app.state.showroom;
+      this.app.state.showroom = { ...previous, followStory: event.target.checked };
+      try { this.app._save(); }
+      catch {
+        this.app.state.showroom = previous;
+        return this.notify("舞台偏好未保存，请检查本机存储。");
+      }
+      this.previewing = null;
+      this.loadStage(this.showroom.equipped);
+      this.updateStageLabel();
+      this.showStages();
     });
     this.stage = new ShowroomStage(this.root.querySelector(".collection-scene"), app.labScreen.stage);
     this.stage.container.addEventListener("topswipe",e=>this.select(this.app.state.activeLoadoutIndex+e.detail.direction));
@@ -232,9 +248,11 @@ export class ShowroomScreen {
   }
 
   showStages() {
+    this.dialog.querySelector("h2").textContent = "展示舞台";
     const level = labLevel(this.app.state.lab.xp).level;
     this.dialog.querySelector(".lab-dialog-content").innerHTML = `
       <p>基础舞台已开放，实验室 LV.2 可免费解锁冠军舞台。舞台外观不改变战斗属性。</p>
+      <label class="lab-setting">随剧情升级舞台<input type="checkbox" data-follow-story ${this.showroom.followStory ? "checked" : ""}></label>
       ${DISPLAY_STAGES.map((stage) => {
         const owned = this.showroom.owned.includes(stage.id);
         const equipped = this.showroom.equipped === stage.id;
@@ -258,7 +276,7 @@ export class ShowroomScreen {
     const result = equipDisplayStage(this.showroom, id, this.app.state.lab.xp);
     if (!result.ok) return this.notify("先提升实验室等级，再解锁这座舞台。");
     const previous = this.showroom;
-    this.app.state.showroom = result.showroom;
+    this.app.state.showroom = { ...result.showroom, followStory: false };
     try { this.app._save(); }
     catch { this.app.state.showroom = previous; return this.notify("舞台未保存，请检查本机存储。"); }
     this.previewing = null;
@@ -277,6 +295,14 @@ export class ShowroomScreen {
   }
 
   action(action) {
+    if (action === "measurements") {
+      const build = calculateBuild(this.loadout.build, this.loadout.customizations);
+      this.dialog.querySelector("h2").textContent = "评分依据与实测条件";
+      this.dialog.querySelector(".lab-dialog-content").innerHTML =
+        `<p>${measurementSummary(build)}</p><p>${MEASUREMENT_CONDITIONS}。</p><p>攻击、稳定、控制为属性换算；评分基线不含保养。</p>`;
+      if (!this.dialog.open) this.dialog.showModal();
+      return;
+    }
     if (action === "close") return this.dialog.close();
     if (action === "inspect") return this.stage.setInspection(true);
     if (action === "inspect-back") return this.stage.setInspection(false);

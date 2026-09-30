@@ -2,6 +2,8 @@ import { PART_TYPE_META } from "../data/parts.js";
 
 // Advice uses the player's measured condition, never the loser's result metadata.
 export function battleCoach(result, player) {
+  if (result.winner === "draw") return { slot: null,
+    text: "双方未分胜负。可以保持配置重赛，用不同发射角度和路线比较反馈；本局不推进训练或任务。" };
   const damaged = [...player.structure.parts].sort((a, b) => b.worst - a.worst)[0];
   const lost = result.winner !== "player";
   if (lost && result.reason === "ring_out") {

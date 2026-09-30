@@ -6,6 +6,7 @@ var core_lock: TopPartResource
 var weight_disc: TopPartResource
 var driver_shaft: TopPartResource
 var tip: TopPartResource
+var customizations: Dictionary = {}
 
 var total_mass: float = 0.0
 var center_of_mass: Vector3 = Vector3.ZERO
