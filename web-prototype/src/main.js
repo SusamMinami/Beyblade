@@ -42,6 +42,8 @@ import { canPlayMission, nextMission, normalizeCampaign, settleMission } from ".
 import { renderCampaign } from "./ui/campaign-panel.js";
 import { opponentIdentity } from "./data/opponent-identities.js";
 import "./ui/battle-structure.css";
+import { BattleDamagePanel } from "./ui/battle-damage-panel.js";
+import "./ui/battle-damage-panel.css";
 import { battleCoach } from "./core/battle-coach.js";
 import "./ui/game-flow.css";
 import { normalizeBattleNotes, trainingCue } from "./core/growth-state.js";
@@ -208,6 +210,7 @@ class BeybladeApp {
     };
 
     this._mount();
+    this.damagePanel = new BattleDamagePanel(this.root.querySelector("#battle-damage-panel"));
     this.stage = new ThreeStage(this.root.querySelector("#three-stage"));
     this.stage.setSceneTime(this.state.sceneTime);
     this.root.querySelector("#scene-time").value = this.state.sceneTime;
@@ -303,6 +306,7 @@ class BeybladeApp {
             <strong id="stage-title">五层结构实验</strong>
           </div>
           <div class="drive-zone-hud" id="drive-zone-hud"></div>
+          <aside class="battle-damage-panel" id="battle-damage-panel" aria-label="实时部件结构状态" hidden></aside>
 
           <div class="launch-controls is-hidden" id="launch-controls">
             <p class="campaign-brief is-hidden" id="campaign-brief"></p>
@@ -2047,6 +2051,7 @@ class BeybladeApp {
   _handleResult() {
     if (this.resultHandled || !this.simulation.result) return;
     this.resultHandled = true;
+    this.damagePanel.update(this.simulation, false);
     const { winner, reason, time } = this.simulation.result;
     const won = winner === "player";
     const draw = winner === "draw";
@@ -2217,6 +2222,7 @@ class BeybladeApp {
   }
 
   _updateHud() {
+    this.damagePanel.update(this.simulation, this.screen === "battle");
     if (!this.simulation) return;
     const { player, enemy, time } = this.simulation;
     if (!this.state.tutorial.completed && this.screen === "battle" && this.simulation.phase === "running") {
@@ -2272,6 +2278,15 @@ class BeybladeApp {
         `${clamp(screenPosition.y - 54, 104, screenPosition.height - 154)}px`;
       this.root.querySelector("#top-influence-value").textContent =
         `${influence}%`;
+      const panel = this.damagePanel.root;
+      if (!panel.hidden && panel.querySelector("details").open) {
+        const badge = influenceBadge.getBoundingClientRect();
+        const bounds = panel.getBoundingClientRect();
+        if (badge.right > bounds.left && badge.left < bounds.right &&
+            badge.bottom > bounds.top && badge.top < bounds.bottom) {
+          influenceBadge.classList.add("is-hidden");
+        }
+      }
     }
     const spinRatio = player.spin / Math.max(player.build.maxSpinSpeed, 0.001);
     this.root.querySelector("#control-state").textContent =

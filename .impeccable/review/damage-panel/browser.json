@@ -1,0 +1,11 @@
+{
+  "checks": 44,
+  "errors": [],
+  "fixture": {
+    "pristine": "100%",
+    "unchanged": true,
+    "expectedHealth": 72,
+    "expectedWorst": 100,
+    "massLost": true
+  }
+}

@@ -67,3 +67,68 @@ FINISH：unreviewed and undocumented is unfinished; this build ends with the fin
 - 新战斗 UI 检查 20 项通过；普通终结停留实测约 859ms，减少动态为 0ms。
   独立通用子代理复核八张截图：**SHIP（静态范围）**，没有实质视觉修复项。
   证据与范围见 [最终验收记录](../.impeccable/review/structure/verification.md)。
+
+## 部件状态面板与模型破碎边界（2026-10-28）
+
+### 本轮已实现（Web）
+
+战斗中右上为可折叠的部件状态面板。按核心锁扣、攻击环、配重盘、中轴、轴尖的实际分层
+绘制八方向环形读图；可切换自己／对手、点击部件查看真实配置名。数字“平均完整”来自
+`health`，最重局部损伤来自 `sectors` 最大值，二者不混用。颜色仅是展示分档：0 完好、
+0–25% 轻损、25–55% 受损、超过 55% 重损、85% 起临界；不增加求解器失败阈值。
+
+八格为部件本体方向，顶端 1 号、顺时针，不随旋转相位／赛场镜头转动。显示已有
+`lostMass` 的“等效掉块”和全机 `imbalance`，不把转速减少当作零件损伤。供能不修复，
+新局重置；发射准备、退出及结算隐藏，暂停仍能看到当前状态（操作沿用原生暂停对话框）。
+面板不写库存、存档、战斗求解器或网络协议；无新模型下载、渲染循环或 Three 场景。
+
+实现：[面板组件](../web-prototype/src/ui/battle-damage-panel.js)、
+[样式](../web-prototype/src/ui/battle-damage-panel.css) 和既有主入口接线。
+验证入口 `npm run verify:damage-panel`；包含桌面、手机、短屏、125% DPI、真实定向损伤、
+双方隔离、重开及显示生命周期。截图属于本次检查，不是生产图片资产。
+
+### 现有模型是否能破碎
+
+- Web 的陀螺不是场景／发射器 GLB，而是
+  [top-model.js](../web-prototype/src/render/top-model.js) 生成的程序化几何。
+- 五个 `partGroups[slot]` 已独立，能整件展开、脱开或做爆炸结构；同一部件内部按材质合并。
+- `applyTopDamage` 只按八扇区对顶点做压瘪、下陷、变色和粗糙化。没有删去破损区的三角面、
+  封闭断面、碎片网格或飞散轨迹。数值层 `lostMass` 已存在，**不等于模型真的少了一块**。
+- 因而支持“整部件解体”和现有形变，但**不直接支持具有切口、断面和对应碎片的真实网格破碎**。
+  本轮没有重做陀螺资产，也没有把这些未实现项标为完成。
+
+### 建议的下一步（未实现）
+
+1. 先做程序化外环的有限碎块：按八扇区预制少量封闭碎块和断面，沿用实际配置／DIY 缩放，
+   不能随机甩一堆与缺口无关的通用石头。阈值穿越时从部件去掉对应区域，并在同一位置发出碎块。
+2. 依托现有 `lostMass` 阶段分级推进，而不是一受伤就整格消失；新局恢复完整几何，状态回退时可重建。
+   锁扣／中轴结构失效再触发整部件脱开，普通擦地停转不能假装爆炸解体。
+3. 碎块先是有预算的纯视觉对象（池化、寿命、暂停、减少动态、换场清理），不加入碰撞求解器。
+   飞散方向来自接触方向及本体相位；保持现有确定性模拟、质量和角动量口径，不能另扣一次质量。
+4. 高质量断口再用 Blender 制作：以现有五件、DIY 范围与八方向约定为输入，制作封闭碎块、内断面
+   材质、枢轴和 slot/sector 元数据；GLB 导出不得把全部碎块按材质合成一个不可分离网格。
+   需要覆盖三种外环、极限 DIY、模型／数值方向对齐、资源回收和破碎前后对照。
+
+Blender **不是第一版反馈面板或程序化破损的必需依赖**；当需要可信的断面、材质和不规则碎块时有价值。
+MCP 是制作／检查工具，不会自动建立上述游戏运行时映射。
+
+### 本机 Blender MCP（2026-10-28 核实）
+
+官方来源：[Blender Lab MCP](https://www.blender.org/lab/mcp-server/)、
+[1.0.3 发布 API](https://projects.blender.org/api/v1/repos/lab/blender_mcp/releases/tags/v1.0.3)。
+本机已有 Blender 5.2 和官方 MCP add-on 1.0.3；本轮未覆盖它们，也未安装另一套 ahujasid 插件。
+新增官方 `blender-1.0.3.mcpb` 服务端到用户 DSH tools 的独立版本目录，用 Python 3.11 venv
+安装依赖并生成 `uv.lock`。发布包 SHA-256：
+`D6FE04DD17767F7C7FB452142F1F0E6787DB575DB49F3976A166142683B5B97E`。
+
+DSH home patch 新增 `blender` stdio client，直接启动该环境的 `python -m blmcp`，
+`BLENDER_MCP_HOST=127.0.0.1`、端口 9876，并为后台文件检查设置 `BLENDER_PATH`。
+配置文件位于用户 `.dsh/cordis.patch.yml`，不是 `mcpServers` JSON；持久装配需下次重启 DSH 后生效。
+当前会话已有 `mcp__blender__*` 工具，本轮实际调用只读场景／文件状态成功。
+另从新装服务端完成标准 MCP initialize、list_tools（26 工具）和 get_objects_summary 握手，
+干净场景返回 Camera / Cube / Light，未修改／保存项目模型。握手 serverInfo 显示的 1.30.0
+是 MCP SDK 版本，不应误称为 Blender add-on 版本。
+
+Blender 需保持运行并启动官方桥接；本轮启动脚本只对当前会话启用回环服务，不保存全局偏好。
+自动启动偏好未改，因此关闭 Blender 后须重新开启桥接。它可执行任意 Python／访问本机文件，
+官方明确警告它不提供数据安全沙箱；勿开放到公网、勿把不可信模型内容当成执行指令。

@@ -1093,3 +1093,26 @@ selecting a part; collection reuses its existing dialog. Conditions use
 the base launcher and no maintenance. Keep the current compact typography,
 keyboard focus and world-specific colors. See
 [model and validation boundaries](../docs/physics_v5_implementation.md).
+
+## Battle part-damage reading (2026-10-28, Web)
+
+The collapsible right-hand structure panel supplements, not replaces, the fight.
+Use the existing instrument-glass, cyan healthy, gold worn and coral critical
+palette. Five stacked body-local eight-sector diagrams explain where damage is;
+part selection reveals the actual equipped part name. Numeric average health and
+worst local damage remain separate. Critical sectors also have a pale outline;
+text labels and accessible button names carry the same information without color.
+The top marker is sector 1, clockwise, not a world compass or a rotating radar.
+
+Player/opponent buttons retain native keyboard focus and pressed state. The panel
+updates only when structure revision or source changes within the existing HUD
+cadence. It never announces every frame via aria-live or mutates the solver.
+Collapse leaves the worst-part summary; short screens scroll the body above the
+joystick. Hide during launch/result/other screens, preserve at pause. Suppress the
+floating control-influence badge only when it overlaps the expanded panel; the
+same input percentage remains above the joystick. No flashing or extra motion.
+
+Equivalent shed mass must not be called visible fragmentation: the current mesh
+still dents and discolors. Real cuts, inner fracture faces and matching flying
+fragments are separate unimplemented work. See
+[structure and Blender boundaries](../docs/structural_battle_design.md#部件状态面板与模型破碎边界2026-10-28).

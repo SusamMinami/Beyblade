@@ -1,0 +1,99 @@
+.battle-damage-panel { display: none; }
+.game-shell[data-screen="battle"] .battle-damage-panel:not([hidden]) {
+  display: block;
+  position: absolute;
+  top: 126px;
+  right: 16px;
+  width: 220px;
+  z-index: 6;
+  color: #dfebe7;
+  background: #10282e;
+  border: 1px solid #567378;
+  border-radius: 4px;
+  font-size: 11px;
+  line-height: 1.4;
+  font-variant-numeric: tabular-nums;
+  --damage-sound: #6adbc6;
+  --damage-light: #b9cf9c;
+  --damage-worn: #efc579;
+  --damage-heavy: #ff996d;
+  --damage-critical: #ff6e68;
+}
+.damage-panel-disclosure > summary {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 8px;
+  min-height: 34px;
+  padding: 6px 9px;
+  cursor: pointer;
+  font-weight: 600;
+  list-style: none;
+}
+.damage-panel-disclosure > summary::-webkit-details-marker { display: none; }
+.damage-panel-disclosure > summary::after { content: "+"; font-size: 16px; }
+.damage-panel-disclosure[open] > summary::after { content: "−"; }
+.damage-panel-overview { margin-left: auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 10px; font-weight: 400; }
+.damage-panel-disclosure > summary > span:first-child, .damage-panel-disclosure > summary::after { flex-shrink: 0; }
+.damage-panel-body { padding: 0 8px 8px; }
+.damage-panel-actors { display: flex; border-block: 1px solid #45636a; padding-block: 5px; gap: 4px; }
+.damage-panel-actors button { flex: 1; padding: 4px; background: transparent; color: #bed2d1; border: 1px solid transparent; border-radius: 2px; font: inherit; cursor: pointer; }
+.damage-panel-actors button[aria-pressed="true"] { color: #a7f4e3; background: #23494b; border-color: #6c9996; }
+.battle-damage-panel[data-actor="enemy"] .damage-panel-actors button[aria-pressed="true"] { color: #ffd4bc; background: #4b3533; border-color: #ad8171; }
+.damage-panel-columns { display: flex; justify-content: space-between; font-size: 10px; color: #b5cacc; margin: 7px 3px 3px; }
+.damage-panel-parts { display: grid; gap: 2px; }
+.damage-part {
+  display: grid;
+  grid-template-columns: 43px 1fr auto;
+  align-items: center;
+  gap: 5px;
+  min-height: 43px;
+  padding: 1px 5px 1px 0;
+  border: 1px solid transparent;
+  border-radius: 3px;
+  background: transparent;
+  color: #dfebe7;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
+}
+.damage-part[aria-pressed="true"] { border-color: #789a9d; background: #203e43; }
+.damage-part:hover { background: #29464a; }
+.damage-part-diagram { width: 40px; height: 40px; fill: var(--damage-sound); }
+.damage-part-coreLock { transform: scale(.7); }
+.damage-part-weightDisc { transform: scale(.85, .76); }
+.damage-part-driverShaft { transform: scale(.56, .85); }
+.damage-part-tip { transform: scale(.48, .6); }
+.damage-part-diagram [data-band="light"] { fill: var(--damage-light); }
+.damage-part-diagram [data-band="worn"] { fill: var(--damage-worn); }
+.damage-part-diagram [data-band="heavy"] { fill: var(--damage-heavy); }
+.damage-part-diagram [data-band="critical"] { fill: var(--damage-critical); stroke: #fff0d9; stroke-width: .7; }
+.damage-part-axis { fill: none; stroke: #bbd1d0; stroke-width: 1; }
+.damage-part-caption { display: grid; gap: 1px; }
+.damage-part-caption b { font-size: 11px; font-weight: 500; }
+.damage-part-caption small { color: #b5cacc; font-size: 10px; }
+.damage-part-health { font-size: 12px; font-weight: 600; }
+.damage-part[data-band="worn"] .damage-part-health, .damage-panel-overview[data-band="worn"] { color: var(--damage-worn); }
+.damage-part[data-band="heavy"] .damage-part-health, .damage-panel-overview[data-band="heavy"] { color: var(--damage-heavy); }
+.damage-part[data-band="critical"] .damage-part-health, .damage-panel-overview[data-band="critical"] { color: var(--damage-critical); }
+.damage-panel-detail { border-top: 1px solid #45636a; margin-top: 6px; padding: 7px 3px 0; display: grid; gap: 3px; }
+.damage-panel-detail b { font-weight: 500; }
+.damage-panel-local { color: #efc579; }
+.damage-panel-consequence { margin: 0; color: #b5cacc; font-size: 10px; line-height: 1.5; }
+.damage-panel-key { display: flex; gap: 4px; align-items: center; font-size: 9px; color: #c0d1d0; margin: 8px 3px 0; }
+.damage-panel-key i { width: 6px; height: 6px; background: var(--damage-sound); }
+.damage-panel-key i:nth-of-type(2) { background: var(--damage-worn); }
+.damage-panel-key i:nth-of-type(3) { background: var(--damage-heavy); }
+.damage-panel-key i:nth-of-type(4) { background: var(--damage-critical); }
+.damage-panel-note { margin: 5px 3px 0; font-size: 9px; color: #b5cacc; }
+.battle-damage-panel button:focus-visible, .damage-panel-disclosure > summary:focus-visible { outline: 2px solid #a7f4e3; outline-offset: 1px; }
+@media (max-width: 600px) {
+  .game-shell[data-screen="battle"] .battle-damage-panel:not([hidden]) { top: 124px; right: 10px; width: 190px; }
+  .damage-part { min-height: 36px; grid-template-columns: 34px 1fr auto; gap: 3px; }
+  .damage-part-diagram { width: 33px; height: 33px; }
+  .damage-panel-disclosure > summary { padding: 5px 7px; }
+}
+@media (max-height: 700px) {
+  .game-shell[data-screen="battle"] .battle-damage-panel:not([hidden]) { top: 112px; }
+  .damage-panel-body { max-height: max(100px, calc(100dvh - 390px)); overflow-y: auto; overscroll-behavior: contain; }
+}

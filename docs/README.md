@@ -73,7 +73,7 @@ npm run dev
 | 跨页面约战准备、暂停退出与结算建议 | `npm run verify:flow` |
 | 首次发射器改装、保存回滚、工具返回与短屏点击 | `npm run verify:continuity` |
 | 两场新手训练、改装参照与章节回信 | `npm run verify:growth` |
-| 结构损伤、供能、AI 与战斗反馈 | `npm run verify:structure`、`npm run verify:battle-ui` |
+| 结构损伤、供能、AI 与战斗反馈 | `npm run verify:structure`、`npm run verify:battle-ui`、`npm run verify:damage-panel` |
 | 物理姿态、发射预览、音频隔离与平局 | `npm test`、`npm run verify:physics` |
 | 共享 v6 地形、支点、恢复及跨端金标 | `npm run verify:physics-v6`，随后 Godot 运行 `tests/battle/physics_v6_parity.gd`、`physics_v6_scene.gd` |
 
